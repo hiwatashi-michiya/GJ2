@@ -35,6 +35,11 @@ void MoveCommand::SetMoveCommand(int32_t setNum) {
 			command = Guard;
 
 			break;
+		case Stop:
+
+			command = Stop;
+
+			break;
 
 		}
 
