@@ -11,9 +11,20 @@ void GameScene::Initialize() {
 	dxCommon_ = DirectXCommon::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
+
+	playerTex_ = TextureManager::Load("player/player.png");
+	playerSprite_.reset(Sprite::Create(playerTex_, {0.0f, 0.0f}));
+
+	player_ = std::make_unique<Player>();
+	player_->Initialize(playerSprite_.get());
+
 }
 
-void GameScene::Update() {}
+void GameScene::Update() {
+
+	player_->Update();
+
+}
 
 void GameScene::Draw() {
 
@@ -53,6 +64,7 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
+	player_->Draw();
 
 	// スプライト描画後処理
 	Sprite::PostDraw();
