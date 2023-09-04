@@ -7,6 +7,9 @@
 #include "TextureManager.h"
 #include "WinApp.h"
 
+#include"Option.h"
+#include"Gamepad.h"
+
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	WinApp* win = nullptr;
@@ -17,6 +20,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	AxisIndicator* axisIndicator = nullptr;
 	PrimitiveDrawer* primitiveDrawer = nullptr;
 	GameScene* gameScene = nullptr;
+
+	// 自作汎用機能
+	Option* option=new Option;
 
 	// ゲームウィンドウの作成
 	win = WinApp::GetInstance();
@@ -72,6 +78,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		imguiManager->Begin();
 		// 入力関連の毎フレーム処理
 		input->Update();
+		// オプションの取得
+		option->Update();
+		if (option->GetActionTrigger(JUMP)) {
+			break;
+		}
+		Gamepad::Draw();
 		// ゲームシーンの毎フレーム処理
 		gameScene->Update();
 		// 軸表示の更新
