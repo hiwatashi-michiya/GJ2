@@ -4,7 +4,6 @@
 #include <ImGuiManager.h>
 #endif // _DEBUG
 
-
 void Player::Initialize(Sprite* sprite) {
 
 	input_ = Input::GetInstance();
@@ -13,51 +12,35 @@ void Player::Initialize(Sprite* sprite) {
 	position_ = {640.0f, 500.0f, 0.0f};
 	velocity_ = {0.0f, 0.0f, 0.0f};
 	SetSpritePosition();
-
 }
 
 void Player::Update() {
 
 #ifdef _DEBUG
 
-	ImGui::Begin("State");
+	ImGui::Begin("PlayerState");
 	ImGui::Text("current Command %d", currentMoveCommand_);
+	ImGui::Text("move coolTime %d", coolTime_);
 	ImGui::End();
 
 #endif // _DEBUG
 
-
 	XINPUT_STATE joyState;
 
-	//リストの要素が空なら新たに設定する
+	// リストの要素が空なら新たに設定する
 	if (GetmoveCommands().empty()) {
 		SetMoveCommand(3);
-	}
-	else {
+	} else {
 
-		//リスト内が空でないなら行動開始
+		// リスト内が空でないなら行動開始
 		if (GetmoveCommands().empty() == false) {
 
-			//ゲームパッドの取得
+			// ゲームパッドの取得
 			if (input_->GetJoystickState(0, joyState)) {
 
-				if ((input_->TriggerKey(DIK_SPACE) || joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) && isMove_ == false) {
-
-					//次の行動コマンドを現在の行動コマンドに設定
-					currentMoveCommand_ = GetNextCommand();
-					//先頭の行動コマンドを削除
-					PopMoveCommand();
-					//行動開始フラグを立てる
-					MoveTimer_ = kMoveTime;
-					isMove_ = true;
-
-				}
-
-			}
-			//キーボードの場合
-			else {
-
-				if (input_->TriggerKey(DIK_SPACE) && isMove_ == false) {
+				if ((input_->TriggerKey(DIK_SPACE) ||
+				     joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) &&
+				    isMove_ == false && isCoolTime == false) {
 
 					// 次の行動コマンドを現在の行動コマンドに設定
 					currentMoveCommand_ = GetNextCommand();
@@ -69,18 +52,28 @@ void Player::Update() {
 				}
 
 			}
+			// キーボードの場合
+			else {
 
+				if (input_->TriggerKey(DIK_SPACE) && isMove_ == false && isCoolTime == false) {
+
+					// 次の行動コマンドを現在の行動コマンドに設定
+					currentMoveCommand_ = GetNextCommand();
+					// 先頭の行動コマンドを削除
+					PopMoveCommand();
+					// 行動開始フラグを立てる
+					MoveTimer_ = kMoveTime;
+					isMove_ = true;
+				}
+			}
 		}
-
 	}
 
 	// 行動フラグが立っていたら行動開始
 	if (isMove_) {
 		Move(currentMoveCommand_);
 	} else {
-		
 	}
-
 }
 
 void Player::Move(Command command) {
@@ -88,7 +81,9 @@ void Player::Move(Command command) {
 	switch (command) {
 	case MoveLeft:
 
-		velocity_ = {-1.0f, 0.0f, 0.0f};
+		if (MoveTimer_ == 60) {
+			velocity_ = {-1.0f, 0.0f, 0.0f};
+		}
 
 		position_ += velocity_;
 		SetSpritePosition();
@@ -96,7 +91,9 @@ void Player::Move(Command command) {
 		break;
 	case MoveRight:
 
-		velocity_ = {1.0f, 0.0f, 0.0f};
+		if (MoveTimer_ == 60) {
+			velocity_ = {1.0f, 0.0f, 0.0f};
+		}
 
 		position_ += velocity_;
 		SetSpritePosition();
@@ -118,7 +115,7 @@ void Player::Move(Command command) {
 
 		velocity_ = {0.0f, 0.0f, 0.0f};
 
-		//赤に設定
+		// 赤に設定
 		playerSprite_->SetColor({1.0f, 0.0f, 0.0f, 1.0f});
 
 		break;
@@ -146,15 +143,17 @@ void Player::Move(Command command) {
 	SetSpritePosition();
 
 	if (--MoveTimer_ <= 0) {
+		velocity_ = {0.0f, 0.0f, 0.0f};
 		playerSprite_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
-		velocity_.y = 0.0f;
-		isMove_ = false;
+		isCoolTime = true;
 	}
-
+	if (isCoolTime) {
+		if (--coolTime_ <= 0) {
+			coolTime_ = kPlayerCoolTime_;
+			isCoolTime = false;
+			isMove_ = false;
+		}
+	}
 }
 
-void Player::Draw() {
-
-	playerSprite_->Draw();
-
-}
+void Player::Draw() { playerSprite_->Draw(); }

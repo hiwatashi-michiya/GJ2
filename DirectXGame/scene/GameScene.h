@@ -2,13 +2,14 @@
 
 #include "Audio.h"
 #include "DirectXCommon.h"
+#include "Enemy.h"
 #include "Input.h"
 #include "Model.h"
+#include "Player.h"
 #include "SafeDelete.h"
 #include "Sprite.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
-#include "Player.h"
 #include <memory>
 
 /// <summary>
@@ -50,12 +51,14 @@ private: // メンバ変数
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>
-	
-	std::unique_ptr<Player> player_ = nullptr;
 
-	//画像
+	std::unique_ptr<Player> player_ = nullptr;
+	std::unique_ptr<Enemy> enemy_ = nullptr;
+
+	// 画像
 	std::unique_ptr<Sprite> playerSprite_;
+	std::unique_ptr<Sprite> enemySprite_;
 
 	uint32_t playerTex_ = 0u;
-
+	uint32_t enemyTex_ = 0u;
 };
