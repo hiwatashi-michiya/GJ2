@@ -5,6 +5,10 @@
 #include <Vector3.h>
 #include <memory>
 #include <Input.h>
+#include <Model.h>
+#include <vector>
+#include <WorldTransform.h>
+#include <ViewProjection.h>
 
 class Player : public MoveCommand {
 public:
@@ -23,12 +27,32 @@ public:
 	/// <summary>
 	/// 描画
 	/// </summary>
-	void Draw();
+	void Draw(const ViewProjection& viewProjection);
+
+	/// <summary>
+	/// モデル配列のセット
+	/// </summary>
+	/// <param name="models">モデル配列</param>
+	void SetModels(const std::vector<Model*>& models) { models_ = models; }
+
+	/// <summary>
+	/// 画像配列のセット
+	/// </summary>
+	/// <param name="textures">画像配列</param>
+	void SetTextures(const std::vector<uint32_t>& textures) {
+
+		textures_ = textures;
+		currentTex_ = textures_[0];
+
+	}
 
 private:
 
 	//入力
 	Input* input_ = nullptr;
+
+	//プレイヤーのワールドトランスフォーム
+	WorldTransform worldTransform_;
 
 	//描画位置(中央)
 	Vector3 position_;
@@ -52,6 +76,15 @@ private:
 
 	//スプライト
 	Sprite* playerSprite_;
+
+	//モデル
+	std::vector<Model*> models_;
+
+	//画像
+	std::vector<uint32_t> textures_;
+
+	//現在セットしている画像
+	uint32_t currentTex_ = 0u;
 
 	//画像位置設定。ポジションの変更後に使用
 	void SetSpritePosition() {

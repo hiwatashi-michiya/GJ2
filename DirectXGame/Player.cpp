@@ -13,6 +13,7 @@ void Player::Initialize(Sprite* sprite) {
 	position_ = {640.0f, 500.0f, 0.0f};
 	velocity_ = {0.0f, 0.0f, 0.0f};
 	SetSpritePosition();
+	worldTransform_.Initialize();
 
 }
 
@@ -81,6 +82,8 @@ void Player::Update() {
 		
 	}
 
+	worldTransform_.UpdateMatrix();
+
 }
 
 void Player::Move(Command command) {
@@ -88,29 +91,32 @@ void Player::Move(Command command) {
 	switch (command) {
 	case MoveLeft:
 
-		velocity_ = {-1.0f, 0.0f, 0.0f};
+		velocity_ = {-1.0f / 6.0f, 0.0f, 0.0f};
 
 		position_ += velocity_;
+		worldTransform_.translation_ += velocity_;
 		SetSpritePosition();
 
 		break;
 	case MoveRight:
 
-		velocity_ = {1.0f, 0.0f, 0.0f};
+		velocity_ = {1.0f / 6.0f, 0.0f, 0.0f};
 
 		position_ += velocity_;
+		worldTransform_.translation_ += velocity_;
 		SetSpritePosition();
 
 		break;
 	case Jump:
 
-		if (MoveTimer_ == 60) {
+		/*if (MoveTimer_ == 60) {
 			velocity_ -= {0.0f, 15.0f, 0.0f};
 		}
 
-		velocity_ += {0.0f, 0.5f, 0.0f};
+		velocity_ += {0.0f, 0.5f, 0.0f};*/
 
 		position_ += velocity_;
+		currentTex_ = textures_[0];
 		SetSpritePosition();
 
 		break;
@@ -120,6 +126,7 @@ void Player::Move(Command command) {
 
 		//赤に設定
 		playerSprite_->SetColor({1.0f, 0.0f, 0.0f, 1.0f});
+		currentTex_ = textures_[1];
 
 		break;
 	case Guard:
@@ -128,6 +135,7 @@ void Player::Move(Command command) {
 
 		// 青に設定
 		playerSprite_->SetColor({0.0f, 0.0f, 1.0f, 1.0f});
+		currentTex_ = textures_[2];
 
 		break;
 	default:
@@ -137,6 +145,7 @@ void Player::Move(Command command) {
 
 		// 緑に設定
 		playerSprite_->SetColor({0.0f, 1.0f, 0.0f, 1.0f});
+		currentTex_ = textures_[3];
 
 		break;
 	}
@@ -148,13 +157,14 @@ void Player::Move(Command command) {
 	if (--MoveTimer_ <= 0) {
 		playerSprite_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 		velocity_.y = 0.0f;
+		currentTex_ = textures_[0];
 		isMove_ = false;
 	}
 
 }
 
-void Player::Draw() {
+void Player::Draw(const ViewProjection& viewProjection) {
 
-	playerSprite_->Draw();
+	models_[0]->Draw(worldTransform_, viewProjection, currentTex_);
 
 }
