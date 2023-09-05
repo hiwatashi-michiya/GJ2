@@ -88,7 +88,9 @@ void Player::Move(Command command) {
 	switch (command) {
 	case MoveLeft:
 
-		velocity_ = {-1.0f, 0.0f, 0.0f};
+		if (MoveTimer_ == 60) {
+			velocity_ = {-1.0f, 0.0f, 0.0f};
+		}
 
 		position_ += velocity_;
 		SetSpritePosition();
@@ -96,7 +98,9 @@ void Player::Move(Command command) {
 		break;
 	case MoveRight:
 
-		velocity_ = {1.0f, 0.0f, 0.0f};
+		if (MoveTimer_ == 60) {
+				velocity_ = {1.0f, 0.0f, 0.0f};
+		}
 
 		position_ += velocity_;
 		SetSpritePosition();
@@ -108,15 +112,12 @@ void Player::Move(Command command) {
 			velocity_ -= {0.0f, 15.0f, 0.0f};
 		}
 
-		velocity_ += {0.0f, 0.5f, 0.0f};
-
+		velocity_ -= {0.0f, 5.0f, 0.0f};
 		position_ += velocity_;
 		SetSpritePosition();
 
 		break;
 	case Attack:
-
-		velocity_ = {0.0f, 0.0f, 0.0f};
 
 		//赤に設定
 		playerSprite_->SetColor({1.0f, 0.0f, 0.0f, 1.0f});
@@ -124,16 +125,12 @@ void Player::Move(Command command) {
 		break;
 	case Guard:
 
-		velocity_ = {0.0f, 0.0f, 0.0f};
-
 		// 青に設定
 		playerSprite_->SetColor({0.0f, 0.0f, 1.0f, 1.0f});
 
 		break;
 	default:
 	case Stop:
-
-		velocity_ = {0.0f, 0.0f, 0.0f};
 
 		// 緑に設定
 		playerSprite_->SetColor({0.0f, 1.0f, 0.0f, 1.0f});
@@ -146,8 +143,8 @@ void Player::Move(Command command) {
 	SetSpritePosition();
 
 	if (--MoveTimer_ <= 0) {
+		velocity_ = {0.0f, 0.0f, 0.0f};
 		playerSprite_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
-		velocity_.y = 0.0f;
 		isMove_ = false;
 	}
 
