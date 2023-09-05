@@ -22,6 +22,7 @@ void GameScene::Initialize() {
 	//3Dライン描画のビュープロジェクション設定
 	primitiveDrawer_->SetViewProjection(&viewProjection_);
 
+	enemyTex_ = TextureManager::Load("enemy/enemy.png");
 	redTex_ = TextureManager::Load("player/red.png");
 	greenTex_ = TextureManager::Load("player/green.png");
 	blueTex_ = TextureManager::Load("player/blue.png");
@@ -36,11 +37,18 @@ void GameScene::Initialize() {
 	player_ = std::make_unique<Player>();
 	player_->Initialize(playerModels, playerTextures);
 
+	enemyModel_.reset(Model::Create());
+	std::vector<Model*> enemyModels{enemyModel_.get()};
+	std::vector<uint32_t> enemyTextures{enemyTex_, redTex_, greenTex_, blueTex_, numberTex_};
+	enemy_ = std::make_unique<Enemy>();
+	enemy_->Initialize(enemyModels, enemyTextures);
+
 }
 
 void GameScene::Update() {
 
 	player_->Update();
+	enemy_->Update();
 
 	// ビュープロジェクション更新
 	viewProjection_.UpdateMatrix();
@@ -74,6 +82,7 @@ void GameScene::Draw() {
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
 	player_->Draw(viewProjection_);
+	enemy_->Draw(viewProjection_);
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
@@ -88,6 +97,7 @@ void GameScene::Draw() {
 	/// </summary>
 
 	player_->DrawUI();
+	enemy_->DrawUI();
 
 	for (int i = 0; i < 11; i++) {
 
