@@ -56,10 +56,12 @@ void Option::Update(const ViewProjection& viewprojection) {
 	ImGui::Text("Cursor_Y = %d", m_cursorPos.y);
 	ImGui::DragInt("Jump", &m_InputButton[ActCode::JUMP], 1.0f, 0, 15);
 	ImGui::End();
+	Gamepad::Draw();
 }
 
 void Option::Draw() 
 {
+	
 	m_cursorSprite->Draw();
 }
 
