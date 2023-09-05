@@ -6,7 +6,7 @@ enum Command {
 	MoveRight,
 	MoveUp,
 	MoveDown,
-	Jump,
+	AttackCross,
 	Attack,
 	Guard,
 	Stop

@@ -26,7 +26,7 @@ void GameScene::Initialize() {
 	redTex_ = TextureManager::Load("player/red.png");
 	greenTex_ = TextureManager::Load("player/green.png");
 	blueTex_ = TextureManager::Load("player/blue.png");
-	numberTex_ = TextureManager::Load("UI/number.png");
+	numberTex_ = TextureManager::Load("UI/command.png");
 
 	playerTex_ = TextureManager::Load("player/player.png");
 	playerSprite_.reset(Sprite::Create(playerTex_, {0.0f, 0.0f}));
@@ -67,13 +67,13 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに背景スプライトの描画処理を追加できる
 	/// </summary>
-	for (int i = 0; i < 11; i++) {
+	for (int i = 0; i < 7; i++) {
 
-		float distance = 10 * i - 50.0f;
-		Vector3 lineStartX{-50.0f, 0.0f, distance};
-		Vector3 lineEndX{50.0f, 0.0f, distance};
-		Vector3 lineStartZ{distance, 0.0f, -50.0f};
-		Vector3 lineEndZ{distance, 0.0f, 50.0f};
+		float distance = 10 * i - 30.0f;
+		Vector3 lineStartX{-30.0f, 0.0f, distance};
+		Vector3 lineEndX{30.0f, 0.0f, distance};
+		Vector3 lineStartZ{distance, 0.0f, -30.0f};
+		Vector3 lineEndZ{distance, 0.0f, 30.0f};
 		primitiveDrawer_->DrawLine3d(lineStartX, lineEndX, {1.0f, 1.0f, 1.0f, 1.0f});
 		primitiveDrawer_->DrawLine3d(lineStartZ, lineEndZ, {1.0f, 1.0f, 1.0f, 1.0f});
 	}

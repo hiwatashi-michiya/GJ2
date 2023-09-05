@@ -16,8 +16,8 @@ void Player::Initialize(const std::vector<Model*>& models, const std::vector<uin
 
 	for (int i = 0; i < kMaxCommand; i++) {
 		commandNumSprite_[i].reset(Sprite::Create(textures_[4], {0.0f, 0.0f}));
-		commandNumSprite_[i]->SetSize({32.0f, 64.0f});
-		commandNumSprite_[i]->SetTextureRect({0.0f,0.0f,}, {32.0f,64.0f});
+		commandNumSprite_[i]->SetSize({64.0f, 64.0f});
+		commandNumSprite_[i]->SetTextureRect({0.0f,0.0f,}, {64.0f,64.0f});
 		commandNumSprite_[i]->SetPosition({10.0f, (kMaxCommand - 1 - i) * 64.0f + 10.0f});
 
 	}
@@ -25,8 +25,8 @@ void Player::Initialize(const std::vector<Model*>& models, const std::vector<uin
 	for (int i = 0; i < kMaxSelectNum; i++) {
 
 		selectCommandNumSprite_[i].reset(Sprite::Create(textures_[4], {0.0f, 0.0f}));
-		selectCommandNumSprite_[i]->SetSize({32.0f, 64.0f});
-		selectCommandNumSprite_[i]->SetTextureRect({0.0f,0.0f,}, {32.0f,64.0f});
+		selectCommandNumSprite_[i]->SetSize({64.0f, 64.0f});
+		selectCommandNumSprite_[i]->SetTextureRect({0.0f,0.0f,}, {64.0f,64.0f});
 		selectCommandNumSprite_[i]->SetPosition({i * 64.0f + 300.0f, 600.0f});
 
 	}
@@ -37,6 +37,8 @@ void Player::Initialize(const std::vector<Model*>& models, const std::vector<uin
 
 	velocity_ = {0.0f, 0.0f, 0.0f};
 	worldTransform_.Initialize();
+	worldTransform_.translation_ = Vector3(-25.0f, 2.0f, 5.0f);
+	worldTransform_.UpdateMatrix();
 	SetSelectCommands(kMaxSelectNum);
 
 }
@@ -223,7 +225,7 @@ void Player::Move(Command command) {
 		worldTransform_.translation_ += velocity_;
 
 		break;
-	case Jump:
+	case AttackCross:
 
 		currentTex_ = textures_[0];
 
@@ -252,8 +254,8 @@ void Player::Move(Command command) {
 		break;
 	}
 
-	worldTransform_.translation_.x = Clamp(worldTransform_.translation_.x, -50.0f, 50.0f);
-	worldTransform_.translation_.z = Clamp(worldTransform_.translation_.z, -50.0f, 50.0f);
+	worldTransform_.translation_.x = Clamp(worldTransform_.translation_.x, -25.0f, 25.0f);
+	worldTransform_.translation_.z = Clamp(worldTransform_.translation_.z, -25.0f, 25.0f);
 
 	if (--MoveTimer_ <= 0) {
 		velocity_.y = 0.0f;
@@ -295,7 +297,7 @@ void Player::UpdateMoveCommandsNum() {
 
 		int num = *itr;
 
-		commandNumSprite_[i]->SetTextureRect({num * 32.0f, 0.0f}, {32.0f, 64.0f});
+		commandNumSprite_[i]->SetTextureRect({num * 64.0f, 0.0f}, {64.0f, 64.0f});
 	}
 
 	for (int i = 0; i < selectCommands_.size(); i++) {
@@ -308,7 +310,7 @@ void Player::UpdateMoveCommandsNum() {
 
 		int num = *itr;
 
-		selectCommandNumSprite_[i]->SetTextureRect({num * 32.0f, 0.0f}, {32.0f, 64.0f});
+		selectCommandNumSprite_[i]->SetTextureRect({num * 64.0f, 0.0f}, {64.0f, 64.0f});
 
 	}
 
