@@ -4,50 +4,179 @@
 #include <ImGuiManager.h>
 #endif // _DEBUG
 
-void Enemy::Initialize(Model* model, Sprite* sprite) {
+void Enemy::Initialize(const std::vector<Model*>& models, const std::vector<uint32_t>& textures) {
 
 	input_ = Input::GetInstance();
 
-	model_ = model;
-	enemySprite_ = sprite;
+	SetModels(models);
+	SetTextures(textures);
 
+	currentTex_ = textures_[0];
+
+	for (int i = 0; i < kMaxCommand; i++) {
+		commandNumSprite_[i].reset(Sprite::Create(textures_[4], {0.0f, 0.0f}));
+		commandNumSprite_[i]->SetSize({32.0f, 64.0f});
+		commandNumSprite_[i]->SetTextureRect(
+		    {
+		        0.0f,
+		        0.0f,
+		    },
+		    {32.0f, 64.0f});
+		commandNumSprite_[i]->SetPosition({10.0f, (kMaxCommand - 1 - i) * 64.0f + 10.0f});
+	}
+
+	for (int i = 0; i < kMaxSelectNum; i++) {
+
+		selectCommandNumSprite_[i].reset(Sprite::Create(textures_[4], {0.0f, 0.0f}));
+		selectCommandNumSprite_[i]->SetSize({32.0f, 64.0f});
+		selectCommandNumSprite_[i]->SetTextureRect(
+		    {
+		        0.0f,
+		        0.0f,
+		    },
+		    {32.0f, 64.0f});
+		selectCommandNumSprite_[i]->SetPosition({i * 64.0f + 300.0f, 600.0f});
+	}
+
+	currentNumSprite_.reset(Sprite::Create(textures_[0], {0.0f, 0.0f}));
+	currentNumSprite_->SetSize({16.0f, 16.0f});
+	currentNumSprite_->SetPosition({selectNum_ * 64.0f + 316.0f, 550.0f});
+
+	velocity_ = {0.0f, 0.0f, 0.0f};
 	worldTransform_.Initialize();
-	worldTransform_.translation_ = {0.0f, 0.0f, 0.0f};
-	position_ = {640.0f, 500.0f, 0.0f};
-	spriteVelocity_ = {0.0f, 0.0f, 0.0f};
-	modelVelocity_ = {0.0f, 0.0f, 0.0f};
-	SetSpritePosition();
-
+	SetSelectCommands(kMaxSelectNum);
 }
 
 void Enemy::Update() {
 
 #ifdef _DEBUG
 
-	ImGui::Begin("EnemyState");
+	ImGui::Begin("State");
 	ImGui::Text("current Command %d", currentMoveCommand_);
-	ImGui::Text("move coolTime %d", coolTime_);
 	ImGui::End();
 
 #endif // _DEBUG
 
+	XINPUT_STATE joyState;
+
+	if (inputCoolTimer_ > 0) {
+		inputCoolTimer_--;
+	}
+
 	// リストの要素が空なら新たに設定する
-	if (GetmoveCommands().empty()) {
-		SetMoveCommand(3);
+	if (isSelect_) {
+
+		if (input_->GetJoystickState(0, joyState)) {
+
+			if ((input_->PushKey(DIK_LEFT) ||
+			     joyState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER) &&
+			    inputCoolTimer_ == 0) {
+
+				if (selectNum_ > 0) {
+					selectNum_--;
+				}
+
+				inputCoolTimer_ = kInputCoolTime;
+
+			}
+
+			else if (
+			    (input_->PushKey(DIK_RIGHT) ||
+			     joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) &&
+			    inputCoolTimer_ == 0) {
+
+				if (selectNum_ < selectCommands_.size() - 1) {
+					selectNum_++;
+				}
+
+				inputCoolTimer_ = kInputCoolTime;
+			}
+
+			if ((input_->PushKey(DIK_E) || joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) &&
+			    inputCoolTimer_ == 0 && moveCommands_.size() < kMaxCommand) {
+
+				SetMoveCommand(selectNum_);
+				PopSelectCommand(selectNum_);
+
+				inputCoolTimer_ = kInputCoolTime;
+
+			} else if (
+			    (input_->PushKey(DIK_E) || joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) &&
+			    inputCoolTimer_ == 0) {
+				isSelect_ = false;
+				inputCoolTimer_ = kInputCoolTime;
+			}
+
+			if ((input_->PushKey(DIK_Q) || joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B) &&
+			    inputCoolTimer_ == 0 && moveCommands_.size() != 0) {
+				PushSelectCommand(moveCommands_.back());
+				PopBackMoveCommand();
+				inputCoolTimer_ = kInputCoolTime;
+			}
+
+			if (selectNum_ >= selectCommands_.size()) {
+				selectNum_ = int(selectCommands_.size() - 1);
+			}
+		}
+
+		UpdateMoveCommandsNum();
 	} else {
 
 		// リスト内が空でないなら行動開始
-		if (GetmoveCommands().empty() == false) {
-			if (isMove_ == false && isCoolTime == false) {
+		if (moveCommands_.empty() == false) {
 
+			if (isMove_ == false) {
 				// 次の行動コマンドを現在の行動コマンドに設定
 				currentMoveCommand_ = GetNextCommand();
 				// 先頭の行動コマンドを削除
-				PopMoveCommand();
+				PopFrontMoveCommand();
+				// 数字更新
+				UpdateMoveCommandsNum();
 				// 行動開始フラグを立てる
 				MoveTimer_ = kMoveTime;
 				isMove_ = true;
 			}
+
+			////ゲームパッドの取得
+			// if (input_->GetJoystickState(0, joyState)) {
+
+			//	if ((input_->TriggerKey(DIK_SPACE) || joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A)
+			//&& isMove_ == false) {
+
+			//		//次の行動コマンドを現在の行動コマンドに設定
+			//		currentMoveCommand_ = GetNextCommand();
+			//		//先頭の行動コマンドを削除
+			//		PopFrontMoveCommand();
+			//		//数字更新
+			//		UpdateMoveCommandsNum();
+			//		//行動開始フラグを立てる
+			//		MoveTimer_ = kMoveTime;
+			//		isMove_ = true;
+
+			//	}
+
+			//}
+			////キーボードの場合
+			// else {
+
+			//	if (input_->TriggerKey(DIK_SPACE) && isMove_ == false) {
+
+			//		// 次の行動コマンドを現在の行動コマンドに設定
+			//		currentMoveCommand_ = GetNextCommand();
+			//		// 先頭の行動コマンドを削除
+			//		PopFrontMoveCommand();
+			//		// 数字更新
+			//		UpdateMoveCommandsNum();
+			//		// 行動開始フラグを立てる
+			//		MoveTimer_ = kMoveTime;
+			//		isMove_ = true;
+			//	}
+
+			//}
+
+		} else {
+			SetSelectCommands(kMaxSelectNum);
+			isSelect_ = true;
 		}
 	}
 
@@ -56,6 +185,8 @@ void Enemy::Update() {
 		Move(currentMoveCommand_);
 	} else {
 	}
+
+	worldTransform_.UpdateMatrix();
 }
 
 void Enemy::Move(Command command) {
@@ -63,94 +194,116 @@ void Enemy::Move(Command command) {
 	switch (command) {
 	case MoveLeft:
 
-		if (MoveTimer_ == 60) {
-			spriteVelocity_ = {-1.0f, 0.0f, 0.0f};
-			modelVelocity_ = {-0.1f, 0.0f, 0.0f};
-		}
+		velocity_ = {-1.0f / 6.0f, 0.0f, 0.0f};
 
-		position_ += spriteVelocity_;
-		worldTransform_.translation_ += modelVelocity_;
-		SetSpritePosition();
+		worldTransform_.translation_ += velocity_;
 
 		break;
 	case MoveRight:
 
-		if (MoveTimer_ == 60) {
-			spriteVelocity_ = {1.0f, 0.0f, 0.0f};
-			modelVelocity_ = {0.1f, 0.0f, 0.0f};
-		}
+		velocity_ = {1.0f / 6.0f, 0.0f, 0.0f};
 
-		position_ += spriteVelocity_;
-		worldTransform_.translation_ += modelVelocity_;
-		SetSpritePosition();
+		worldTransform_.translation_ += velocity_;
+
+		break;
+	case MoveUp:
+
+		velocity_ = {0.0f, 0.0f, 1.0f / 6.0f};
+
+		worldTransform_.translation_ += velocity_;
+
+		break;
+	case MoveDown:
+
+		velocity_ = {0.0f, 0.0f, -1.0f / 6.0f};
+
+		worldTransform_.translation_ += velocity_;
 
 		break;
 	case Jump:
 
-		if (MoveTimer_ == 60) {
-			spriteVelocity_ -= {0.0f, 15.0f, 0.0f};
-			modelVelocity_ -= {0.0f, 0.5f, 0.0f};
-		}
-
-		spriteVelocity_ += {0.0f, 0.5f, 0.0f};
-		modelVelocity_ += {0.0f, 0.0155f, 0.0f};
-
-		position_ += spriteVelocity_;
-		worldTransform_.translation_ -= modelVelocity_;
-		SetSpritePosition();
+		currentTex_ = textures_[0];
 
 		break;
 	case Attack:
 
-		// 赤に設定
-		enemySprite_->SetColor({1.0f, 0.0f, 0.0f, 1.0f});
+		velocity_ = {0.0f, 0.0f, 0.0f};
+
+		currentTex_ = textures_[1];
 
 		break;
 	case Guard:
 
-		// 青に設定
-		enemySprite_->SetColor({0.0f, 0.0f, 1.0f, 1.0f});
+		velocity_ = {0.0f, 0.0f, 0.0f};
+
+		currentTex_ = textures_[2];
 
 		break;
 	default:
 	case Stop:
 
-		spriteVelocity_ = {0.0f, 0.0f, 0.0f};
-		modelVelocity_ = {0.0f, 0.0f, 0.0f};
+		velocity_ = {0.0f, 0.0f, 0.0f};
 
-		// 緑に設定
-		enemySprite_->SetColor({0.0f, 1.0f, 0.0f, 1.0f});
+		currentTex_ = textures_[3];
 
 		break;
 	}
 
-	position_.x = Clamp(position_.x, 32.0f, 1248.0f);
-	position_.y = Clamp(position_.y, 0.0f, 500.0f);
-	SetSpritePosition();
-
-	// WorldTransformの更新
-	worldTransform_.translation_.x = Clamp(worldTransform_.translation_.x, -20.0f, 20.0f);
-	worldTransform_.translation_.y = Clamp(worldTransform_.translation_.y, -20.0f, 20.0f);
-	worldTransform_.UpdateMatrix();
+	worldTransform_.translation_.x = Clamp(worldTransform_.translation_.x, -50.0f, 50.0f);
+	worldTransform_.translation_.z = Clamp(worldTransform_.translation_.z, -50.0f, 50.0f);
 
 	if (--MoveTimer_ <= 0) {
-		spriteVelocity_ = {0.0f, 0.0f, 0.0f};
-		modelVelocity_ = {0.0f, 0.0f, 0.0f};
-		enemySprite_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
-		isCoolTime = true;
-	}
-	if (isCoolTime) {
-		if (--coolTime_ <= 0) {
-			coolTime_ = kEnemyCoolTime_;
-			isCoolTime = false;
-			isMove_ = false;
-		}
+		velocity_.y = 0.0f;
+		currentTex_ = textures_[0];
+		isMove_ = false;
 	}
 }
 
-void Enemy::DrawSprite() {
-	enemySprite_->Draw();
+void Enemy::Draw(const ViewProjection& viewProjection) {
+
+	models_[0]->Draw(worldTransform_, viewProjection, currentTex_);
 }
-void Enemy::DrawModel(ViewProjection& viewProjection) {
-	model_->Draw(worldTransform_, viewProjection);
+
+void Enemy::DrawUI() {
+
+	for (int i = 0; i < GetmoveCommands().size(); i++) {
+		commandNumSprite_[i]->Draw();
+	}
+
+	for (int i = 0; i < selectCommands_.size(); i++) {
+		selectCommandNumSprite_[i]->Draw();
+	}
+
+	currentNumSprite_->Draw();
+}
+
+void Enemy::UpdateMoveCommandsNum() {
+
+	for (int i = 0; i < moveCommands_.size(); i++) {
+
+		auto itr = moveCommands_.begin();
+
+		for (int k = 0; k < i; k++) {
+			itr++;
+		}
+
+		int num = *itr;
+
+		commandNumSprite_[i]->SetTextureRect({num * 32.0f, 0.0f}, {32.0f, 64.0f});
+	}
+
+	for (int i = 0; i < selectCommands_.size(); i++) {
+
+		auto itr = selectCommands_.begin();
+
+		for (int k = 0; k < i; k++) {
+			itr++;
+		}
+
+		int num = *itr;
+
+		selectCommandNumSprite_[i]->SetTextureRect({num * 32.0f, 0.0f}, {32.0f, 64.0f});
+	}
+
+	currentNumSprite_->SetPosition({selectNum_ * 64.0f + 316.0f, 550.0f});
 }

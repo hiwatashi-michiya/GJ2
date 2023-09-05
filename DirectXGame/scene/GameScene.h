@@ -13,6 +13,7 @@
 #include "Player.h"
 #include "Enemy.h"
 #include <memory>
+#include "PrimitiveDrawer.h"
 
 /// <summary>
 /// ゲームシーン
@@ -52,9 +53,11 @@ private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
 	Audio* audio_ = nullptr;
+	PrimitiveDrawer* primitiveDrawer_ = nullptr;
 
-	// 3Dモデル
-	std::unique_ptr<Model> enemyModel_ = nullptr;
+	/// <summary>
+	/// ゲームシーン用
+	/// </summary>
 
 	// ビュープロジェクション
 	ViewProjection viewProjection_;
@@ -62,17 +65,21 @@ private: // メンバ変数
 	// デバッグカメラ
 	DebugCamera* debugCamera_ = nullptr;
 
-	/// <summary>
-	/// ゲームシーン用
-	/// </summary>
+	// 画像
+	std::unique_ptr<Sprite> playerSprite_;
+	uint32_t playerTex_ = 0u;
+	std::unique_ptr<Sprite> enemySprite_;
+	uint32_t enemyTex_ = 0u;
+	uint32_t redTex_ = 0u;
+	uint32_t greenTex_ = 0u;
+	uint32_t blueTex_ = 0u;
+	uint32_t numberTex_ = 0u;
+
+	// 3Dモデル
+	std::unique_ptr<Model> playerModel_ = nullptr;
+	std::unique_ptr<Model> enemyModel_ = nullptr;
 
 	std::unique_ptr<Player> player_ = nullptr;
 	std::unique_ptr<Enemy> enemy_ = nullptr;
 
-	// 画像
-	std::unique_ptr<Sprite> playerSprite_;
-	std::unique_ptr<Sprite> enemySprite_;
-
-	uint32_t playerTex_ = 0u;
-	uint32_t enemyTex_ = 0u;
 };

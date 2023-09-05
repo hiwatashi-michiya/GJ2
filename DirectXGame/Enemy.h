@@ -1,13 +1,14 @@
 #pragma once
 #include "MoveCommand.h"
 #include <Input.h>
+#include <Model.h>
 #include <Sprite.h>
 #include <TextureManager.h>
 #include <Vector3.h>
+#include <ViewProjection.h>
+#include <WorldTransform.h>
 #include <memory>
-#include "Model.h"
-#include "ViewProjection.h"
-#include "WorldTransform.h"
+#include <vector>
 
 class Enemy : public MoveCommand {
 public:
@@ -15,7 +16,7 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <param name="sprite">スプライト</param>
-	void Initialize(Model* model, Sprite* sprite);
+	void Initialize(const std::vector<Model*>& models, const std::vector<uint32_t>& textures);
 
 	/// <summary>
 	/// 更新
@@ -25,35 +26,39 @@ public:
 	/// <summary>
 	/// 描画
 	/// </summary>
-	void DrawSprite();
-	void DrawModel(ViewProjection& viewProjection);
+	void Draw(const ViewProjection& viewProjection);
 
-	void SetViewProjection(const ViewProjection* viewProjection) {
-		viewProjection_ = viewProjection;
-	}
+	/// <summary>
+	/// UI描画
+	/// </summary>
+	void DrawUI();
+
+	/// <summary>
+	/// モデル配列のセット
+	/// </summary>
+	/// <param name="models">モデル配列</param>
+	void SetModels(const std::vector<Model*>& models) { models_ = models; }
+
+	/// <summary>
+	/// 画像配列のセット
+	/// </summary>
+	/// <param name="textures">画像配列</param>
+	void SetTextures(const std::vector<uint32_t>& textures) { textures_ = textures; }
 
 private:
-	// ワールド変換データ
-	WorldTransform worldTransform_;
-
-	// テクスチャハンドル
-	uint32_t textureHandle_ = 0u;
-
-	// モデル
-	Model* model_ = nullptr;
-
 	// 入力
 	Input* input_ = nullptr;
 
-	// カメラのビュープロジェクション
-	const ViewProjection* viewProjection_ = nullptr;
+	// 入力クールタイム
+	const int kInputCoolTime = 15;
 
-	// 描画位置(中央)
-	Vector3 position_;
+	int inputCoolTimer_ = 0;
+
+	// プレイヤーのワールドトランスフォーム
+	WorldTransform worldTransform_;
 
 	// 速度
-	Vector3 spriteVelocity_;
-	Vector3 modelVelocity_;
+	Vector3 velocity_;
 
 	// 現在の行動コマンド
 	Command currentMoveCommand_ = Stop;
@@ -63,31 +68,34 @@ private:
 
 	int MoveTimer_ = 0;
 
+	// 行動選択中か
+	bool isSelect_ = true;
+
+	// 現在選んでいるリストの要素
+	int selectNum_ = 0;
+
 	// 行動中かどうか
 	bool isMove_ = false;
-
-	// 行動クールタイム
-	int kEnemyCoolTime_ = 60;
-
-	int coolTime_ = 0;
-
-	bool isCoolTime = false;
 
 	// 行動
 	void Move(Command command);
 
+	// 行動コマンド画像更新
+	void UpdateMoveCommandsNum();
+
 	// スプライト
-	Sprite* enemySprite_;
+	std::unique_ptr<Sprite> commandNumSprite_[kMaxCommand];
 
-	// 画像位置設定。ポジションの変更後に使用
-	void SetSpritePosition() {
-		enemySprite_->SetPosition(
-		    {position_.x - kTextureWidth / 2.0f, 
-			position_.y - kTextureHeight / 2.0f});
-	}
+	std::unique_ptr<Sprite> selectCommandNumSprite_[kMaxSelectNum];
 
-	// 画像横幅
-	const int kTextureWidth = 32;
-	// 画像縦幅
-	const int kTextureHeight = 32;
+	std::unique_ptr<Sprite> currentNumSprite_;
+
+	// モデル
+	std::vector<Model*> models_;
+
+	// 画像
+	std::vector<uint32_t> textures_;
+
+	// 現在セットしている画像
+	uint32_t currentTex_ = 0u;
 };
