@@ -13,6 +13,10 @@
 //コマンドの最大表示数
 const int kMaxCommand = 3;
 
+// 選択できる個数
+const int kMaxSelectNum = 6;
+
+
 class Player : public MoveCommand {
 public:
 
@@ -54,6 +58,11 @@ private:
 	//入力
 	Input* input_ = nullptr;
 
+	//入力クールタイム
+	const int kInputCoolTime = 15;
+
+	int inputCoolTimer_ = 0;
+
 	//プレイヤーのワールドトランスフォーム
 	WorldTransform worldTransform_;
 
@@ -68,6 +77,12 @@ private:
 
 	int MoveTimer_ = 0;
 
+	//行動選択中か
+	bool isSelect_ = true;
+
+	//現在選んでいるリストの要素
+	int selectNum_ = 0;
+
 	//行動中かどうか
 	bool isMove_ = false;
 
@@ -77,8 +92,12 @@ private:
 	//行動コマンド画像更新
 	void UpdateMoveCommandsNum();
 
-	//画像
+	//スプライト
 	std::unique_ptr<Sprite> commandNumSprite_[kMaxCommand];
+
+	std::unique_ptr<Sprite> selectCommandNumSprite_[kMaxSelectNum];
+
+	std::unique_ptr<Sprite> currentNumSprite_;
 
 	//モデル
 	std::vector<Model*> models_;
