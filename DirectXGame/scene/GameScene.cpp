@@ -18,11 +18,17 @@ void GameScene::Initialize() {
 	player_ = std::make_unique<Player>();
 	player_->Initialize(playerSprite_.get());
 
+	enemyTex_ = TextureManager::Load("player/player.png");
+	enemySprite_.reset(Sprite::Create(enemyTex_, {0.0f, 0.0f}));
+
+	enemy_ = std::make_unique<Enemy>();
+	enemy_->Initialize(enemySprite_.get());
 }
 
 void GameScene::Update() {
-
+	
 	player_->Update();
+	enemy_->Update();
 
 }
 
@@ -65,6 +71,7 @@ void GameScene::Draw() {
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
 	player_->Draw();
+	enemy_->Draw();
 
 	// スプライト描画後処理
 	Sprite::PostDraw();
