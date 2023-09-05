@@ -11,6 +11,7 @@
 #include "Player.h"
 #include <memory>
 #include "PrimitiveDrawer.h"
+#include "Option.h"
 
 /// <summary>
 /// ゲームシーン
@@ -68,5 +69,8 @@ private: // メンバ変数
 	uint32_t greenTex_ = 0u;
 	uint32_t blueTex_ = 0u;
 	uint32_t numberTex_ = 0u;
+
+	// オプション
+	Option* option = new Option;
 
 };

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include"Input.h"
 #include"WorldTransform.h"
 #include"Sprite.h"
@@ -22,7 +22,7 @@ public:
 	Option();
 	~Option();
 	void Initialize();
-	void Update();
+	void Update(const ViewProjection& viewprojection);
 	void Draw();
 
 	bool GetActionTrigger(ActCode act);
@@ -30,13 +30,11 @@ public:
 
 private:
 
-	DirectXCommon* dxCommon_ = nullptr;
-
 	// カーソル
 	WorldTransform m_cursorWorldTransform;
 	Sprite* m_cursorSprite = nullptr;
-	Vector3 m_cursorPos = {60, 60, 5};
-	Vector3 m_cursorVel = {3, 3, 0};
+	Vector3 m_cursorPos = {640, 320, 0};
+	Vector3 m_cursorVel = {6, 6, 0};
 
 	uint32_t cursorTextureHandle = 0u;
 

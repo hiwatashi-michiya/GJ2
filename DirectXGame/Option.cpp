@@ -1,4 +1,4 @@
-﻿#include "Option.h"
+#include "Option.h"
 #include "Gamepad.h"
 #include "ImGuiManager.h"
 #include <assert.h>
@@ -19,26 +19,28 @@ Option::~Option() {}
 
 void Option::Initialize() 
 {
-	dxCommon_ = DirectXCommon::GetInstance();
 
 	cursorTextureHandle = TextureManager::Load("cursorImage.png");
 	assert(cursorTextureHandle);
 	
 	m_cursorSprite = Sprite::Create(
 	    cursorTextureHandle, {m_cursorPos.x, m_cursorPos.y}, 
-		{1.0f, 1.0f, 1.0f, 1.0f},{0.5f, 0.5f});
-	m_cursorSprite->SetSize({64.0f, 64.0f});
+		{1.0f, 1.0f, 0.0f, 1.0f},{0.5f, 0.5f});
+	m_cursorSprite->SetSize({32.0f, 32.0f});
 
 
 }
 
-void Option::Update() {
-	
+void Option::Update(const ViewProjection& viewprojection) {
+
 	// ゲームパッドのインスタンスを取得
 	Gamepad::Input();
 
 	// カーソルの更新処理
 	CursorUpdate();
+	viewprojection;
+	// ビューポート
+	m_cursorSprite->SetPosition({m_cursorPos.x, m_cursorPos.y});
 
 
 	ImGui::Begin("Action");
@@ -58,47 +60,7 @@ void Option::Update() {
 
 void Option::Draw() 
 {
-	// コマンドリストの取得
-	ID3D12GraphicsCommandList* commandList = dxCommon_->GetCommandList();
-
-#pragma region 背景スプライト描画
-	// 背景スプライト描画前処理
-	Sprite::PreDraw(commandList);
-
-	/// <summary>
-	/// ここに背景スプライトの描画処理を追加できる
-	/// </summary>
-
-	// スプライト描画後処理
-	Sprite::PostDraw();
-	// 深度バッファクリア
-	dxCommon_->ClearDepthBuffer();
-#pragma endregion
-
-#pragma region 3Dオブジェクト描画
-	// 3Dオブジェクト描画前処理
-	Model::PreDraw(commandList);
-
-	/// <summary>
-	/// ここに3Dオブジェクトの描画処理を追加できる
-	/// </summary>
-
-	// 3Dオブジェクト描画後処理
-	Model::PostDraw();
-#pragma endregion
-
-#pragma region 前景スプライト描画
-	// 前景スプライト描画前処理
-	Sprite::PreDraw(commandList);
-
-	/// <summary>
-	/// ここに前景スプライトの描画処理を追加できる
-	/// </summary>
-
-		m_cursorSprite->Draw();
-
-	// スプライト描画後処理
-	Sprite::PostDraw();
+	m_cursorSprite->Draw();
 }
 
 bool Option::GetActionTrigger(ActCode act) {
@@ -530,10 +492,10 @@ void Option::CursorUpdate() {
 		m_cursorPos.x -= m_cursorVel.x;
 	}
 	if (Gamepad::getStick(Gamepad::Stick::LEFT_Y) >= 3000) {
-		m_cursorPos.y += m_cursorVel.x;
+		m_cursorPos.y -= m_cursorVel.x;
 	}
 	if (Gamepad::getStick(Gamepad::Stick::LEFT_Y) <= -3000) {
-		m_cursorPos.y -= m_cursorVel.x;
+		m_cursorPos.y += m_cursorVel.x;
 	}
 
 	m_cursorSprite->SetPosition({m_cursorPos.x, m_cursorPos.y});
