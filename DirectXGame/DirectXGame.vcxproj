@@ -113,9 +113,11 @@
     <ClCompile Include="CollisionManager.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Ground.cpp" />
+    <ClCompile Include="Gamepad.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Matrix4x4.cpp" />
     <ClCompile Include="MoveCommand.cpp" />
+    <ClCompile Include="Option.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Rand.cpp" />
     <ClCompile Include="scene\GameScene.cpp" />
@@ -151,12 +153,14 @@
     <ClInclude Include="CollisionManager.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Ground.h" />
+    <ClInclude Include="Gamepad.h" />
     <ClInclude Include="input\Input.h" />
     <ClInclude Include="math\Matrix4x4.h" />
     <ClInclude Include="math\Vector2.h" />
     <ClInclude Include="math\Vector3.h" />
     <ClInclude Include="math\Vector4.h" />
     <ClInclude Include="MoveCommand.h" />
+    <ClInclude Include="Option.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Rand.h" />
     <ClInclude Include="scene\GameScene.h" />

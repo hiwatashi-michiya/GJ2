@@ -8,6 +8,7 @@
 #include "WinApp.h"
 #include "Rand.h"
 
+
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	WinApp* win = nullptr;
@@ -69,6 +70,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		if (win->ProcessMessage()) {
 			break;
 		}
+
+		input->GetMousePosition();
 
 		// ImGui受付開始
 		imguiManager->Begin();

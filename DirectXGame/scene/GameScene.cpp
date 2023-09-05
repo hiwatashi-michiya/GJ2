@@ -31,27 +31,29 @@ void GameScene::Initialize() {
 	ground_ = std::make_unique<Ground>();
 	ground_->Initialize(groundModel_.get());
 
-	enemyTex_ = TextureManager::Load("enemy/enemy.png");
+	enemyTex_ = TextureManager::Load("king/king.png");
 	redTex_ = TextureManager::Load("player/red.png");
 	greenTex_ = TextureManager::Load("player/green.png");
 	blueTex_ = TextureManager::Load("player/blue.png");
 	numberTex_ = TextureManager::Load("UI/command.png");
 
-	playerTex_ = TextureManager::Load("player/player.png");
+	playerTex_ = TextureManager::Load("pawn/pawn.png");
 	playerSprite_.reset(Sprite::Create(playerTex_, {0.0f, 0.0f}));
-	playerModel_.reset(Model::Create());
+	playerModel_.reset(Model::CreateFromOBJ("pawn",true));
 
 	std::vector<Model*> playerModels{playerModel_.get()};
 	std::vector<uint32_t> playerTextures{playerTex_, redTex_, greenTex_, blueTex_, numberTex_};
 	player_ = std::make_unique<Player>();
 	player_->Initialize(playerModels, playerTextures);
 
-	enemyModel_.reset(Model::Create());
+	enemyModel_.reset(Model::CreateFromOBJ("king", true));
 	std::vector<Model*> enemyModels{enemyModel_.get()};
 	std::vector<uint32_t> enemyTextures{enemyTex_, redTex_, greenTex_, blueTex_, numberTex_};
 	enemy_ = std::make_unique<Enemy>();
 	enemy_->Initialize(enemyModels, enemyTextures);
 
+	// オプション 初期化
+	option->Initialize();
 }
 
 void GameScene::Update() {
@@ -59,6 +61,7 @@ void GameScene::Update() {
 	player_->Update();
 	enemy_->Update();
 
+	option->Update(viewProjection_);
 	// ビュープロジェクション更新
 	viewProjection_.UpdateMatrix();
 
@@ -76,7 +79,17 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに背景スプライトの描画処理を追加できる
 	/// </summary>
-	
+
+	for (int i = 0; i < 11; i++) {
+
+		float distance = 10 * i - 50.0f;
+		Vector3 lineStartX{-50.0f, 0.0f, distance};
+		Vector3 lineEndX{50.0f, 0.0f, distance};
+		Vector3 lineStartZ{distance, 0.0f, -50.0f};
+		Vector3 lineEndZ{distance, 0.0f, 50.0f};
+		primitiveDrawer_->DrawLine3d(lineStartX, lineEndX, {1.0f, 1.0f, 1.0f, 1.0f});
+		primitiveDrawer_->DrawLine3d(lineStartZ, lineEndZ, {1.0f, 1.0f, 1.0f, 1.0f});
+	}
 
 	// スプライト描画後処理
 	Sprite::PostDraw();
@@ -112,6 +125,8 @@ void GameScene::Draw() {
 
 	player_->DrawUI();
 	enemy_->DrawUI();
+
+	option->Draw();
 
 	// スプライト描画後処理
 	Sprite::PostDraw();
