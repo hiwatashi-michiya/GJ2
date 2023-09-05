@@ -1,4 +1,5 @@
 #include "Enemy.h"
+#include "Rand.h"
 
 #ifdef _DEBUG
 #include <ImGuiManager.h>
@@ -40,7 +41,7 @@ void Enemy::Initialize(const std::vector<Model*>& models, const std::vector<uint
 
 	currentNumSprite_.reset(Sprite::Create(textures_[0], {0.0f, 0.0f}));
 	currentNumSprite_->SetSize({16.0f, 16.0f});
-	currentNumSprite_->SetPosition({selectNum_ * 64.0f + 316.0f, 550.0f});
+	currentNumSprite_->SetPosition({selectNum_ * 64.0f + 610.0f, 80.0f});
 
 	velocity_ = {0.0f, 0.0f, 0.0f};
 	worldTransform_.Initialize();
@@ -57,6 +58,8 @@ void Enemy::Update() {
 
 #endif // _DEBUG
 
+	SetRandom();
+
 	XINPUT_STATE joyState;
 
 	if (inputCoolTimer_ > 0) {
@@ -68,32 +71,11 @@ void Enemy::Update() {
 
 		if (input_->GetJoystickState(0, joyState)) {
 
-			if ((input_->PushKey(DIK_LEFT) ||
-			     joyState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER) &&
-			    inputCoolTimer_ == 0) {
-
-				if (selectNum_ > 0) {
-					selectNum_--;
-				}
-
-				inputCoolTimer_ = kInputCoolTime;
-
-			}
-
-			else if (
-			    (input_->PushKey(DIK_RIGHT) ||
-			     joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) &&
-			    inputCoolTimer_ == 0) {
-
-				if (selectNum_ < selectCommands_.size() - 1) {
-					selectNum_++;
-				}
-
-				inputCoolTimer_ = kInputCoolTime;
-			}
-
 			if ((input_->PushKey(DIK_E) || joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) &&
 			    inputCoolTimer_ == 0 && moveCommands_.size() < kMaxCommand) {
+
+				// ランダム行動
+				selectNum_ = rand() % selectCommands_.size();
 
 				SetMoveCommand(selectNum_);
 				PopSelectCommand(selectNum_);
@@ -267,5 +249,5 @@ void Enemy::UpdateMoveCommandsNum() {
 		selectCommandNumSprite_[i]->SetTextureRect({num * 32.0f, 0.0f}, {32.0f, 64.0f});
 	}
 
-	currentNumSprite_->SetPosition({selectNum_ * 64.0f + 316.0f, 550.0f});
+	currentNumSprite_->SetPosition({selectNum_ * 64.0f + 610.0f, 80.0f});
 }
