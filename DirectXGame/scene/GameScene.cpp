@@ -67,6 +67,16 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに背景スプライトの描画処理を追加できる
 	/// </summary>
+	for (int i = 0; i < 11; i++) {
+
+		float distance = 10 * i - 50.0f;
+		Vector3 lineStartX{-50.0f, 0.0f, distance};
+		Vector3 lineEndX{50.0f, 0.0f, distance};
+		Vector3 lineStartZ{distance, 0.0f, -50.0f};
+		Vector3 lineEndZ{distance, 0.0f, 50.0f};
+		primitiveDrawer_->DrawLine3d(lineStartX, lineEndX, {1.0f, 1.0f, 1.0f, 1.0f});
+		primitiveDrawer_->DrawLine3d(lineStartZ, lineEndZ, {1.0f, 1.0f, 1.0f, 1.0f});
+	}
 
 	// スプライト描画後処理
 	Sprite::PostDraw();
@@ -99,16 +109,7 @@ void GameScene::Draw() {
 	player_->DrawUI();
 	enemy_->DrawUI();
 
-	for (int i = 0; i < 11; i++) {
-
-		float distance = 10 * i - 50.0f;
-		Vector3 lineStartX{-50.0f, 0.0f, distance};
-		Vector3 lineEndX{50.0f, 0.0f, distance};
-		Vector3 lineStartZ{distance, 0.0f, -50.0f};
-		Vector3 lineEndZ{distance, 0.0f, 50.0f};
-		primitiveDrawer_->DrawLine3d(lineStartX, lineEndX, {1.0f, 1.0f, 1.0f, 1.0f});
-		primitiveDrawer_->DrawLine3d(lineStartZ, lineEndZ, {1.0f, 1.0f, 1.0f, 1.0f});
-	}
+	
 
 	// スプライト描画後処理
 	Sprite::PostDraw();
