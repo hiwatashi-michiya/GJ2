@@ -14,6 +14,7 @@
 #include "Enemy.h"
 #include "Skydome.h"
 #include "Ground.h"
+#include "CollisionManager.h"
 
 /// <summary>
 /// ゲームシーン
@@ -51,6 +52,7 @@ private: // メンバ変数
 	Input* input_ = nullptr;
 	Audio* audio_ = nullptr;
 	PrimitiveDrawer* primitiveDrawer_ = nullptr;
+	CollisionManager* collisionManager_ = nullptr;
 
 	/// <summary>
 	/// ゲームシーン用

@@ -12,6 +12,7 @@ void GameScene::Initialize() {
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
 	primitiveDrawer_ = PrimitiveDrawer::GetInstance();
+	collisionManager_ = CollisionManager::GetInstance();
 
 	//ビュープロジェクション初期化
 	viewProjection_.Initialize();

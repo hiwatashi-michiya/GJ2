@@ -8,6 +8,7 @@
 void Player::Initialize(const std::vector<Model*>& models, const std::vector<uint32_t>& textures) {
 
 	input_ = Input::GetInstance();
+	collisionManager_ = CollisionManager::GetInstance();
 
 	SetModels(models);
 	SetTextures(textures);
@@ -40,6 +41,8 @@ void Player::Initialize(const std::vector<Model*>& models, const std::vector<uin
 	worldTransform_.translation_ = Vector3(-25.0f, 2.0f, 5.0f);
 	worldTransform_.UpdateMatrix();
 	SetSelectCommands(kMaxSelectNum);
+	SetGrid(0, 2);
+	collisionManager_->SetCollision(GetGridX(), GetGridZ());
 
 }
 
@@ -194,10 +197,30 @@ void Player::Update() {
 
 }
 
-void Player::Move(Command command) {
+void Player::Move(Command& command) {
 
 	switch (command) {
 	case MoveLeft:
+
+		if (MoveTimer_ == 60) {
+
+			int tmpX = GetGridX() - 1;
+			int tmpZ = GetGridZ();
+
+			tmpX = IntClamp(tmpX, 0, 5);
+			tmpZ = IntClamp(tmpZ, 0, 5);
+
+			//障害物があったらストップコマンドに移行
+			if (collisionManager_->IsHit(tmpX, tmpZ)) {
+				command = Stop;
+				break;
+			}
+
+			collisionManager_->SetCollision(tmpX, tmpZ);
+			collisionManager_->RemoveCollision(GetGridX(), GetGridZ());
+			SetGrid(tmpX, tmpZ);
+
+		}
 
 		velocity_ = {-1.0f / 6.0f, 0.0f, 0.0f};
 
@@ -206,6 +229,26 @@ void Player::Move(Command command) {
 		break;
 	case MoveRight:
 
+		if (MoveTimer_ == 60) {
+
+			int tmpX = GetGridX() + 1;
+			int tmpZ = GetGridZ();
+
+			tmpX = IntClamp(tmpX, 0, 5);
+			tmpZ = IntClamp(tmpZ, 0, 5);
+
+			// 障害物があったらストップコマンドに移行
+			if (collisionManager_->IsHit(tmpX, tmpZ)) {
+				command = Stop;
+				break;
+			}
+
+			collisionManager_->SetCollision(tmpX, tmpZ);
+			collisionManager_->RemoveCollision(GetGridX(), GetGridZ());
+			SetGrid(tmpX, tmpZ);
+
+		}
+
 		velocity_ = {1.0f / 6.0f, 0.0f, 0.0f};
 
 		worldTransform_.translation_ += velocity_;
@@ -213,12 +256,52 @@ void Player::Move(Command command) {
 		break;
 	case MoveUp:
 
+		if (MoveTimer_ == 60) {
+
+			int tmpX = GetGridX();
+			int tmpZ = GetGridZ() - 1;
+
+			tmpX = IntClamp(tmpX, 0, 5);
+			tmpZ = IntClamp(tmpZ, 0, 5);
+
+			// 障害物があったらストップコマンドに移行
+			if (collisionManager_->IsHit(tmpX, tmpZ)) {
+				command = Stop;
+				break;
+			}
+
+			collisionManager_->SetCollision(tmpX, tmpZ);
+			collisionManager_->RemoveCollision(GetGridX(), GetGridZ());
+			SetGrid(tmpX, tmpZ);
+
+		}
+
 		velocity_ = {0.0f, 0.0f, 1.0f / 6.0f};
 
 		worldTransform_.translation_ += velocity_;
 
 		break;
 	case MoveDown:
+
+		if (MoveTimer_ == 60) {
+
+			int tmpX = GetGridX();
+			int tmpZ = GetGridZ() + 1;
+
+			tmpX = IntClamp(tmpX, 0, 5);
+			tmpZ = IntClamp(tmpZ, 0, 5);
+
+			// 障害物があったらストップコマンドに移行
+			if (collisionManager_->IsHit(tmpX, tmpZ)) {
+				command = Stop;
+				break;
+			}
+
+			collisionManager_->SetCollision(tmpX, tmpZ);
+			collisionManager_->RemoveCollision(GetGridX(), GetGridZ());
+			SetGrid(tmpX, tmpZ);
+
+		}
 
 		velocity_ = {0.0f, 0.0f, -1.0f / 6.0f};
 

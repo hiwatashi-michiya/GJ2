@@ -9,6 +9,8 @@
 #include <vector>
 #include <WorldTransform.h>
 #include <ViewProjection.h>
+#include "Collider.h"
+#include "CollisionManager.h"
 
 //コマンドの最大表示数
 const int kMaxCommand = 3;
@@ -17,7 +19,7 @@ const int kMaxCommand = 3;
 const int kMaxSelectNum = 6;
 
 
-class Player : public MoveCommand {
+class Player : public MoveCommand, public Collider {
 public:
 
 	/// <summary>
@@ -58,6 +60,8 @@ private:
 	//入力
 	Input* input_ = nullptr;
 
+	CollisionManager* collisionManager_ = nullptr;
+
 	//入力クールタイム
 	const int kInputCoolTime = 15;
 
@@ -87,7 +91,7 @@ private:
 	bool isMove_ = false;
 
 	//行動
-	void Move(Command command);
+	void Move(Command& command);
 
 	//行動コマンド画像更新
 	void UpdateMoveCommandsNum();

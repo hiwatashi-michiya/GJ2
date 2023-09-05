@@ -4,18 +4,18 @@
 class Collider {
 public:
 
-	void SetGrid(int x, int y) {
+	void SetGrid(int x, int z) {
 		gridX_ = x;
-		gridY_ = y;
+		gridZ_ = z;
 	}
 
 	int GetGridX() { return gridX_; }
 
-	int GetGridY() { return gridY_; }
+	int GetGridZ() { return gridZ_; }
 
 private:
 
 	int gridX_;
-	int gridY_;
+	int gridZ_;
 
 };

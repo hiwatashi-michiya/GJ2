@@ -153,6 +153,18 @@ float Clamp(float x, float min, float max) {
 	return x;
 }
 
+int IntClamp(int x, int min, int max) {
+
+	if (x > max) {
+		return max;
+	}
+
+	if (x < min) {
+		return min;
+	}
+
+	return x;
+}
 
 Vector3 Project(const Vector3& v1, const Vector3& v2) {
 
