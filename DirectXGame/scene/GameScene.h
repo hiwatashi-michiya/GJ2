@@ -2,12 +2,14 @@
 
 #include "Audio.h"
 #include "DirectXCommon.h"
+#include "AxisIndicator.h"
 #include "Input.h"
 #include "Model.h"
 #include "SafeDelete.h"
 #include "Sprite.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
+#include "DebugCamera.h"
 #include "Player.h"
 #include "Enemy.h"
 #include <memory>
@@ -43,10 +45,22 @@ public: // メンバ関数
 	/// </summary>
 	void Draw();
 
+	// デバッグカメラ有効
+	bool isDebugCameraActive_ = false;
+
 private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
 	Audio* audio_ = nullptr;
+
+	// 3Dモデル
+	std::unique_ptr<Model> enemyModel_ = nullptr;
+
+	// ビュープロジェクション
+	ViewProjection viewProjection_;
+
+	// デバッグカメラ
+	DebugCamera* debugCamera_ = nullptr;
 
 	/// <summary>
 	/// ゲームシーン用

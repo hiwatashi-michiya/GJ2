@@ -4,14 +4,20 @@
 #include <ImGuiManager.h>
 #endif // _DEBUG
 
-void Enemy::Initialize(Sprite* sprite) {
+void Enemy::Initialize(Model* model, Sprite* sprite) {
 
 	input_ = Input::GetInstance();
 
+	model_ = model;
 	enemySprite_ = sprite;
+
+	worldTransform_.Initialize();
+	worldTransform_.translation_ = {0.0f, 0.0f, 0.0f};
 	position_ = {640.0f, 500.0f, 0.0f};
-	velocity_ = {0.0f, 0.0f, 0.0f};
+	spriteVelocity_ = {0.0f, 0.0f, 0.0f};
+	modelVelocity_ = {0.0f, 0.0f, 0.0f};
 	SetSpritePosition();
+
 }
 
 void Enemy::Update() {
@@ -55,44 +61,42 @@ void Enemy::Update() {
 void Enemy::Move(Command command) {
 
 	switch (command) {
-	default:
-	case Stop:
-
-		velocity_ = {0.0f, 0.0f, 0.0f};
-
-		// 緑に設定
-		enemySprite_->SetColor({0.0f, 1.0f, 0.0f, 1.0f});
-
-		break;
 	case MoveLeft:
 
 		if (MoveTimer_ == 60) {
-			velocity_ = {-1.0f, 0.0f, 0.0f};
+			spriteVelocity_ = {-1.0f, 0.0f, 0.0f};
+			modelVelocity_ = {-0.1f, 0.0f, 0.0f};
 		}
 
-		position_ += velocity_;
+		position_ += spriteVelocity_;
+		worldTransform_.translation_ += modelVelocity_;
 		SetSpritePosition();
 
 		break;
 	case MoveRight:
 
 		if (MoveTimer_ == 60) {
-			velocity_ = {1.0f, 0.0f, 0.0f};
+			spriteVelocity_ = {1.0f, 0.0f, 0.0f};
+			modelVelocity_ = {0.1f, 0.0f, 0.0f};
 		}
 
-		position_ += velocity_;
+		position_ += spriteVelocity_;
+		worldTransform_.translation_ += modelVelocity_;
 		SetSpritePosition();
 
 		break;
 	case Jump:
 
 		if (MoveTimer_ == 60) {
-			velocity_ -= {0.0f, 15.0f, 0.0f};
+			spriteVelocity_ -= {0.0f, 15.0f, 0.0f};
+			modelVelocity_ -= {0.0f, 5.0f, 0.0f};
 		}
 
-		velocity_ += {0.0f, 0.5f, 0.0f};
+		spriteVelocity_ += {0.0f, 0.5f, 0.0f};
+		modelVelocity_ += {0.0f, 0.01f, 0.0f};
 
-		position_ += velocity_;
+		position_ += spriteVelocity_;
+		worldTransform_.translation_ -= modelVelocity_;
 		SetSpritePosition();
 
 		break;
@@ -108,14 +112,30 @@ void Enemy::Move(Command command) {
 		enemySprite_->SetColor({0.0f, 0.0f, 1.0f, 1.0f});
 
 		break;
+	default:
+	case Stop:
+
+		spriteVelocity_ = {0.0f, 0.0f, 0.0f};
+		modelVelocity_ = {0.0f, 0.0f, 0.0f};
+
+		// 緑に設定
+		enemySprite_->SetColor({0.0f, 1.0f, 0.0f, 1.0f});
+
+		break;
 	}
 
-	position_.x = Clamp(position_.x, 32.0f, 1248.0f);
-	position_.y = Clamp(position_.y, 0.0f, 500.0f);
+	position_.x = Clamp(position_.x, 32.0f, 1270.0f);
+	position_.y = Clamp(position_.y, 0.0f, 720.0f);
 	SetSpritePosition();
 
+	// WorldTransformの更新
+	worldTransform_.translation_.x = Clamp(worldTransform_.translation_.x, -10.0f, 10.0f);
+	worldTransform_.translation_.y = Clamp(worldTransform_.translation_.y, -10.0f, 10.0f);
+	worldTransform_.UpdateMatrix();
+
 	if (--MoveTimer_ <= 0) {
-		velocity_ = {0.0f, 0.0f, 0.0f};
+		spriteVelocity_ = {0.0f, 0.0f, 0.0f};
+		modelVelocity_ = {0.0f, 0.0f, 0.0f};
 		enemySprite_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 		isCoolTime = true;
 	}
@@ -128,4 +148,9 @@ void Enemy::Move(Command command) {
 	}
 }
 
-void Enemy::Draw() { enemySprite_->Draw(); }
+void Enemy::DrawSprite() {
+	enemySprite_->Draw();
+}
+void Enemy::DrawModel(ViewProjection& viewProjection) {
+	model_->Draw(worldTransform_, viewProjection);
+}

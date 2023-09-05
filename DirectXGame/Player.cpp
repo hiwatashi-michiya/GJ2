@@ -41,7 +41,9 @@ void Player::Update() {
 			//ゲームパッドの取得
 			if (input_->GetJoystickState(0, joyState)) {
 
-				if ((input_->TriggerKey(DIK_SPACE) || joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) && isMove_ == false) {
+				if ((input_->TriggerKey(DIK_SPACE) ||
+					joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) && 
+					isMove_ == false) {
 
 					//次の行動コマンドを現在の行動コマンドに設定
 					currentMoveCommand_ = GetNextCommand();
