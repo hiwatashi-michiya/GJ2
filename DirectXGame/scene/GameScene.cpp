@@ -21,6 +21,14 @@ void GameScene::Initialize() {
 	viewProjection_.rotation_.x = 3.14f / 4.0f;
 	//3Dライン描画のビュープロジェクション設定
 	primitiveDrawer_->SetViewProjection(&viewProjection_);
+	// 天球初期化
+	skydomeModel_.reset(Model::CreateFromOBJ("skydome", true));
+	skydome_ = std::make_unique<Skydome>();
+	skydome_->Initialize(skydomeModel_.get());
+	// 地面初期化
+	groundModel_.reset(Model::CreateFromOBJ("ground", true));
+	ground_ = std::make_unique<Ground>();
+	ground_->Initialize(groundModel_.get());
 
 	enemyTex_ = TextureManager::Load("enemy/enemy.png");
 	redTex_ = TextureManager::Load("player/red.png");
@@ -67,16 +75,7 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに背景スプライトの描画処理を追加できる
 	/// </summary>
-	for (int i = 0; i < 7; i++) {
-
-		float distance = 10 * i - 30.0f;
-		Vector3 lineStartX{-30.0f, 0.0f, distance};
-		Vector3 lineEndX{30.0f, 0.0f, distance};
-		Vector3 lineStartZ{distance, 0.0f, -30.0f};
-		Vector3 lineEndZ{distance, 0.0f, 30.0f};
-		primitiveDrawer_->DrawLine3d(lineStartX, lineEndX, {1.0f, 1.0f, 1.0f, 1.0f});
-		primitiveDrawer_->DrawLine3d(lineStartZ, lineEndZ, {1.0f, 1.0f, 1.0f, 1.0f});
-	}
+	
 
 	// スプライト描画後処理
 	Sprite::PostDraw();
@@ -91,6 +90,10 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
+	
+	skydome_->Draw(viewProjection_);
+	ground_->Draw(viewProjection_);
+
 	player_->Draw(viewProjection_);
 	enemy_->Draw(viewProjection_);
 
@@ -108,8 +111,6 @@ void GameScene::Draw() {
 
 	player_->DrawUI();
 	enemy_->DrawUI();
-
-	
 
 	// スプライト描画後処理
 	Sprite::PostDraw();

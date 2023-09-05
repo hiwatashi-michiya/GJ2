@@ -92,6 +92,9 @@ private:
 	//行動コマンド画像更新
 	void UpdateMoveCommandsNum();
 
+	//現在プレイヤーのターンかどうか
+	bool isPlayerTurn_ = false;
+
 	//スプライト
 	std::unique_ptr<Sprite> commandNumSprite_[kMaxCommand];
 

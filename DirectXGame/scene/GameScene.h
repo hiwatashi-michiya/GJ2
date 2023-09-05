@@ -12,6 +12,8 @@
 #include <memory>
 #include "PrimitiveDrawer.h"
 #include "Enemy.h"
+#include "Skydome.h"
+#include "Ground.h"
 
 /// <summary>
 /// ゲームシーン
@@ -60,9 +62,19 @@ private: // メンバ変数
 
 	std::unique_ptr<Enemy> enemy_ = nullptr;
 
+	// 天球
+	std::unique_ptr<Skydome> skydome_ = nullptr;
+	// 地面
+	std::unique_ptr<Ground> ground_ = nullptr;
+	
+
 	//モデル
 	std::unique_ptr<Model> playerModel_;
 	std::unique_ptr<Model> enemyModel_;
+	// 天球モデル
+	std::unique_ptr<Model> skydomeModel_ = nullptr;
+	// 地面モデル
+	std::unique_ptr<Model> groundModel_ = nullptr;
 
 	//画像
 	std::unique_ptr<Sprite> playerSprite_;
