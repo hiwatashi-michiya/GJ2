@@ -89,11 +89,11 @@ void Enemy::Move(Command command) {
 
 		if (MoveTimer_ == 60) {
 			spriteVelocity_ -= {0.0f, 15.0f, 0.0f};
-			modelVelocity_ -= {0.0f, 5.0f, 0.0f};
+			modelVelocity_ -= {0.0f, 0.5f, 0.0f};
 		}
 
 		spriteVelocity_ += {0.0f, 0.5f, 0.0f};
-		modelVelocity_ += {0.0f, 0.01f, 0.0f};
+		modelVelocity_ += {0.0f, 0.0155f, 0.0f};
 
 		position_ += spriteVelocity_;
 		worldTransform_.translation_ -= modelVelocity_;
@@ -124,13 +124,13 @@ void Enemy::Move(Command command) {
 		break;
 	}
 
-	position_.x = Clamp(position_.x, 32.0f, 1270.0f);
-	position_.y = Clamp(position_.y, 0.0f, 720.0f);
+	position_.x = Clamp(position_.x, 32.0f, 1248.0f);
+	position_.y = Clamp(position_.y, 0.0f, 500.0f);
 	SetSpritePosition();
 
 	// WorldTransformの更新
-	worldTransform_.translation_.x = Clamp(worldTransform_.translation_.x, -10.0f, 10.0f);
-	worldTransform_.translation_.y = Clamp(worldTransform_.translation_.y, -10.0f, 10.0f);
+	worldTransform_.translation_.x = Clamp(worldTransform_.translation_.x, -20.0f, 20.0f);
+	worldTransform_.translation_.y = Clamp(worldTransform_.translation_.y, -20.0f, 20.0f);
 	worldTransform_.UpdateMatrix();
 
 	if (--MoveTimer_ <= 0) {
