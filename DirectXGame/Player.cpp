@@ -112,7 +112,7 @@ void Player::Move(Command command) {
 			velocity_ -= {0.0f, 15.0f, 0.0f};
 		}
 
-		velocity_ -= {0.0f, 5.0f, 0.0f};
+		velocity_ += {0.0f, 0.5f, 0.0f};
 		position_ += velocity_;
 		SetSpritePosition();
 
