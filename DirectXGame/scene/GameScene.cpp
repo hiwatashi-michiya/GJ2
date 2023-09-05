@@ -27,9 +27,9 @@ void GameScene::Initialize() {
 	blueTex_ = TextureManager::Load("player/blue.png");
 	numberTex_ = TextureManager::Load("UI/number.png");
 
-	playerTex_ = TextureManager::Load("player/player.png");
+	playerTex_ = TextureManager::Load("pawn/pawn.png");
 	playerSprite_.reset(Sprite::Create(playerTex_, {0.0f, 0.0f}));
-	playerModel_.reset(Model::Create());
+	playerModel_.reset(Model::CreateFromOBJ("pawn",true));
 
 	std::vector<Model*> playerModels{playerModel_.get()};
 	std::vector<uint32_t> playerTextures{playerTex_, redTex_, greenTex_, blueTex_, numberTex_};

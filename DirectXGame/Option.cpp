@@ -54,7 +54,7 @@ void Option::Update(const ViewProjection& viewprojection) {
 	ImGui::Begin("Option");
 	ImGui::Text("Cursor_X = %d", m_cursorPos.x);
 	ImGui::Text("Cursor_Y = %d", m_cursorPos.y);
-	ImGui::DragInt("Jump", &m_InputButton[ActCode::JUMP], 1.0f, 0, 15);
+	ImGui::Text("Frame rate = %3.0f fps", ImGui::GetIO().Framerate);
 	ImGui::End();
 	Gamepad::Draw();
 }
