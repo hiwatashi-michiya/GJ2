@@ -8,35 +8,7 @@ void MoveCommand::SetMoveCommand(int32_t setNum) {
 
 		Command command;
 
-		switch (rand() % kMovePattern) {
-		default:
-		case MoveLeft:
-
-			command = MoveLeft;
-
-			break;
-		case MoveRight:
-
-			command = MoveRight;
-
-			break;
-		case Jump:
-
-			command = Jump;
-
-			break;
-		case Attack:
-
-			command = Attack;
-
-			break;
-		case Guard:
-
-			command = Guard;
-
-			break;
-
-		}
+		command = Command(rand() % kMovePattern);
 
 		moveCommands_.push_back(command);
 

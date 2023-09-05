@@ -4,6 +4,8 @@
 enum Command {
 	MoveLeft,
 	MoveRight,
+	MoveUp,
+	MoveDown,
 	Jump,
 	Attack,
 	Guard,
@@ -11,7 +13,7 @@ enum Command {
 };
 
 //行動パターンの種類
-const int32_t kMovePattern = 6;
+const int32_t kMovePattern = 8;
 
 class MoveCommand {
 public:
@@ -30,8 +32,10 @@ public:
 
 	std::list<Command> GetmoveCommands() { return moveCommands_; }
 
+	std::list<Command> moveCommands_;
+
 private:
 
-	std::list<Command> moveCommands_;
+	
 
 };

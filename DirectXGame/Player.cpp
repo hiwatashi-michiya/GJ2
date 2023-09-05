@@ -5,14 +5,24 @@
 #endif // _DEBUG
 
 
-void Player::Initialize(Sprite* sprite) {
+void Player::Initialize(const std::vector<Model*>& models, const std::vector<uint32_t>& textures) {
 
 	input_ = Input::GetInstance();
 
-	playerSprite_ = sprite;
-	position_ = {640.0f, 500.0f, 0.0f};
+	SetModels(models);
+	SetTextures(textures);
+
+	currentTex_ = textures_[0];
+
+	for (int i = 0; i < kMaxCommand; i++) {
+		commandNumSprite_[i].reset(Sprite::Create(textures_[4], {0.0f, 0.0f}));
+		commandNumSprite_[i]->SetSize({32.0f, 64.0f});
+		commandNumSprite_[i]->SetTextureRect({0.0f,0.0f,}, {32.0f,64.0f});
+		commandNumSprite_[i]->SetPosition({10.0f, (kMaxCommand - 1 - i) * 64.0f + 10.0f});
+
+	}
+
 	velocity_ = {0.0f, 0.0f, 0.0f};
-	SetSpritePosition();
 	worldTransform_.Initialize();
 
 }
@@ -31,13 +41,14 @@ void Player::Update() {
 	XINPUT_STATE joyState;
 
 	//リストの要素が空なら新たに設定する
-	if (GetmoveCommands().empty()) {
-		SetMoveCommand(3);
+	if (moveCommands_.empty()) {
+		SetMoveCommand(kMaxCommand);
+		UpdateMoveCommandsNum();
 	}
 	else {
 
 		//リスト内が空でないなら行動開始
-		if (GetmoveCommands().empty() == false) {
+		if (moveCommands_.empty() == false) {
 
 			//ゲームパッドの取得
 			if (input_->GetJoystickState(0, joyState)) {
@@ -48,6 +59,8 @@ void Player::Update() {
 					currentMoveCommand_ = GetNextCommand();
 					//先頭の行動コマンドを削除
 					PopMoveCommand();
+					//数字更新
+					UpdateMoveCommandsNum();
 					//行動開始フラグを立てる
 					MoveTimer_ = kMoveTime;
 					isMove_ = true;
@@ -64,6 +77,8 @@ void Player::Update() {
 					currentMoveCommand_ = GetNextCommand();
 					// 先頭の行動コマンドを削除
 					PopMoveCommand();
+					// 数字更新
+					UpdateMoveCommandsNum();
 					// 行動開始フラグを立てる
 					MoveTimer_ = kMoveTime;
 					isMove_ = true;
@@ -93,39 +108,39 @@ void Player::Move(Command command) {
 
 		velocity_ = {-1.0f / 6.0f, 0.0f, 0.0f};
 
-		position_ += velocity_;
 		worldTransform_.translation_ += velocity_;
-		SetSpritePosition();
 
 		break;
 	case MoveRight:
 
 		velocity_ = {1.0f / 6.0f, 0.0f, 0.0f};
 
-		position_ += velocity_;
 		worldTransform_.translation_ += velocity_;
-		SetSpritePosition();
+
+		break;
+	case MoveUp:
+
+		velocity_ = {0.0f, 0.0f, 1.0f / 6.0f};
+
+		worldTransform_.translation_ += velocity_;
+
+		break;
+	case MoveDown:
+
+		velocity_ = {0.0f, 0.0f, -1.0f / 6.0f};
+
+		worldTransform_.translation_ += velocity_;
 
 		break;
 	case Jump:
 
-		/*if (MoveTimer_ == 60) {
-			velocity_ -= {0.0f, 15.0f, 0.0f};
-		}
-
-		velocity_ += {0.0f, 0.5f, 0.0f};*/
-
-		position_ += velocity_;
 		currentTex_ = textures_[0];
-		SetSpritePosition();
 
 		break;
 	case Attack:
 
 		velocity_ = {0.0f, 0.0f, 0.0f};
 
-		//赤に設定
-		playerSprite_->SetColor({1.0f, 0.0f, 0.0f, 1.0f});
 		currentTex_ = textures_[1];
 
 		break;
@@ -133,8 +148,6 @@ void Player::Move(Command command) {
 
 		velocity_ = {0.0f, 0.0f, 0.0f};
 
-		// 青に設定
-		playerSprite_->SetColor({0.0f, 0.0f, 1.0f, 1.0f});
 		currentTex_ = textures_[2];
 
 		break;
@@ -143,19 +156,15 @@ void Player::Move(Command command) {
 
 		velocity_ = {0.0f, 0.0f, 0.0f};
 
-		// 緑に設定
-		playerSprite_->SetColor({0.0f, 1.0f, 0.0f, 1.0f});
 		currentTex_ = textures_[3];
 
 		break;
 	}
 
-	position_.x = Clamp(position_.x, 32.0f, 1248.0f);
-	position_.y = Clamp(position_.y, 0.0f, 500.0f);
-	SetSpritePosition();
+	worldTransform_.translation_.x = Clamp(worldTransform_.translation_.x, -50.0f, 50.0f);
+	worldTransform_.translation_.z = Clamp(worldTransform_.translation_.z, -50.0f, 50.0f);
 
 	if (--MoveTimer_ <= 0) {
-		playerSprite_->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
 		velocity_.y = 0.0f;
 		currentTex_ = textures_[0];
 		isMove_ = false;
@@ -166,5 +175,30 @@ void Player::Move(Command command) {
 void Player::Draw(const ViewProjection& viewProjection) {
 
 	models_[0]->Draw(worldTransform_, viewProjection, currentTex_);
+
+}
+
+void Player::DrawUI() {
+
+	for (int i = 0; i < GetmoveCommands().size(); i++) {
+		commandNumSprite_[i]->Draw();
+	}
+
+}
+
+void Player::UpdateMoveCommandsNum() {
+
+	for (int i = 0; i < moveCommands_.size(); i++) {
+
+		auto itr = moveCommands_.begin();
+
+		for (int k = 0; k < i; k++) {
+			itr++;
+		}
+
+		int num = *itr;
+
+		commandNumSprite_[i]->SetTextureRect({num * 32.0f, 0.0f}, {32.0f, 64.0f});
+	}
 
 }

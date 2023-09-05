@@ -67,5 +67,6 @@ private: // メンバ変数
 	uint32_t redTex_ = 0u;
 	uint32_t greenTex_ = 0u;
 	uint32_t blueTex_ = 0u;
+	uint32_t numberTex_ = 0u;
 
 };

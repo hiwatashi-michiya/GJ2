@@ -25,17 +25,16 @@ void GameScene::Initialize() {
 	redTex_ = TextureManager::Load("player/red.png");
 	greenTex_ = TextureManager::Load("player/green.png");
 	blueTex_ = TextureManager::Load("player/blue.png");
+	numberTex_ = TextureManager::Load("UI/number.png");
 
 	playerTex_ = TextureManager::Load("player/player.png");
 	playerSprite_.reset(Sprite::Create(playerTex_, {0.0f, 0.0f}));
 	playerModel_.reset(Model::Create());
 
-	player_ = std::make_unique<Player>();
-	player_->Initialize(playerSprite_.get());
 	std::vector<Model*> playerModels{playerModel_.get()};
-	std::vector<uint32_t> playerTextures{playerTex_, redTex_, greenTex_, blueTex_};
-	player_->SetModels(playerModels);
-	player_->SetTextures(playerTextures);
+	std::vector<uint32_t> playerTextures{playerTex_, redTex_, greenTex_, blueTex_, numberTex_};
+	player_ = std::make_unique<Player>();
+	player_->Initialize(playerModels, playerTextures);
 
 }
 
@@ -87,6 +86,9 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
+
+	player_->DrawUI();
+
 	for (int i = 0; i < 11; i++) {
 
 		float distance = 10 * i - 50.0f;
@@ -96,9 +98,7 @@ void GameScene::Draw() {
 		Vector3 lineEndZ{distance, 0.0f, 50.0f};
 		primitiveDrawer_->DrawLine3d(lineStartX, lineEndX, {1.0f, 1.0f, 1.0f, 1.0f});
 		primitiveDrawer_->DrawLine3d(lineStartZ, lineEndZ, {1.0f, 1.0f, 1.0f, 1.0f});
-
 	}
-
 
 	// スプライト描画後処理
 	Sprite::PostDraw();

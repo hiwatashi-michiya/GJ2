@@ -10,6 +10,9 @@
 #include <WorldTransform.h>
 #include <ViewProjection.h>
 
+//コマンドの最大表示数
+const int kMaxCommand = 3;
+
 class Player : public MoveCommand {
 public:
 
@@ -17,7 +20,7 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <param name="sprite">スプライト</param>
-	void Initialize(Sprite* sprite);
+	void Initialize(const std::vector<Model*>& models, const std::vector<uint32_t>& textures);
 
 	/// <summary>
 	/// 更新
@@ -30,6 +33,11 @@ public:
 	void Draw(const ViewProjection& viewProjection);
 
 	/// <summary>
+	/// UI描画
+	/// </summary>
+	void DrawUI();
+
+	/// <summary>
 	/// モデル配列のセット
 	/// </summary>
 	/// <param name="models">モデル配列</param>
@@ -39,12 +47,7 @@ public:
 	/// 画像配列のセット
 	/// </summary>
 	/// <param name="textures">画像配列</param>
-	void SetTextures(const std::vector<uint32_t>& textures) {
-
-		textures_ = textures;
-		currentTex_ = textures_[0];
-
-	}
+	void SetTextures(const std::vector<uint32_t>& textures) { textures_ = textures; }
 
 private:
 
@@ -53,9 +56,6 @@ private:
 
 	//プレイヤーのワールドトランスフォーム
 	WorldTransform worldTransform_;
-
-	//描画位置(中央)
-	Vector3 position_;
 
 	//速度
 	Vector3 velocity_;
@@ -74,8 +74,11 @@ private:
 	//行動
 	void Move(Command command);
 
-	//スプライト
-	Sprite* playerSprite_;
+	//行動コマンド画像更新
+	void UpdateMoveCommandsNum();
+
+	//画像
+	std::unique_ptr<Sprite> commandNumSprite_[kMaxCommand];
 
 	//モデル
 	std::vector<Model*> models_;
@@ -85,16 +88,5 @@ private:
 
 	//現在セットしている画像
 	uint32_t currentTex_ = 0u;
-
-	//画像位置設定。ポジションの変更後に使用
-	void SetSpritePosition() {
-		playerSprite_->SetPosition(
-		    {position_.x - kTextureWidth / 2.0f, position_.y - kTextureHeight / 2.0f});
-	}
-
-	//画像横幅
-	const int kTextureWidth = 32;
-	//画像縦幅
-	const int kTextureHeight = 32;
 
 };
