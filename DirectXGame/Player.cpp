@@ -51,7 +51,7 @@ void Player::Update() {
 
 #ifdef _DEBUG
 
-	ImGui::Begin("State");
+	ImGui::Begin("PlayerState");
 	ImGui::Text("current Command %d", currentMoveCommand_);
 	ImGui::End();
 

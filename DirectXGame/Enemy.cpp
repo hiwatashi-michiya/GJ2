@@ -22,7 +22,7 @@ void Enemy::Initialize(const std::vector<Model*>& models, const std::vector<uint
 		        0.0f,
 		    },
 		    {32.0f, 64.0f});
-		commandNumSprite_[i]->SetPosition({10.0f, (kMaxCommand - 1 - i) * 64.0f + 10.0f});
+		commandNumSprite_[i]->SetPosition({1200.0f, (kMaxCommand - 1 - i) * 64.0f + 10.0f});
 	}
 
 	for (int i = 0; i < kMaxSelectNum; i++) {
@@ -35,7 +35,7 @@ void Enemy::Initialize(const std::vector<Model*>& models, const std::vector<uint
 		        0.0f,
 		    },
 		    {32.0f, 64.0f});
-		selectCommandNumSprite_[i]->SetPosition({i * 64.0f + 300.0f, 600.0f});
+		selectCommandNumSprite_[i]->SetPosition({i * 64.0f + 600.0f, 120.0f});
 	}
 
 	currentNumSprite_.reset(Sprite::Create(textures_[0], {0.0f, 0.0f}));
@@ -51,7 +51,7 @@ void Enemy::Update() {
 
 #ifdef _DEBUG
 
-	ImGui::Begin("State");
+	ImGui::Begin("EnemyState");
 	ImGui::Text("current Command %d", currentMoveCommand_);
 	ImGui::End();
 
@@ -136,44 +136,6 @@ void Enemy::Update() {
 				MoveTimer_ = kMoveTime;
 				isMove_ = true;
 			}
-
-			////ゲームパッドの取得
-			// if (input_->GetJoystickState(0, joyState)) {
-
-			//	if ((input_->TriggerKey(DIK_SPACE) || joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A)
-			//&& isMove_ == false) {
-
-			//		//次の行動コマンドを現在の行動コマンドに設定
-			//		currentMoveCommand_ = GetNextCommand();
-			//		//先頭の行動コマンドを削除
-			//		PopFrontMoveCommand();
-			//		//数字更新
-			//		UpdateMoveCommandsNum();
-			//		//行動開始フラグを立てる
-			//		MoveTimer_ = kMoveTime;
-			//		isMove_ = true;
-
-			//	}
-
-			//}
-			////キーボードの場合
-			// else {
-
-			//	if (input_->TriggerKey(DIK_SPACE) && isMove_ == false) {
-
-			//		// 次の行動コマンドを現在の行動コマンドに設定
-			//		currentMoveCommand_ = GetNextCommand();
-			//		// 先頭の行動コマンドを削除
-			//		PopFrontMoveCommand();
-			//		// 数字更新
-			//		UpdateMoveCommandsNum();
-			//		// 行動開始フラグを立てる
-			//		MoveTimer_ = kMoveTime;
-			//		isMove_ = true;
-			//	}
-
-			//}
-
 		} else {
 			SetSelectCommands(kMaxSelectNum);
 			isSelect_ = true;

@@ -31,7 +31,7 @@ void GameScene::Initialize() {
 	playerTex_ = TextureManager::Load("player/player.png");
 	playerSprite_.reset(Sprite::Create(playerTex_, {0.0f, 0.0f}));
 
-	enemyTex_ = TextureManager::Load("player/player.png");
+	enemyTex_ = TextureManager::Load("enemy/enemy.png");
 	enemySprite_.reset(Sprite::Create(enemyTex_, {0.0f, 0.0f}));
 
 	// 3Dモデルの生成
@@ -46,7 +46,7 @@ void GameScene::Initialize() {
 
 	// 敵の生成
 	std::vector<Model*> enemyModels{playerModel_.get()};
-	std::vector<uint32_t> enemyTextures{playerTex_, redTex_, greenTex_, blueTex_, numberTex_};
+	std::vector<uint32_t> enemyTextures{enemyTex_, redTex_, greenTex_, blueTex_, numberTex_};
 	enemy_ = std::make_unique<Enemy>();
 	enemy_->Initialize(enemyModels, enemyTextures);
 }
