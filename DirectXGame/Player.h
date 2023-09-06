@@ -70,6 +70,9 @@ private:
 	//プレイヤーのワールドトランスフォーム
 	WorldTransform worldTransform_;
 
+	//エフェクトのワールドトランスフォーム
+	WorldTransform worldTransformEffect_[4];
+
 	//速度
 	Vector3 velocity_;
 

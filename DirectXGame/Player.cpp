@@ -40,6 +40,14 @@ void Player::Initialize(const std::vector<Model*>& models, const std::vector<uin
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = Vector3(-25.0f, 2.0f, 5.0f);
 	worldTransform_.UpdateMatrix();
+
+	for (int i = 0; i < 4; i++) {
+		worldTransformEffect_[i].Initialize();
+		worldTransformEffect_[i].scale_ *= 2.0f;
+		worldTransformEffect_[i].parent_ = &worldTransform_;
+		worldTransformEffect_[i].UpdateMatrix();
+	}
+
 	SetSelectCommands(kMaxSelectNum);
 	SetGrid(0, 2);
 	collisionManager_->SetCollision(GetGridX(), GetGridZ());
@@ -190,10 +198,13 @@ void Player::Update() {
 	if (isMove_) {
 		Move(currentMoveCommand_);
 	} else {
-		
+		currentMoveCommand_ = Stop;
 	}
 
 	worldTransform_.UpdateMatrix();
+	for (int i = 0; i < 4; i++) {
+		worldTransformEffect_[i].UpdateMatrix();
+	}
 
 }
 
@@ -310,6 +321,25 @@ void Player::Move(Command& command) {
 		break;
 	case AttackCross:
 
+		if (MoveTimer_ == 60) {
+			
+			for (int i = 0; i < 4; i++) {
+				worldTransformEffect_[i].translation_ = Vector3(0.0f, 0.0f, 0.0f);
+			}
+
+		}
+
+		if (MoveTimer_ % 5 == 0) {
+			for (int i = 0; i < 4; i++) {
+				worldTransformEffect_[i].translation_.y = -3.0f;
+			}
+		}
+
+		for (int i = 0; i < 4; i++) {
+			velocity_ = {cosf(i * 3.14f / 2.0f) / 3.0f,1.0f, sinf(i * 3.14f / 2.0f) / 3.0f};
+			worldTransformEffect_[i].translation_ += velocity_;
+		}
+
 		currentTex_ = textures_[0];
 
 		break;
@@ -351,6 +381,14 @@ void Player::Move(Command& command) {
 void Player::Draw(const ViewProjection& viewProjection) {
 
 	models_[0]->Draw(worldTransform_, viewProjection, currentTex_);
+
+	if (currentMoveCommand_ == AttackCross) {
+
+		for (int i = 0; i < 4; i++) {
+			models_[1]->Draw(worldTransformEffect_[i], viewProjection, textures_[5]);
+		}
+
+	}
 
 }
 

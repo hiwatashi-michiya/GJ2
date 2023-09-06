@@ -30,25 +30,28 @@ void GameScene::Initialize() {
 	groundModel_.reset(Model::CreateFromOBJ("ground", true));
 	ground_ = std::make_unique<Ground>();
 	ground_->Initialize(groundModel_.get());
+	crossEffectModel_.reset(Model::CreateFromOBJ("crosseffect", true));
 
 	enemyTex_ = TextureManager::Load("king/king.png");
 	redTex_ = TextureManager::Load("player/red.png");
 	greenTex_ = TextureManager::Load("player/green.png");
 	blueTex_ = TextureManager::Load("player/blue.png");
 	numberTex_ = TextureManager::Load("UI/command.png");
+	alphaRedTex_ = TextureManager::Load("crosseffect/effectred.png");
+	alphaDarkTex_ = TextureManager::Load("crosseffect/effectdark.png");
 
 	playerTex_ = TextureManager::Load("pawn/pawn.png");
 	playerSprite_.reset(Sprite::Create(playerTex_, {0.0f, 0.0f}));
 	playerModel_.reset(Model::CreateFromOBJ("pawn",true));
 
-	std::vector<Model*> playerModels{playerModel_.get()};
-	std::vector<uint32_t> playerTextures{playerTex_, redTex_, greenTex_, blueTex_, numberTex_};
+	std::vector<Model*> playerModels{playerModel_.get(), crossEffectModel_.get()};
+	std::vector<uint32_t> playerTextures{playerTex_, redTex_, greenTex_, blueTex_, numberTex_, alphaRedTex_};
 	player_ = std::make_unique<Player>();
 	player_->Initialize(playerModels, playerTextures);
 
 	enemyModel_.reset(Model::CreateFromOBJ("king", true));
-	std::vector<Model*> enemyModels{enemyModel_.get()};
-	std::vector<uint32_t> enemyTextures{enemyTex_, redTex_, greenTex_, blueTex_, numberTex_};
+	std::vector<Model*> enemyModels{enemyModel_.get(), crossEffectModel_.get()};
+	std::vector<uint32_t> enemyTextures{enemyTex_, redTex_, greenTex_, blueTex_, numberTex_, alphaDarkTex_};
 	enemy_ = std::make_unique<Enemy>();
 	enemy_->Initialize(enemyModels, enemyTextures);
 

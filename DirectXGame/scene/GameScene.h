@@ -74,6 +74,7 @@ private: // メンバ変数
 	//モデル
 	std::unique_ptr<Model> playerModel_;
 	std::unique_ptr<Model> enemyModel_;
+	std::unique_ptr<Model> crossEffectModel_;
 	// 天球モデル
 	std::unique_ptr<Model> skydomeModel_ = nullptr;
 	// 地面モデル
@@ -88,6 +89,8 @@ private: // メンバ変数
 	uint32_t greenTex_ = 0u;
 	uint32_t blueTex_ = 0u;
 	uint32_t numberTex_ = 0u;
+	uint32_t alphaRedTex_ = 0u;
+	uint32_t alphaDarkTex_ = 0u;
 
 	// オプション
 	Option* option = new Option;
