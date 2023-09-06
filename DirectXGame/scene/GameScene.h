@@ -1,21 +1,22 @@
 #pragma once
 
 #include "Audio.h"
+#include "CollisionManager.h"
 #include "DirectXCommon.h"
+#include "Enemy.h"
+#include "Ground.h"
 #include "Input.h"
 #include "Model.h"
+#include "Option.h"
+#include "Player.h"
+#include "PrimitiveDrawer.h"
 #include "SafeDelete.h"
+#include "Skydome.h"
 #include "Sprite.h"
+#include "TransitionEffect.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
-#include "Player.h"
 #include <memory>
-#include "PrimitiveDrawer.h"
-#include "Enemy.h"
-#include "Skydome.h"
-#include "Ground.h"
-#include "Option.h"
-#include "CollisionManager.h"
 
 /// <summary>
 /// ゲームシーン
@@ -58,7 +59,7 @@ private: // メンバ変数
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>
-	
+
 	ViewProjection viewProjection_;
 
 	std::unique_ptr<Player> player_ = nullptr;
@@ -69,9 +70,8 @@ private: // メンバ変数
 	std::unique_ptr<Skydome> skydome_ = nullptr;
 	// 地面
 	std::unique_ptr<Ground> ground_ = nullptr;
-	
 
-	//モデル
+	// モデル
 	std::unique_ptr<Model> playerModel_;
 	std::unique_ptr<Model> enemyModel_;
 	// 天球モデル
@@ -79,7 +79,7 @@ private: // メンバ変数
 	// 地面モデル
 	std::unique_ptr<Model> groundModel_ = nullptr;
 
-	//画像
+	// 画像
 	std::unique_ptr<Sprite> playerSprite_;
 
 	uint32_t playerTex_ = 0u;
@@ -87,9 +87,14 @@ private: // メンバ変数
 	uint32_t redTex_ = 0u;
 	uint32_t greenTex_ = 0u;
 	uint32_t blueTex_ = 0u;
+	uint32_t whiteTex_ = 0u;
+	uint32_t blackTex_ = 0u;
 	uint32_t numberTex_ = 0u;
 
 	// オプション
 	Option* option = new Option;
 
+	// 画面遷移アニメーション
+	std::unique_ptr<TransitionEffect> transition_ = nullptr;
+	bool isStageTransition_ = false;
 };
