@@ -14,13 +14,13 @@ void GameScene::Initialize() {
 	primitiveDrawer_ = PrimitiveDrawer::GetInstance();
 	collisionManager_ = CollisionManager::GetInstance();
 
-	//ビュープロジェクション初期化
+	// ビュープロジェクション初期化
 	viewProjection_.Initialize();
 	viewProjection_.farZ = 2000.0f;
 	viewProjection_.translation_.y = 100.0f;
 	viewProjection_.translation_.z = -100.0f;
 	viewProjection_.rotation_.x = 3.14f / 4.0f;
-	//3Dライン描画のビュープロジェクション設定
+	// 3Dライン描画のビュープロジェクション設定
 	primitiveDrawer_->SetViewProjection(&viewProjection_);
 	// 天球初期化
 	skydomeModel_.reset(Model::CreateFromOBJ("skydome", true));
@@ -42,7 +42,7 @@ void GameScene::Initialize() {
 
 	playerTex_ = TextureManager::Load("pawn/pawn.png");
 	playerSprite_.reset(Sprite::Create(playerTex_, {0.0f, 0.0f}));
-	playerModel_.reset(Model::CreateFromOBJ("pawn",true));
+	playerModel_.reset(Model::CreateFromOBJ("pawn", true));
 
 	std::vector<Model*> playerModels{playerModel_.get(), crossEffectModel_.get()};
 	std::vector<uint32_t> playerTextures{playerTex_, redTex_, greenTex_, blueTex_, numberTex_, alphaRedTex_};
@@ -57,9 +57,15 @@ void GameScene::Initialize() {
 
 	// オプション 初期化
 	option->Initialize();
+
+	whiteTex_ = TextureManager::Load("player/player.png");
+	blackTex_ = TextureManager::Load("enemy/enemy.png");
+	AddStageTransition();
 }
 
 void GameScene::Update() {
+
+	XINPUT_STATE joyState;
 
 	player_->Update();
 	enemy_->Update();
@@ -68,6 +74,17 @@ void GameScene::Update() {
 	// ビュープロジェクション更新
 	viewProjection_.UpdateMatrix();
 
+	if (input_->GetJoystickState(0, joyState)) {
+		if ((input_->PushKey(DIK_LEFT) || joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A)) {
+			AddStageTransition();
+		} 
+		else if ((input_->PushKey(DIK_RIGHT) || joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B)) {
+			isStageTransition_ = false;
+		}
+	}
+	if (isStageTransition_) {
+		transition_->Update();
+	}
 }
 
 void GameScene::Draw() {
@@ -107,7 +124,7 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
-	
+
 	skydome_->Draw(viewProjection_);
 	ground_->Draw(viewProjection_);
 
@@ -131,8 +148,20 @@ void GameScene::Draw() {
 
 	option->Draw();
 
+	if (isStageTransition_) {
+		transition_->Draw();
+	}
+
 	// スプライト描画後処理
 	Sprite::PostDraw();
 
 #pragma endregion
+}
+
+// 画面遷移
+void GameScene::AddStageTransition() {
+	std::vector<uint32_t> transitionTextures{whiteTex_, blackTex_};
+	transition_ = std::make_unique<TransitionEffect>();
+	transition_->Initialize(transitionTextures);
+	isStageTransition_ = true;
 }
