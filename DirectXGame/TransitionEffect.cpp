@@ -38,7 +38,6 @@ void TransitionEffect::Update() {
 }
 
 void TransitionEffect::Draw() {
-
 	for (int i = 0; i < kHorizontalDivisionMax; i++) {
 		for (int j = 0; j < kVerticalDivisionMax; j++) {
 			transition[i][j]->Draw();

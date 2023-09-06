@@ -57,9 +57,7 @@ void GameScene::Initialize() {
 
 	whiteTex_ = TextureManager::Load("player/player.png");
 	blackTex_ = TextureManager::Load("enemy/enemy.png");
-	std::vector<uint32_t> transitionTextures{whiteTex_, blackTex_};
-	transition_ = std::make_unique<TransitionEffect>();
-	transition_->Initialize(transitionTextures);
+	AddStageTransition();
 }
 
 void GameScene::Update() {
@@ -75,7 +73,10 @@ void GameScene::Update() {
 
 	if (input_->GetJoystickState(0, joyState)) {
 		if ((input_->PushKey(DIK_LEFT) || joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A)) {
-			isStageTransition_ = true;
+			AddStageTransition();
+		} 
+		else if ((input_->PushKey(DIK_RIGHT) || joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B)) {
+			isStageTransition_ = false;
 		}
 	}
 	if (isStageTransition_) {
@@ -152,4 +153,12 @@ void GameScene::Draw() {
 	Sprite::PostDraw();
 
 #pragma endregion
+}
+
+// 画面遷移
+void GameScene::AddStageTransition() {
+	std::vector<uint32_t> transitionTextures{whiteTex_, blackTex_};
+	transition_ = std::make_unique<TransitionEffect>();
+	transition_->Initialize(transitionTextures);
+	isStageTransition_ = true;
 }

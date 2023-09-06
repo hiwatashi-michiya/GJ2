@@ -19,7 +19,6 @@ public:
 	void SetTextures(const std::vector<uint32_t>& textures) { textures_ = textures; }
 
 private:
-	int moveTime_ = 0;
 	int colorNum_ = 0;
 	float verticalSize_ = 0.0f;
 	float horizontalSize_ = 0.0f;
