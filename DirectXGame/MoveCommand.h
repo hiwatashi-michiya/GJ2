@@ -7,7 +7,7 @@ enum Command {
 	MoveUp,
 	MoveDown,
 	AttackCross,
-	Attack,
+	AttackCircle,
 	Guard,
 	Stop
 };
