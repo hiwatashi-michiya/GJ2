@@ -67,7 +67,7 @@ void GameScene::Update() {
 
 	XINPUT_STATE joyState;
 
-	player_->Update();
+	player_->Update(option);
 	enemy_->Update();
 
 	option->Update(viewProjection_);
@@ -75,10 +75,10 @@ void GameScene::Update() {
 	viewProjection_.UpdateMatrix();
 
 	if (input_->GetJoystickState(0, joyState)) {
-		if ((input_->PushKey(DIK_LEFT) || joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A)) {
+		if ((input_->PushKey(DIK_LEFT) || option->GetActionTrigger(DASH))) {
 			AddStageTransition();
 		} 
-		else if ((input_->PushKey(DIK_RIGHT) || joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B)) {
+		else if ((input_->PushKey(DIK_RIGHT) || option->GetActionTrigger(JUMP))) {
 			isStageTransition_ = false;
 		}
 	}

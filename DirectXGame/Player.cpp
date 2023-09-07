@@ -54,7 +54,7 @@ void Player::Initialize(const std::vector<Model*>& models, const std::vector<uin
 
 }
 
-void Player::Update() {
+void Player::Update(Option* option) {
 
 #ifdef _DEBUG
 
@@ -76,7 +76,7 @@ void Player::Update() {
 
 		if (input_->GetJoystickState(0, joyState)) {
 
-			if ((input_->PushKey(DIK_LEFT) || joyState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)
+			if ((input_->PushKey(DIK_LEFT) || option->GetActionTrigger(L_SELECT))
 				&& inputCoolTimer_ == 0) {
 
 				if (selectNum_ > 0) {
@@ -88,7 +88,7 @@ void Player::Update() {
 			}
 
 			else if ((input_->PushKey(DIK_RIGHT) ||
-			     joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) &&
+			     option->GetActionTrigger(R_SELECT)) &&
 			    inputCoolTimer_ == 0) {
 
 				if (selectNum_ < selectCommands_.size() - 1) {
@@ -99,7 +99,7 @@ void Player::Update() {
 
 			}
 
-			if ((input_->PushKey(DIK_E) || joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) &&
+			if ((input_->PushKey(DIK_E) || option->GetActionTrigger(ACT)) &&
 				inputCoolTimer_ == 0 &&
 				moveCommands_.size() < kMaxCommand) {
 
@@ -108,14 +108,14 @@ void Player::Update() {
 
 				inputCoolTimer_ = kInputCoolTime;
 
-			}
-			else if ((input_->PushKey(DIK_E) || joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) &&
+			} else if (
+			    (input_->PushKey(DIK_E) || option->GetActionTrigger(ACT)) &&
 				inputCoolTimer_ == 0) {
 				isSelect_ = false;
 				inputCoolTimer_ = kInputCoolTime;
 			}
 
-			if ((input_->PushKey(DIK_Q) || joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B) &&
+			if ((input_->PushKey(DIK_Q) || option->GetActionTrigger(CANCEL)) &&
 				inputCoolTimer_ == 0 &&
 				moveCommands_.size() != 0) {
 				PushSelectCommand(moveCommands_.back());

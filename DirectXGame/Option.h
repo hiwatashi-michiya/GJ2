@@ -13,6 +13,8 @@ enum ActCode {
 	ACT,
 	MENU,
 	CANCEL,
+	L_SELECT,
+	R_SELECT,
 
 	END = 64,
 };
