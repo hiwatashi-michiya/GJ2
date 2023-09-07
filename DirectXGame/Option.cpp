@@ -1409,7 +1409,22 @@ void Option::CursorUpdate() {
 		m_cursorPos.y += m_cursorVel.y;
 	}
 
+	if (m_cursorPos.x < 10) {
+		m_cursorPos.x = 10;
+	}
+	if (m_cursorPos.x > 1270) {
+		m_cursorPos.x = 10;
+	}
+	if (m_cursorPos.y < 10) {
+		m_cursorPos.y = 10;
+	}
+	if (m_cursorPos.y > 710) {
+		m_cursorPos.y = 710;
+	}
+
 	m_cursorSprite->SetPosition({m_cursorPos.x, m_cursorPos.y});
+
+
 }
 
 Vector2 Option::GetCursorPos() { return Vector2(m_cursorPos.x,m_cursorPos.y); }
