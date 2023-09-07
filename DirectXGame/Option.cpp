@@ -1413,7 +1413,7 @@ void Option::CursorUpdate() {
 		m_cursorPos.x = 10;
 	}
 	if (m_cursorPos.x > 1270) {
-		m_cursorPos.x = 10;
+		m_cursorPos.x = 1270;
 	}
 	if (m_cursorPos.y < 10) {
 		m_cursorPos.y = 10;
