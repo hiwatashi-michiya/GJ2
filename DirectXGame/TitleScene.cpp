@@ -49,6 +49,8 @@ void TitleScene::Initialize() {
 	blackTex_ = TextureManager::Load("enemy/enemy.png");
 	titleTex_ = TextureManager::Load("UI/title.png");
 
+	debugSE_ = audio_->LoadWave("SE/debugmode.wav");
+
 	titleSprite_.reset(Sprite::Create(titleTex_, {0.0f, 0.0f}));
 	titleSprite_->SetSize({1280.0f, 720.0f});
 	titleSprite_->SetTextureRect({ 0.0f, 0.0f,},{1280.0f, 720.0f});
@@ -76,6 +78,7 @@ void TitleScene::Update() {
 	if (input_->GetJoystickState(0, joyState)) {
 		if ((input_->PushKey(DIK_LEFT) || option->GetActionTrigger(DASH))) {
 			isChangeGameScene_ = true;
+			audio_->PlayWave(debugSE_);
 		}
 	}
 	// 画面遷移の更新
