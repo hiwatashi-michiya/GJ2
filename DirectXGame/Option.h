@@ -15,6 +15,7 @@ enum ActCode {
 	CANCEL,
 	L_SELECT,
 	R_SELECT,
+	UI_SELECT,
 
 	END = 64,
 };
@@ -29,7 +30,10 @@ public:
 	void Draw();
 
 	bool GetActionTrigger(ActCode act);
+	bool GetActionLongPush(ActCode act);
 	void CursorUpdate();
+	Vector2 GetCursorPos();
+	Vector2 GetCursorRad();
 
 private:
 

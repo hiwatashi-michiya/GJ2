@@ -146,4 +146,8 @@ private:
 	//現在セットしている画像
 	uint32_t currentTex_ = 0u;
 
+	// 行動UIの表示
+	bool isFindUI_[kMaxSelectNum] = {};
+	std::unique_ptr<Sprite> findUI_[kMaxSelectNum];
+	uint32_t findUITexture_;
 };

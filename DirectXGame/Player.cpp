@@ -14,6 +14,7 @@ void Player::Initialize(const std::vector<Model*>& models, const std::vector<uin
 	SetTextures(textures);
 
 	currentTex_ = textures_[0];
+	findUITexture_ = TextureManager::Load("findUI.png");
 
 	for (int i = 0; i < kMaxCommand; i++) {
 		commandNumSprite_[i].reset(Sprite::Create(textures_[4], {0.0f, 0.0f}));
@@ -30,6 +31,13 @@ void Player::Initialize(const std::vector<Model*>& models, const std::vector<uin
 		selectCommandNumSprite_[i]->SetTextureRect({0.0f,0.0f,}, {64.0f,64.0f});
 		selectCommandNumSprite_[i]->SetPosition({i * 64.0f + 300.0f, 600.0f});
 
+	}
+
+	for (int i = 0; i < kMaxSelectNum; i++) {
+		findUI_[i].reset(Sprite::Create(findUITexture_, {0.0f, 0.0f}));
+		findUI_[i]->SetSize({64.0f, 64.0f});
+		findUI_[i]->SetTextureRect({0.0f,0.0f,},{32.0f, 32.0f});
+		findUI_[i]->SetPosition({selectCommandNumSprite_[i]->GetPosition().x,selectCommandNumSprite_[i]->GetPosition().y});
 	}
 
 	currentNumSprite_.reset(Sprite::Create(textures_[0], {0.0f, 0.0f}));
@@ -64,6 +72,25 @@ void Player::Update(Option* option) {
 
 #endif // _DEBUG
 
+	// ポインターを行動カードと接触してる状態でXボタンを押すと効果を表示
+	for (int i = 0; i < kMaxSelectNum; i++) {
+		Vector2 pos = selectCommandNumSprite_[i]->GetPosition();
+		Vector2 size = selectCommandNumSprite_[i]->GetSize();
+
+
+		if ((pos.x) <= (option->GetCursorPos().x + option->GetCursorRad().x) &&
+		    (pos.x + size.x) >= (option->GetCursorPos().x - option->GetCursorRad().x) &&
+		    (pos.y) <= (option->GetCursorPos().y + option->GetCursorRad().y) &&
+		    (pos.y + size.y) >= (option->GetCursorPos().y - option->GetCursorRad().y)&&
+			option->GetActionLongPush(UI_SELECT))
+		{
+			if (findUI_[i]->GetSize().x)
+			isFindUI_[i] = true;
+		} else {
+			isFindUI_[i] = false;
+		}
+
+	}
 
 	XINPUT_STATE joyState;
 
@@ -378,6 +405,12 @@ void Player::DrawUI() {
 
 	for (int i = 0; i < selectCommands_.size(); i++) {
 		selectCommandNumSprite_[i]->Draw();
+	}
+
+	for (int i = 0; i < selectCommands_.size(); i++) {
+		if (isFindUI_[i] == true) {
+			findUI_[i]->Draw();
+		}
 	}
 
 	currentNumSprite_->Draw();
