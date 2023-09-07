@@ -112,6 +112,7 @@ void Player::Update(Option* option) {
 			    (input_->PushKey(DIK_E) || option->GetActionTrigger(ACT)) &&
 				inputCoolTimer_ == 0) {
 				isSelect_ = false;
+				isPlayerTurn_ = true;
 				inputCoolTimer_ = kInputCoolTime;
 			}
 
@@ -131,11 +132,21 @@ void Player::Update(Option* option) {
 
 
 
-		UpdateMoveCommandsNum();
+		
 	}
 	else {
 
-		//リスト内が空でないなら行動開始
+	}
+
+	UpdateMoveCommandsNum();
+
+}
+
+void Player::MoveTurn() {
+
+	if (!isSelect_) {
+
+		// リスト内が空でないなら行動開始
 		if (moveCommands_.empty() == false) {
 
 			if (isMove_ == false) {
@@ -150,46 +161,9 @@ void Player::Update(Option* option) {
 				isMove_ = true;
 			}
 
-			////ゲームパッドの取得
-			//if (input_->GetJoystickState(0, joyState)) {
-
-			//	if ((input_->TriggerKey(DIK_SPACE) || joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) && isMove_ == false) {
-
-			//		//次の行動コマンドを現在の行動コマンドに設定
-			//		currentMoveCommand_ = GetNextCommand();
-			//		//先頭の行動コマンドを削除
-			//		PopFrontMoveCommand();
-			//		//数字更新
-			//		UpdateMoveCommandsNum();
-			//		//行動開始フラグを立てる
-			//		MoveTimer_ = kMoveTime;
-			//		isMove_ = true;
-
-			//	}
-
-			//}
-			////キーボードの場合
-			//else {
-
-			//	if (input_->TriggerKey(DIK_SPACE) && isMove_ == false) {
-
-			//		// 次の行動コマンドを現在の行動コマンドに設定
-			//		currentMoveCommand_ = GetNextCommand();
-			//		// 先頭の行動コマンドを削除
-			//		PopFrontMoveCommand();
-			//		// 数字更新
-			//		UpdateMoveCommandsNum();
-			//		// 行動開始フラグを立てる
-			//		MoveTimer_ = kMoveTime;
-			//		isMove_ = true;
-			//	}
-
-			//}
-
-		}
-		else {
+		} else if(isMove_ == false){
 			SetSelectCommands(kMaxSelectNum);
-			isSelect_ = true;
+			isPlayerTurn_ = false;
 		}
 
 	}
@@ -198,7 +172,7 @@ void Player::Update(Option* option) {
 	if (isMove_) {
 		Move(currentMoveCommand_);
 	} else {
-		currentMoveCommand_ = Stop;
+		
 	}
 
 	worldTransform_.UpdateMatrix();
@@ -375,6 +349,7 @@ void Player::Move(Command& command) {
 	if (--MoveTimer_ <= 0) {
 		velocity_.y = 0.0f;
 		currentTex_ = textures_[0];
+		currentMoveCommand_ = Stop;
 		isMove_ = false;
 		isHit_ = false;
 	}

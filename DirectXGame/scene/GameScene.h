@@ -17,6 +17,7 @@
 #include "ViewProjection.h"
 #include "WorldTransform.h"
 #include <memory>
+#include <list>
 
 /// <summary>
 /// ゲームシーン
@@ -68,6 +69,11 @@ private: // メンバ変数
 	std::unique_ptr<Player> player_ = nullptr;
 
 	std::unique_ptr<Enemy> enemy_ = nullptr;
+
+	std::list<Enemy*> enemies_;
+
+	//全ての敵の行動が終わったかどうか確認するフラグ
+	bool CheckAllEnemyTurn();
 
 	// 天球
 	std::unique_ptr<Skydome> skydome_ = nullptr;

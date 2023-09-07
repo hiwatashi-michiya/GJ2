@@ -4,7 +4,13 @@
 
 GameScene::GameScene() {}
 
-GameScene::~GameScene() {}
+GameScene::~GameScene() {
+
+	for (Enemy* enemy : enemies_) {
+		delete enemy;
+	}
+
+}
 
 void GameScene::Initialize() {
 
@@ -17,8 +23,8 @@ void GameScene::Initialize() {
 	// ビュープロジェクション初期化
 	viewProjection_.Initialize();
 	viewProjection_.farZ = 2000.0f;
-	viewProjection_.translation_.y = 100.0f;
-	viewProjection_.translation_.z = -100.0f;
+	viewProjection_.translation_.y = 70.0f;
+	viewProjection_.translation_.z = -70.0f;
 	viewProjection_.rotation_.x = 3.14f / 4.0f;
 	// 3Dライン描画のビュープロジェクション設定
 	primitiveDrawer_->SetViewProjection(&viewProjection_);
@@ -52,8 +58,18 @@ void GameScene::Initialize() {
 	enemyModel_.reset(Model::CreateFromOBJ("king", true));
 	std::vector<Model*> enemyModels{enemyModel_.get(), crossEffectModel_.get()};
 	std::vector<uint32_t> enemyTextures{enemyTex_, redTex_, greenTex_, blueTex_, numberTex_, alphaDarkTex_};
-	enemy_ = std::make_unique<Enemy>();
-	enemy_->Initialize(enemyModels, enemyTextures);
+
+	Enemy* newEnemy = new Enemy();
+	newEnemy->Initialize(enemyModels, enemyTextures);
+	newEnemy->SetPlayer(player_.get());
+	newEnemy->SetPosition(5, 2);
+	enemies_.push_back(newEnemy);
+
+	Enemy* newEnemy2 = new Enemy();
+	newEnemy2->Initialize(enemyModels, enemyTextures);
+	newEnemy2->SetPlayer(player_.get());
+	newEnemy2->SetPosition(5, 3);
+	enemies_.push_back(newEnemy2);
 
 	// オプション 初期化
 	option->Initialize();
@@ -67,9 +83,51 @@ void GameScene::Update() {
 
 	XINPUT_STATE joyState;
 
-	player_->Update(option);
-	enemy_->Update();
+	enemies_.remove_if([](Enemy* enemy) {
+		if (enemy->GetIsDead()) {
 
+			delete enemy;
+			return true;
+		}
+
+		return false;
+	});
+
+	player_->Update(option);
+
+	for (Enemy* enemy : enemies_) {
+		enemy->Update();
+	}
+
+	if (player_->GetIsPlayerTurn()) {
+		player_->MoveTurn();
+	}
+	else if(CheckAllEnemyTurn()) {
+
+		for (Enemy* enemy : enemies_) {
+
+			if (enemy->GetIsEnemyTurn()) {
+				enemy->MoveTurn();
+				break;
+			}
+
+		}
+
+	}
+	//全員のターンが終了したらコマンドを打てるようにする
+	else {
+
+		if (player_->GetIsSelect() == false) {
+			player_->SetIsSelect(true);
+
+			for (Enemy* enemy : enemies_) {
+				enemy->SetIsSelect(true);
+			}
+
+		}
+
+	}
+	
 	option->Update(viewProjection_);
 	// ビュープロジェクション更新
 	viewProjection_.UpdateMatrix();
@@ -118,7 +176,10 @@ void GameScene::Draw() {
 	ground_->Draw(viewProjection_);
 
 	player_->Draw(viewProjection_);
-	enemy_->Draw(viewProjection_);
+
+	for (Enemy* enemy : enemies_) {
+		enemy->Draw(viewProjection_);
+	}
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
@@ -133,7 +194,10 @@ void GameScene::Draw() {
 	/// </summary>
 
 	player_->DrawUI();
-	enemy_->DrawUI();
+
+	for (Enemy* enemy : enemies_) {
+		enemy->DrawUI();
+	}
 
 	option->Draw();
 
@@ -153,4 +217,17 @@ void GameScene::AddStageTransition() {
 	transition_ = std::make_unique<TransitionEffect>();
 	transition_->Initialize(transitionTextures);
 	isStageTransition_ = true;
+}
+
+bool GameScene::CheckAllEnemyTurn() {
+
+	for (Enemy* enemy : enemies_) {
+
+		if (enemy->GetIsEnemyTurn()) {
+			return true;
+		}
+	}
+
+	return false;
+
 }

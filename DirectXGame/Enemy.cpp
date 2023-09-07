@@ -63,7 +63,7 @@ void Enemy::Update() {
 
 #endif // _DEBUG
 
-	XINPUT_STATE joyState;
+	/*XINPUT_STATE joyState;*/
 
 	if (inputCoolTimer_ > 0) {
 		inputCoolTimer_--;
@@ -72,66 +72,92 @@ void Enemy::Update() {
 	// リストの要素が空なら新たに設定する
 	if (isSelect_) {
 
-		if (input_->GetJoystickState(0, joyState)) {
-
-			if ((input_->PushKey(DIK_LEFT) ||
-			     joyState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER) &&
-			    inputCoolTimer_ == 0) {
-
-				if (selectNum_ > 0) {
-					selectNum_--;
-				}
-
-				inputCoolTimer_ = kInputCoolTime;
-
-			}
-
-			else if (
-			    (input_->PushKey(DIK_RIGHT) ||
-			     joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) &&
-			    inputCoolTimer_ == 0) {
-
-				if (selectNum_ < selectCommands_.size() - 1) {
-					selectNum_++;
-				}
-
-				inputCoolTimer_ = kInputCoolTime;
-			}
-
-			if ((input_->PushKey(DIK_E) || joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) &&
-			    inputCoolTimer_ == 0 && moveCommands_.size() < kMaxEnemyCommand) {
+		if (moveCommands_.size() < kMaxEnemyCommand) {
 
 				// ランダム行動
-				selectNum_ = rand() % selectCommands_.size();
+			selectNum_ = rand() % selectCommands_.size();
 
-				SetMoveCommand(selectNum_);
-				PopSelectCommand(selectNum_);
+			SetMoveCommand(selectNum_);
+			PopSelectCommand(selectNum_);
 
-				inputCoolTimer_ = kInputCoolTime;
-
-			} else if (
-			    (input_->PushKey(DIK_E) || joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) &&
-			    inputCoolTimer_ == 0) {
-				isSelect_ = false;
-				inputCoolTimer_ = kInputCoolTime;
-			}
-
-			if ((input_->PushKey(DIK_Q) || joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B) &&
-			    inputCoolTimer_ == 0 && moveCommands_.size() != 0) {
-				PushSelectCommand(moveCommands_.back());
-				PopBackMoveCommand();
-				inputCoolTimer_ = kInputCoolTime;
-			}
-
-			if (selectNum_ >= selectCommands_.size()) {
-				selectNum_ = int(selectCommands_.size() - 1);
-			}
 		}
+		else if(player_->GetIsSelect() == false){
+
+			isSelect_ = false;
+			isEnemyTurn_ = true;
+			inputCoolTimer_ = kInputCoolTime;
+
+		}
+
+		//if (input_->GetJoystickState(0, joyState)) {
+
+		//	if ((input_->PushKey(DIK_LEFT) ||
+		//	     joyState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER) &&
+		//	    inputCoolTimer_ == 0) {
+
+		//		if (selectNum_ > 0) {
+		//			selectNum_--;
+		//		}
+
+		//		inputCoolTimer_ = kInputCoolTime;
+
+		//	}
+
+		//	else if (
+		//	    (input_->PushKey(DIK_RIGHT) ||
+		//	     joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) &&
+		//	    inputCoolTimer_ == 0) {
+
+		//		if (selectNum_ < selectCommands_.size() - 1) {
+		//			selectNum_++;
+		//		}
+
+		//		inputCoolTimer_ = kInputCoolTime;
+		//	}
+
+		//	if ((input_->PushKey(DIK_E) || joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) &&
+		//	    inputCoolTimer_ == 0 && moveCommands_.size() < kMaxEnemyCommand) {
+
+		//		// ランダム行動
+		//		selectNum_ = rand() % selectCommands_.size();
+
+		//		SetMoveCommand(selectNum_);
+		//		PopSelectCommand(selectNum_);
+
+		//		inputCoolTimer_ = kInputCoolTime;
+
+		//	} else if (
+		//	    (input_->PushKey(DIK_E) || joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) &&
+		//	    inputCoolTimer_ == 0) {
+		//		isSelect_ = false;
+		//		inputCoolTimer_ = kInputCoolTime;
+		//	}
+
+		//	if ((input_->PushKey(DIK_Q) || joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B) &&
+		//	    inputCoolTimer_ == 0 && moveCommands_.size() != 0) {
+		//		PushSelectCommand(moveCommands_.back());
+		//		PopBackMoveCommand();
+		//		inputCoolTimer_ = kInputCoolTime;
+		//	}
+
+		//	if (selectNum_ >= selectCommands_.size()) {
+		//		selectNum_ = int(selectCommands_.size() - 1);
+		//	}
+		//}
 
 		UpdateMoveCommandsNum();
 	} else {
 
-		// リスト内が空でないなら行動開始
+	}
+
+	worldTransform_.UpdateMatrix();
+}
+
+void Enemy::MoveTurn() {
+
+	if (!isSelect_) {
+
+			// リスト内が空でないなら行動開始
 		if (moveCommands_.empty() == false) {
 
 			if (isMove_ == false) {
@@ -145,10 +171,12 @@ void Enemy::Update() {
 				MoveTimer_ = kMoveTime;
 				isMove_ = true;
 			}
-		} else {
+		} 
+		else if(isMove_ == false) {
 			SetSelectCommands(kMaxEnemySelectNum);
-			isSelect_ = true;
+			isEnemyTurn_ = false;
 		}
+
 	}
 
 	// 行動フラグが立っていたら行動開始
@@ -158,6 +186,7 @@ void Enemy::Update() {
 	}
 
 	worldTransform_.UpdateMatrix();
+
 }
 
 void Enemy::Move(Command& command) {
@@ -353,4 +382,17 @@ void Enemy::UpdateMoveCommandsNum() {
 	}
 
 	currentNumSprite_->SetPosition({selectNum_ * 64.0f + 610.0f, 80.0f});
+}
+
+void Enemy::SetPosition(int x, int z) {
+
+	x = IntClamp(x, 0, 5);
+	z = IntClamp(z, 0, 5);
+
+
+	worldTransform_.translation_ = Vector3(-25.0f + x * 10.0f, 2.0f, 25.0f - z * 10.0f);
+	worldTransform_.UpdateMatrix();
+	SetGrid(x, z);
+	collisionManager_->SetCollision(GetGridX(), GetGridZ());
+
 }

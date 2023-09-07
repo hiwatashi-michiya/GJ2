@@ -56,7 +56,18 @@ public:
 	/// <param name="textures">画像配列</param>
 	void SetTextures(const std::vector<uint32_t>& textures) { textures_ = textures; }
 
+	/// <summary>
+	/// 行動ターン
+	/// </summary>
+	void MoveTurn();
+
 	bool GetIsDead() const { return isDead_; }
+
+	bool GetIsPlayerTurn() const { return isPlayerTurn_; }
+
+	bool GetIsSelect() const { return isSelect_; }
+
+	void SetIsSelect(bool flag) { isSelect_ = flag; }
 
 private:
 

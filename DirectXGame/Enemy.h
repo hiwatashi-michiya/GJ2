@@ -11,6 +11,7 @@
 #include <vector>
 #include "Collider.h"
 #include "CollisionManager.h"
+#include "Player.h"
 
 // コマンドの最大表示数
 const int kMaxEnemyCommand = 3;
@@ -53,13 +54,30 @@ public:
 	/// <param name="textures">画像配列</param>
 	void SetTextures(const std::vector<uint32_t>& textures) { textures_ = textures; }
 
+	/// <summary>
+	/// 行動ターン
+	/// </summary>
+	void MoveTurn();
+
 	bool GetIsDead() const { return isDead_; }
+
+	bool GetIsEnemyTurn() const { return isEnemyTurn_; }
+
+	void SetPosition(int x, int z);
+
+	void SetPlayer(Player* player) { player_ = player; }
+
+	bool GetIsSelect() const { return isSelect_; }
+
+	void SetIsSelect(bool flag) { isSelect_ = flag; }
 
 private:
 	// 入力
 	Input* input_ = nullptr;
 
 	CollisionManager* collisionManager_ = nullptr;
+
+	Player* player_ = nullptr;
 
 	// 入力クールタイム
 	const int kInputCoolTime = 15;
@@ -108,6 +126,9 @@ private:
 
 	// 行動コマンド画像更新
 	void UpdateMoveCommandsNum();
+
+		// 現在プレイヤーのターンかどうか
+	bool isEnemyTurn_ = false;
 
 	// スプライト
 	std::unique_ptr<Sprite> commandNumSprite_[kMaxEnemyCommand];
