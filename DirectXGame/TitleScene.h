@@ -80,6 +80,10 @@ private: // メンバ変数
 	uint32_t whiteTex_ = 0u;
 	uint32_t blackTex_ = 0u;
 	uint32_t numberTex_ = 0u;
+	uint32_t titleTex_ = 0u;
+
+	// スプライト
+	std::unique_ptr<Sprite> titleSprite_;
 
 	// オプション
 	Option* option = new Option;

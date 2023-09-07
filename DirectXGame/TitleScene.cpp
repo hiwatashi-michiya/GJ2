@@ -47,6 +47,12 @@ void TitleScene::Initialize() {
 	numberTex_ = TextureManager::Load("UI/command.png");
 	whiteTex_ = TextureManager::Load("player/player.png");
 	blackTex_ = TextureManager::Load("enemy/enemy.png");
+	titleTex_ = TextureManager::Load("UI/title.png");
+
+	titleSprite_.reset(Sprite::Create(titleTex_, {0.0f, 0.0f}));
+	titleSprite_->SetSize({1280.0f, 720.0f});
+	titleSprite_->SetTextureRect({ 0.0f, 0.0f,},{1280.0f, 720.0f});
+	titleSprite_->SetPosition({0.0f, 0.0f});
 
 	// オプション 初期化
 	option->Initialize();
@@ -126,6 +132,11 @@ void TitleScene::Draw() {
 	/// </summary>
 
 	option->Draw();
+
+	//タイトルの表示
+	if (transition_->GetFadeOut() != 1) {
+		titleSprite_->Draw();
+	}
 
 	// 画面遷移の描画
 	transition_->Draw();
