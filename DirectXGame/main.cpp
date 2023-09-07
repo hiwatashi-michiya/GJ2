@@ -120,7 +120,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 		// 画面遷移の描画
 		//if (titleScene->GetChangeGameScene()) {
-			transition_->Draw();
+			//transition_->Draw();
 		//}
 		// 軸表示の描画
 		axisIndicator->Draw();
