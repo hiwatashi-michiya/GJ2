@@ -3,6 +3,12 @@
 
 const int kMaxGrid = 6;
 
+enum AttackType {
+	PlayerAttack = 1,
+	EnemyAttack, 
+	EnemySpecialAttack
+};
+
 class CollisionManager {
 public:
 
@@ -14,9 +20,13 @@ public:
 
 	bool IsHit(int x, int z, int num);
 
+	bool IsHitAttack(int x, int z, int num);
+
 	void SetAttackCross(int x, int z, int num);
 
 	void SetAttackCircle(int x, int z, int num);
+
+	void ResetAttack();
 
 private:
 	CollisionManager() = default;
@@ -25,5 +35,6 @@ private:
 	const CollisionManager& operator=(const CollisionManager&) = delete;
 
 	int collisionMass_[kMaxGrid][kMaxGrid]{};
+	int attackMass_[kMaxGrid][kMaxGrid]{};
 
 };

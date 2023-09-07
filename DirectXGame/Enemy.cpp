@@ -57,11 +57,29 @@ void Enemy::Update() {
 
 #ifdef _DEBUG
 
-	/*ImGui::Begin("EnemyState");
-	ImGui::Text("current Command %d", currentMoveCommand_);
-	ImGui::End();*/
+	ImGui::Begin("EnemyState");
+	ImGui::Text("HP %d", life_);
+	ImGui::End();
 
 #endif // _DEBUG
+
+	if (isHit_ == false) {
+
+		//プレイヤーの攻撃を受けたら
+		if (collisionManager_->IsHitAttack(GetGridX(), GetGridZ(), PlayerAttack)) {
+
+			life_ -= 10;
+			isHit_ = true;
+
+		}
+
+	}
+	//アタックが終了したらヒットフラグを降ろす
+	else if (isHit_ == true && collisionManager_->IsHitAttack(GetGridX(), GetGridZ(), 0)) {
+
+		isHit_ = false;
+
+	}
 
 	/*XINPUT_STATE joyState;*/
 
@@ -242,10 +260,22 @@ void Enemy::Move(Command& command) {
 		break;
 	case AttackCross:
 
+		if (MoveTimer_ == 60) {
+
+			collisionManager_->SetAttackCross(GetGridX(), GetGridZ(), EnemyAttack);
+
+		}
+
 		currentTex_ = textures_[0];
 
 		break;
 	case AttackCircle:
+
+		if (MoveTimer_ == 60) {
+
+			collisionManager_->SetAttackCircle(GetGridX(), GetGridZ(), EnemyAttack);
+
+		}
 
 		velocity_ = {0.0f, 0.0f, 0.0f};
 
@@ -275,6 +305,7 @@ void Enemy::Move(Command& command) {
 	if (--MoveTimer_ <= 0) {
 		velocity_.y = 0.0f;
 		currentTex_ = textures_[0];
+		collisionManager_->ResetAttack();
 		isMove_ = false;
 	}
 }

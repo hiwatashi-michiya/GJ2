@@ -70,11 +70,26 @@ void Player::Update(Option* option) {
 
 #ifdef _DEBUG
 
-	/*ImGui::Begin("State");
-	ImGui::Text("current Command %d", currentMoveCommand_);
-	ImGui::End();*/
+	ImGui::Begin("State");
+	ImGui::Text("HP %d", life_);
+	ImGui::End();
 
 #endif // _DEBUG
+
+	if (isHit_ == false) {
+
+		if (collisionManager_->IsHitAttack(GetGridX(), GetGridZ(), EnemyAttack)) {
+
+			life_ -= 10;
+			isHit_ = true;
+		}
+
+	}
+	// アタックが終了したらヒットフラグを降ろす
+	else if (isHit_ == true && collisionManager_->IsHitAttack(GetGridX(), GetGridZ(), 0)) {
+
+		isHit_ = false;
+	}
 
 	// ポインターを行動カードと接触してる状態でXボタンを押すと効果を表示
 	for (int i = 0; i < kMaxSelectNum; i++) {
@@ -337,6 +352,8 @@ void Player::Move(Command& command) {
 				worldTransformEffect_[i].translation_ = Vector3(0.0f, 0.0f, 0.0f);
 			}
 
+			collisionManager_->SetAttackCross(GetGridX(), GetGridZ(), PlayerAttack);
+
 			audio_->PlayWave(crossAttackSE_);
 
 		}
@@ -356,6 +373,12 @@ void Player::Move(Command& command) {
 
 		break;
 	case AttackCircle:
+
+		if (MoveTimer_ == 60) {
+
+			collisionManager_->SetAttackCircle(GetGridX(), GetGridZ(), PlayerAttack);
+
+		}
 
 		velocity_ = {0.0f, 0.0f, 0.0f};
 
@@ -386,6 +409,7 @@ void Player::Move(Command& command) {
 		velocity_.y = 0.0f;
 		currentTex_ = textures_[0];
 		currentMoveCommand_ = Stop;
+		collisionManager_->ResetAttack();
 		isMove_ = false;
 		isHit_ = false;
 	}
