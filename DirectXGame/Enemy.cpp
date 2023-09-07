@@ -174,7 +174,7 @@ void Enemy::Move(Command& command) {
 			tmpZ = IntClamp(tmpZ, 0, 5);
 
 			// 障害物があったらストップコマンドに移行
-			if (collisionManager_->IsHit(tmpX, tmpZ)) {
+			if (collisionManager_->IsHit(tmpX, tmpZ, 1)) {
 				command = Stop;
 				break;
 			}
@@ -200,7 +200,7 @@ void Enemy::Move(Command& command) {
 			tmpZ = IntClamp(tmpZ, 0, 5);
 
 			// 障害物があったらストップコマンドに移行
-			if (collisionManager_->IsHit(tmpX, tmpZ)) {
+			if (collisionManager_->IsHit(tmpX, tmpZ, 1)) {
 				command = Stop;
 				break;
 			}
@@ -226,7 +226,7 @@ void Enemy::Move(Command& command) {
 			tmpZ = IntClamp(tmpZ, 0, 5);
 
 			// 障害物があったらストップコマンドに移行
-			if (collisionManager_->IsHit(tmpX, tmpZ)) {
+			if (collisionManager_->IsHit(tmpX, tmpZ, 1)) {
 				command = Stop;
 				break;
 			}
@@ -252,7 +252,7 @@ void Enemy::Move(Command& command) {
 			tmpZ = IntClamp(tmpZ, 0, 5);
 
 			// 障害物があったらストップコマンドに移行
-			if (collisionManager_->IsHit(tmpX, tmpZ)) {
+			if (collisionManager_->IsHit(tmpX, tmpZ, 1)) {
 				command = Stop;
 				break;
 			}
@@ -272,7 +272,7 @@ void Enemy::Move(Command& command) {
 		currentTex_ = textures_[0];
 
 		break;
-	case Attack:
+	case AttackCircle:
 
 		velocity_ = {0.0f, 0.0f, 0.0f};
 

@@ -210,6 +210,8 @@ void Player::Update() {
 
 void Player::Move(Command& command) {
 
+
+
 	switch (command) {
 	case MoveLeft:
 
@@ -222,7 +224,7 @@ void Player::Move(Command& command) {
 			tmpZ = IntClamp(tmpZ, 0, 5);
 
 			//障害物があったらストップコマンドに移行
-			if (collisionManager_->IsHit(tmpX, tmpZ)) {
+			if (collisionManager_->IsHit(tmpX, tmpZ, 1)) {
 				command = Stop;
 				break;
 			}
@@ -249,7 +251,7 @@ void Player::Move(Command& command) {
 			tmpZ = IntClamp(tmpZ, 0, 5);
 
 			// 障害物があったらストップコマンドに移行
-			if (collisionManager_->IsHit(tmpX, tmpZ)) {
+			if (collisionManager_->IsHit(tmpX, tmpZ, 1)) {
 				command = Stop;
 				break;
 			}
@@ -276,7 +278,7 @@ void Player::Move(Command& command) {
 			tmpZ = IntClamp(tmpZ, 0, 5);
 
 			// 障害物があったらストップコマンドに移行
-			if (collisionManager_->IsHit(tmpX, tmpZ)) {
+			if (collisionManager_->IsHit(tmpX, tmpZ, 1)) {
 				command = Stop;
 				break;
 			}
@@ -303,7 +305,7 @@ void Player::Move(Command& command) {
 			tmpZ = IntClamp(tmpZ, 0, 5);
 
 			// 障害物があったらストップコマンドに移行
-			if (collisionManager_->IsHit(tmpX, tmpZ)) {
+			if (collisionManager_->IsHit(tmpX, tmpZ, 1)) {
 				command = Stop;
 				break;
 			}
@@ -343,7 +345,7 @@ void Player::Move(Command& command) {
 		currentTex_ = textures_[0];
 
 		break;
-	case Attack:
+	case AttackCircle:
 
 		velocity_ = {0.0f, 0.0f, 0.0f};
 
@@ -374,6 +376,7 @@ void Player::Move(Command& command) {
 		velocity_.y = 0.0f;
 		currentTex_ = textures_[0];
 		isMove_ = false;
+		isHit_ = false;
 	}
 
 }

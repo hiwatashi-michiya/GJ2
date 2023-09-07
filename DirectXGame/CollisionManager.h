@@ -12,7 +12,11 @@ public:
 
 	void RemoveCollision(int x, int z);
 
-	bool IsHit(int x, int z);
+	bool IsHit(int x, int z, int num);
+
+	void SetAttackCross(int x, int z, int num);
+
+	void SetAttackCircle(int x, int z, int num);
 
 private:
 	CollisionManager() = default;

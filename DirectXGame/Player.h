@@ -55,6 +55,8 @@ public:
 	/// <param name="textures">画像配列</param>
 	void SetTextures(const std::vector<uint32_t>& textures) { textures_ = textures; }
 
+	bool GetIsDead() const { return isDead_; }
+
 private:
 
 	//入力
@@ -75,6 +77,17 @@ private:
 
 	//速度
 	Vector3 velocity_;
+
+	//体力
+	const int kMaxLife = 100;
+
+	int life_ = kMaxLife;
+
+	//攻撃が当たったかどうか
+	bool isHit_ = false;
+
+	//死んだかどうか
+	bool isDead_ = false;
 
 	//現在の行動コマンド
 	Command currentMoveCommand_ = Stop;
@@ -98,6 +111,9 @@ private:
 
 	//行動コマンド画像更新
 	void UpdateMoveCommandsNum();
+
+	//攻撃したかどうか
+	bool isAttack_ = false;
 
 	//現在プレイヤーのターンかどうか
 	bool isPlayerTurn_ = false;
