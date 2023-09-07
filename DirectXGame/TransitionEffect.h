@@ -2,6 +2,7 @@
 #include <Sprite.h>
 #include <TextureManager.h>
 #include <Vector3.h>
+#include "scene.h"
 
 const int kHorizontalDivisionMax = 7;
 const int kVerticalDivisionMax = 4;
@@ -18,8 +19,12 @@ public:
 	/// <param name="textures">画像配列</param>
 	void SetTextures(const std::vector<uint32_t>& textures) { textures_ = textures; }
 
-	// シーン遷移ゲッター
-	int32_t GetChangeGameScene() { return isChangeGameScene_; }
+	// シーン遷移ゲッター関数
+	int32_t GetCurrentScene() { return scene; }
+
+	//フェードインアウトゲッター関数
+	bool GetFadeIn() { return isFadeIn_; }
+	bool GetFadeOut() { return isFadeOut_; }
 
 private:
 	int colorNum_ = 0;
@@ -39,5 +44,5 @@ private:
 	// 現在セットしている画像
 	uint32_t currentTex_ = 0u;
 
-	int32_t isChangeGameScene_ = false;
+	int32_t scene = TITLE;
 };

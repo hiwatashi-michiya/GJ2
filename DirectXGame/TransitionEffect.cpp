@@ -24,7 +24,6 @@ void TransitionEffect::Initialize(const std::vector<uint32_t>& textures) {
 	fadeOut = {0.0f, 0.0f};
 	isFadeIn_ = true;
 	isFadeOut_ = false;
-	isChangeGameScene_ = false;
 }
 
 void TransitionEffect::Update() {
@@ -61,7 +60,7 @@ void TransitionEffect::Update() {
 				}
 				if (horizontalSize_ <= 0.0f && verticalSize_ <= 0.0f) {
 					isFadeOut_ = false;
-					isChangeGameScene_ = true;
+					scene++;
 				}
 			}
 		}

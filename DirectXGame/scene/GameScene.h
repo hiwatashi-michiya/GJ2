@@ -101,6 +101,6 @@ private: // メンバ変数
 	Option* option = new Option;
 
 	// 画面遷移アニメーション
-	/*std::unique_ptr<TransitionEffect> transition_ = nullptr;
-	bool isStageTransition_ = false;*/
+	std::unique_ptr<TransitionEffect> transition_ = nullptr;
+	/*bool isStageTransition_ = false;*/
 };

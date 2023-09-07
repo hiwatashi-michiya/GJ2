@@ -65,6 +65,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	uint32_t whiteTex_ = TextureManager::Load("player/player.png");
 	uint32_t blackTex_ = TextureManager::Load("enemy/enemy.png");
 
+	// 画面遷移アニメーションの初期化
+	std::unique_ptr<TransitionEffect> transition_ = std::make_unique<TransitionEffect>();
+	std::vector<uint32_t> transitionTextures{whiteTex_, blackTex_};
+	transition_->Initialize(transitionTextures);
+
 	// タイトルシーンの初期化
 	titleScene = new TitleScene();
 	titleScene->Initialize();
@@ -72,11 +77,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// ゲームシーンの初期化
 	gameScene = new GameScene();
 	gameScene->Initialize();
-
-	// 画面遷移アニメーションの初期化
-	std::unique_ptr<TransitionEffect> transition_ = std::make_unique<TransitionEffect>();
-	std::vector<uint32_t> transitionTextures{whiteTex_, blackTex_};
-	transition_->Initialize(transitionTextures);
 
 	// メインループ
 	while (true) {
@@ -91,18 +91,31 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		imguiManager->Begin();
 		// 入力関連の毎フレーム処理
 		input->Update();
-		// タイトルシーンの毎フレーム処理
-		if (transition_->GetChangeGameScene() == false) {
+
+		// シーン処理
+		switch (transition_->GetCurrentScene()) {
+		case TITLE:
+			// タイトルシーンの毎フレーム処理
 			titleScene->Update();
+			break;
+		case GAME:
+			// ゲームシーンの毎フレーム処理
+			gameScene->Update();
+			break;
+		default:
+			break;
 		}
+
 		// ゲームシーンの毎フレーム処理
-		else if (transition_->GetChangeGameScene()) {
+		if (transition_->GetFadeOut()) {
 			gameScene->Update();
 		}
+
 		// 画面遷移の更新
-		//if (titleScene->GetChangeGameScene()) {
+		if (titleScene->GetChangeGameScene()) {
 			transition_->Update();
-		//}
+		}
+
 		// 軸表示の更新
 		axisIndicator->Update();
 		// ImGui受付終了
@@ -110,18 +123,25 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		// 描画開始
 		dxCommon->PreDraw();
-		// タイトルシーンの描画
-		if (transition_->GetChangeGameScene() == false) {
+
+		// シーン処理
+		switch (transition_->GetCurrentScene()) {
+		case TITLE:
+			// タイトルシーンの描画
 			titleScene->Draw();
-		}
-		// ゲームシーンの描画
-		else if (transition_->GetChangeGameScene()) {
+			break;
+		case GAME:
+			// ゲームシーンの描画
 			gameScene->Draw();
+			break;
+		default:
+			break;
 		}
+
 		// 画面遷移の描画
-		//if (titleScene->GetChangeGameScene()) {
-			//transition_->Draw();
-		//}
+		if (titleScene->GetChangeGameScene()) {
+			// transition_->Draw();
+		}
 		// 軸表示の描画
 		axisIndicator->Draw();
 		// プリミティブ描画のリセット

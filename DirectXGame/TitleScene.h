@@ -85,4 +85,7 @@ private: // メンバ変数
 	Option* option = new Option;
 
 	int32_t isChangeGameScene_ = false;
+
+	// 画面遷移アニメーション
+	std::unique_ptr<TransitionEffect> transition_ = nullptr;
 };

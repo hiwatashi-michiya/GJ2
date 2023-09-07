@@ -50,6 +50,10 @@ void TitleScene::Initialize() {
 
 	// オプション 初期化
 	option->Initialize();
+
+	std::vector<uint32_t> transitionTextures{whiteTex_, blackTex_};
+	transition_ = std::make_unique<TransitionEffect>();
+	transition_->Initialize(transitionTextures);
 }
 
 /// <summary>
@@ -62,12 +66,19 @@ void TitleScene::Update() {
 	// ビュープロジェクション更新
 	viewProjection_.UpdateMatrix();
 
-	//シーンチェンジ
+	// シーンチェンジ
 	if (input_->GetJoystickState(0, joyState)) {
 		if ((input_->PushKey(DIK_LEFT) || option->GetActionTrigger(DASH))) {
 			isChangeGameScene_ = true;
 		}
 	}
+	// 画面遷移の更新
+	if (isChangeGameScene_) {
+		transition_->Update();
+	}
+	/*if (transition_->GetFadeIn() != 1) {
+		isChangeGameScene_ = true;
+	}*/
 }
 
 /// <summary>
@@ -115,6 +126,9 @@ void TitleScene::Draw() {
 	/// </summary>
 
 	option->Draw();
+
+	// 画面遷移の描画
+	transition_->Draw();
 
 	// スプライト描画後処理
 	Sprite::PostDraw();
