@@ -23,6 +23,10 @@ private:
 	float verticalSize_ = 0.0f;
 	float horizontalSize_ = 0.0f;
 
+	bool isFadeIn_ = false;
+	bool isFadeOut_ = false;
+	Vector2 fadeOut = {0.0f, 0.0f};
+
 	// スプライト
 	std::unique_ptr<Sprite> transition[kHorizontalDivisionMax][kVerticalDivisionMax];
 
