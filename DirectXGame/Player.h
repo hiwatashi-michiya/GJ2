@@ -12,6 +12,7 @@
 #include "Collider.h"
 #include "CollisionManager.h"
 #include "Option.h"
+#include <Audio.h>
 
 //コマンドの最大表示数
 const int kMaxCommand = 3;
@@ -73,6 +74,8 @@ private:
 
 	//入力
 	Input* input_ = nullptr;
+	//音再生
+	Audio* audio_ = nullptr;
 
 	CollisionManager* collisionManager_ = nullptr;
 
@@ -142,6 +145,9 @@ private:
 
 	//画像
 	std::vector<uint32_t> textures_;
+
+	//SE
+	uint32_t crossAttackSE_ = 0u;
 
 	//現在セットしている画像
 	uint32_t currentTex_ = 0u;

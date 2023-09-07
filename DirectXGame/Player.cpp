@@ -8,6 +8,7 @@
 void Player::Initialize(const std::vector<Model*>& models, const std::vector<uint32_t>& textures) {
 
 	input_ = Input::GetInstance();
+	audio_ = Audio::GetInstance();
 	collisionManager_ = CollisionManager::GetInstance();
 
 	SetModels(models);
@@ -59,6 +60,8 @@ void Player::Initialize(const std::vector<Model*>& models, const std::vector<uin
 	SetSelectCommands(kMaxSelectNum);
 	SetGrid(0, 2);
 	collisionManager_->SetCollision(GetGridX(), GetGridZ());
+
+	crossAttackSE_ = audio_->LoadWave("SE/crossattack.wav");
 
 }
 
@@ -329,6 +332,8 @@ void Player::Move(Command& command) {
 			for (int i = 0; i < 4; i++) {
 				worldTransformEffect_[i].translation_ = Vector3(0.0f, 0.0f, 0.0f);
 			}
+
+			audio_->PlayWave(crossAttackSE_);
 
 		}
 
