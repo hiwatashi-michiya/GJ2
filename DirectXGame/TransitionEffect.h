@@ -18,6 +18,9 @@ public:
 	/// <param name="textures">画像配列</param>
 	void SetTextures(const std::vector<uint32_t>& textures) { textures_ = textures; }
 
+	// シーン遷移ゲッター
+	int32_t GetChangeGameScene() { return isChangeGameScene_; }
+
 private:
 	int colorNum_ = 0;
 	float verticalSize_ = 0.0f;
@@ -35,4 +38,6 @@ private:
 
 	// 現在セットしている画像
 	uint32_t currentTex_ = 0u;
+
+	int32_t isChangeGameScene_ = false;
 };

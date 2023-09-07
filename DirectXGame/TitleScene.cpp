@@ -1,12 +1,21 @@
-#include "GameScene.h"
+#include "TitleScene.h"
 #include "TextureManager.h"
 #include <cassert>
 
-GameScene::GameScene() {}
+/// <summary>
+/// コンストクラタ
+/// </summary>
+TitleScene::TitleScene() {}
 
-GameScene::~GameScene() {}
+/// <summary>
+/// デストラクタ
+/// </summary>
+TitleScene::~TitleScene() {}
 
-void GameScene::Initialize() {
+/// <summary>
+/// 初期化
+/// </summary>
+void TitleScene::Initialize() {
 
 	dxCommon_ = DirectXCommon::GetInstance();
 	input_ = Input::GetInstance();
@@ -32,62 +41,39 @@ void GameScene::Initialize() {
 	ground_->Initialize(groundModel_.get());
 	crossEffectModel_.reset(Model::CreateFromOBJ("crosseffect", true));
 
-	enemyTex_ = TextureManager::Load("king/king.png");
 	redTex_ = TextureManager::Load("player/red.png");
 	greenTex_ = TextureManager::Load("player/green.png");
 	blueTex_ = TextureManager::Load("player/blue.png");
 	numberTex_ = TextureManager::Load("UI/command.png");
-	alphaRedTex_ = TextureManager::Load("crosseffect/effectred.png");
-	alphaDarkTex_ = TextureManager::Load("crosseffect/effectdark.png");
-
-	playerTex_ = TextureManager::Load("pawn/pawn.png");
-	playerSprite_.reset(Sprite::Create(playerTex_, {0.0f, 0.0f}));
-	playerModel_.reset(Model::CreateFromOBJ("pawn", true));
-
-	std::vector<Model*> playerModels{playerModel_.get(), crossEffectModel_.get()};
-	std::vector<uint32_t> playerTextures{playerTex_, redTex_, greenTex_, blueTex_, numberTex_, alphaRedTex_};
-	player_ = std::make_unique<Player>();
-	player_->Initialize(playerModels, playerTextures);
-
-	enemyModel_.reset(Model::CreateFromOBJ("king", true));
-	std::vector<Model*> enemyModels{enemyModel_.get(), crossEffectModel_.get()};
-	std::vector<uint32_t> enemyTextures{enemyTex_, redTex_, greenTex_, blueTex_, numberTex_, alphaDarkTex_};
-	enemy_ = std::make_unique<Enemy>();
-	enemy_->Initialize(enemyModels, enemyTextures);
+	whiteTex_ = TextureManager::Load("player/player.png");
+	blackTex_ = TextureManager::Load("enemy/enemy.png");
 
 	// オプション 初期化
 	option->Initialize();
-
-	whiteTex_ = TextureManager::Load("player/player.png");
-	blackTex_ = TextureManager::Load("enemy/enemy.png");
 }
 
-void GameScene::Update() {
-
-	//XINPUT_STATE joyState;
-
-	player_->Update(option);
-	enemy_->Update();
+/// <summary>
+/// 毎フレーム処理
+/// </summary>
+void TitleScene::Update() {
+	XINPUT_STATE joyState;
 
 	option->Update(viewProjection_);
 	// ビュープロジェクション更新
 	viewProjection_.UpdateMatrix();
 
-	/*if (input_->GetJoystickState(0, joyState)) {
+	//シーンチェンジ
+	if (input_->GetJoystickState(0, joyState)) {
 		if ((input_->PushKey(DIK_LEFT) || option->GetActionTrigger(DASH))) {
-			AddStageTransition();
-		} 
-		else if ((input_->PushKey(DIK_RIGHT) || option->GetActionTrigger(JUMP))) {
-			isStageTransition_ = false;
+			isChangeGameScene_ = true;
 		}
 	}
-	if (isStageTransition_) {
-		transition_->Update();
-	}*/
 }
 
-void GameScene::Draw() {
-
+/// <summary>
+/// 描画
+/// </summary>
+void TitleScene::Draw() {
 	// コマンドリストの取得
 	ID3D12GraphicsCommandList* commandList = dxCommon_->GetCommandList();
 
@@ -116,9 +102,6 @@ void GameScene::Draw() {
 	skydome_->Draw(viewProjection_);
 	ground_->Draw(viewProjection_);
 
-	player_->Draw(viewProjection_);
-	enemy_->Draw(viewProjection_);
-
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
 #pragma endregion
@@ -131,25 +114,10 @@ void GameScene::Draw() {
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
 
-	player_->DrawUI();
-	enemy_->DrawUI();
-
 	option->Draw();
-
-	/*if (isStageTransition_) {
-		transition_->Draw();
-	}*/
 
 	// スプライト描画後処理
 	Sprite::PostDraw();
 
 #pragma endregion
 }
-
-// 画面遷移
-//void GameScene::AddStageTransition() {
-//	std::vector<uint32_t> transitionTextures{whiteTex_, blackTex_};
-//	transition_ = std::make_unique<TransitionEffect>();
-//	transition_->Initialize(transitionTextures);
-//	isStageTransition_ = true;
-//}
