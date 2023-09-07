@@ -57,9 +57,9 @@ void Enemy::Update() {
 
 #ifdef _DEBUG
 
-	ImGui::Begin("EnemyState");
+	/*ImGui::Begin("EnemyState");
 	ImGui::Text("current Command %d", currentMoveCommand_);
-	ImGui::End();
+	ImGui::End();*/
 
 #endif // _DEBUG
 
@@ -88,62 +88,6 @@ void Enemy::Update() {
 			inputCoolTimer_ = kInputCoolTime;
 
 		}
-
-		//if (input_->GetJoystickState(0, joyState)) {
-
-		//	if ((input_->PushKey(DIK_LEFT) ||
-		//	     joyState.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER) &&
-		//	    inputCoolTimer_ == 0) {
-
-		//		if (selectNum_ > 0) {
-		//			selectNum_--;
-		//		}
-
-		//		inputCoolTimer_ = kInputCoolTime;
-
-		//	}
-
-		//	else if (
-		//	    (input_->PushKey(DIK_RIGHT) ||
-		//	     joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) &&
-		//	    inputCoolTimer_ == 0) {
-
-		//		if (selectNum_ < selectCommands_.size() - 1) {
-		//			selectNum_++;
-		//		}
-
-		//		inputCoolTimer_ = kInputCoolTime;
-		//	}
-
-		//	if ((input_->PushKey(DIK_E) || joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) &&
-		//	    inputCoolTimer_ == 0 && moveCommands_.size() < kMaxEnemyCommand) {
-
-		//		// ランダム行動
-		//		selectNum_ = rand() % selectCommands_.size();
-
-		//		SetMoveCommand(selectNum_);
-		//		PopSelectCommand(selectNum_);
-
-		//		inputCoolTimer_ = kInputCoolTime;
-
-		//	} else if (
-		//	    (input_->PushKey(DIK_E) || joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) &&
-		//	    inputCoolTimer_ == 0) {
-		//		isSelect_ = false;
-		//		inputCoolTimer_ = kInputCoolTime;
-		//	}
-
-		//	if ((input_->PushKey(DIK_Q) || joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B) &&
-		//	    inputCoolTimer_ == 0 && moveCommands_.size() != 0) {
-		//		PushSelectCommand(moveCommands_.back());
-		//		PopBackMoveCommand();
-		//		inputCoolTimer_ = kInputCoolTime;
-		//	}
-
-		//	if (selectNum_ >= selectCommands_.size()) {
-		//		selectNum_ = int(selectCommands_.size() - 1);
-		//	}
-		//}
 
 		UpdateMoveCommandsNum();
 	} else {
@@ -346,11 +290,11 @@ void Enemy::DrawUI() {
 		commandNumSprite_[i]->Draw();
 	}
 
-	for (int i = 0; i < selectCommands_.size(); i++) {
+	/*for (int i = 0; i < selectCommands_.size(); i++) {
 		selectCommandNumSprite_[i]->Draw();
 	}
 
-	currentNumSprite_->Draw();
+	currentNumSprite_->Draw();*/
 }
 
 void Enemy::UpdateMoveCommandsNum() {

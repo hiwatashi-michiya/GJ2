@@ -11,8 +11,8 @@ Option::Option() {
 	m_InputButton[ActCode::ACT] = (int)Gamepad::Button::B;
 	m_InputButton[ActCode::MENU] = (int)Gamepad::Button::START;
 	m_InputButton[ActCode::CANCEL] = (int)Gamepad::Button::A;
-	m_InputButton[ActCode::L_SELECT] = (int(Gamepad::Button::LEFT_SHOULDER));
-	m_InputButton[ActCode::R_SELECT] = (int(Gamepad::Button::RIGHT_SHOULDER));
+	m_InputButton[ActCode::L_SELECT] = (int(Gamepad::Button::UP));
+	m_InputButton[ActCode::R_SELECT] = (int(Gamepad::Button::DOWN));
 	m_InputButton[ActCode::UI_SELECT] = (int(Gamepad::Button::X));
 
 	this->Initialize();
@@ -46,7 +46,7 @@ void Option::Update(const ViewProjection& viewprojection) {
 	m_cursorSprite->SetPosition({m_cursorPos.x, m_cursorPos.y});
 
 
-	ImGui::Begin("Action");
+	/*ImGui::Begin("Action");
 	ImGui::Text("JUMP = %d", m_InputButton[ActCode::JUMP]);
 	ImGui::Text("DASH = %d", m_InputButton[ActCode::DASH]);
 	ImGui::Text("ACT = %d", m_InputButton[ActCode::ACT]);
@@ -59,7 +59,7 @@ void Option::Update(const ViewProjection& viewprojection) {
 	ImGui::Text("Cursor_Y = %d", m_cursorPos.y);
 	ImGui::Text("Frame rate = %3.0f fps", ImGui::GetIO().Framerate);
 	ImGui::End();
-	Gamepad::Draw();
+	Gamepad::Draw();*/
 }
 
 void Option::Draw() 

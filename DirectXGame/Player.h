@@ -77,7 +77,7 @@ private:
 	CollisionManager* collisionManager_ = nullptr;
 
 	//入力クールタイム
-	const int kInputCoolTime = 15;
+	const int kInputCoolTime = 5;
 
 	int inputCoolTimer_ = 0;
 

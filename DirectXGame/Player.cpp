@@ -29,7 +29,7 @@ void Player::Initialize(const std::vector<Model*>& models, const std::vector<uin
 		selectCommandNumSprite_[i].reset(Sprite::Create(textures_[4], {0.0f, 0.0f}));
 		selectCommandNumSprite_[i]->SetSize({64.0f, 64.0f});
 		selectCommandNumSprite_[i]->SetTextureRect({0.0f,0.0f,}, {64.0f,64.0f});
-		selectCommandNumSprite_[i]->SetPosition({i * 64.0f + 300.0f, 600.0f});
+		selectCommandNumSprite_[i]->SetPosition({10.0f, i * 64.0f + 222.0f});
 
 	}
 
@@ -66,9 +66,9 @@ void Player::Update(Option* option) {
 
 #ifdef _DEBUG
 
-	ImGui::Begin("State");
+	/*ImGui::Begin("State");
 	ImGui::Text("current Command %d", currentMoveCommand_);
-	ImGui::End();
+	ImGui::End();*/
 
 #endif // _DEBUG
 
@@ -446,6 +446,6 @@ void Player::UpdateMoveCommandsNum() {
 
 	}
 
-	currentNumSprite_->SetPosition({selectNum_ * 64.0f + 316.0f, 550.0f});
+	currentNumSprite_->SetPosition({74.0f, selectNum_ * 64.0f + 246.0f});
 
 }

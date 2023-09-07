@@ -24,8 +24,8 @@ void GameScene::Initialize() {
 	viewProjection_.Initialize();
 	viewProjection_.farZ = 2000.0f;
 	viewProjection_.translation_.y = 70.0f;
-	viewProjection_.translation_.z = -70.0f;
-	viewProjection_.rotation_.x = 3.14f / 4.0f;
+	viewProjection_.translation_.z = -45.0f;
+	viewProjection_.rotation_.x = 3.14f / 3.0f;
 	// 3Dライン描画のビュープロジェクション設定
 	primitiveDrawer_->SetViewProjection(&viewProjection_);
 	// 天球初期化
