@@ -76,12 +76,14 @@ void GameScene::Initialize() {
 
 	whiteTex_ = TextureManager::Load("player/player.png");
 	blackTex_ = TextureManager::Load("enemy/enemy.png");
-	AddStageTransition();
+	std::vector<uint32_t> transitionTextures{whiteTex_, blackTex_};
+	transition_ = std::make_unique<TransitionEffect>();
+	transition_->Initialize(transitionTextures);
 }
 
 void GameScene::Update() {
 
-	XINPUT_STATE joyState;
+	//XINPUT_STATE joyState;
 
 	enemies_.remove_if([](Enemy* enemy) {
 		if (enemy->GetIsDead()) {
@@ -132,7 +134,7 @@ void GameScene::Update() {
 	// ビュープロジェクション更新
 	viewProjection_.UpdateMatrix();
 
-	if (input_->GetJoystickState(0, joyState)) {
+	/*if (input_->GetJoystickState(0, joyState)) {
 		if ((input_->PushKey(DIK_LEFT) || option->GetActionTrigger(DASH))) {
 			AddStageTransition();
 		} 
@@ -142,7 +144,7 @@ void GameScene::Update() {
 	}
 	if (isStageTransition_) {
 		transition_->Update();
-	}
+	}*/
 }
 
 void GameScene::Draw() {
@@ -201,9 +203,8 @@ void GameScene::Draw() {
 
 	option->Draw();
 
-	if (isStageTransition_) {
-		transition_->Draw();
-	}
+	// 画面遷移の描画
+	transition_->Draw();
 
 	// スプライト描画後処理
 	Sprite::PostDraw();
@@ -212,12 +213,12 @@ void GameScene::Draw() {
 }
 
 // 画面遷移
-void GameScene::AddStageTransition() {
-	std::vector<uint32_t> transitionTextures{whiteTex_, blackTex_};
-	transition_ = std::make_unique<TransitionEffect>();
-	transition_->Initialize(transitionTextures);
-	isStageTransition_ = true;
-}
+//void GameScene::AddStageTransition() {
+//	std::vector<uint32_t> transitionTextures{whiteTex_, blackTex_};
+//	transition_ = std::make_unique<TransitionEffect>();
+//	transition_->Initialize(transitionTextures);
+//	isStageTransition_ = true;
+//}
 
 bool GameScene::CheckAllEnemyTurn() {
 

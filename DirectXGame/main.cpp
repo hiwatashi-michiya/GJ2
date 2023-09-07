@@ -4,10 +4,11 @@
 #include "GameScene.h"
 #include "ImGuiManager.h"
 #include "PrimitiveDrawer.h"
-#include "TextureManager.h"
-#include "WinApp.h"
 #include "Rand.h"
-
+#include "TextureManager.h"
+#include "TitleScene.h"
+#include "TransitionEffect.h"
+#include "WinApp.h"
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
@@ -18,6 +19,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Audio* audio = nullptr;
 	AxisIndicator* axisIndicator = nullptr;
 	PrimitiveDrawer* primitiveDrawer = nullptr;
+	TitleScene* titleScene = nullptr;
 	GameScene* gameScene = nullptr;
 	SetRandom();
 
@@ -60,6 +62,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	primitiveDrawer->Initialize();
 #pragma endregion
 
+	uint32_t whiteTex_ = TextureManager::Load("player/player.png");
+	uint32_t blackTex_ = TextureManager::Load("enemy/enemy.png");
+
+	// 画面遷移アニメーションの初期化
+	std::unique_ptr<TransitionEffect> transition_ = std::make_unique<TransitionEffect>();
+	std::vector<uint32_t> transitionTextures{whiteTex_, blackTex_};
+	transition_->Initialize(transitionTextures);
+
+	// タイトルシーンの初期化
+	titleScene = new TitleScene();
+	titleScene->Initialize();
+
 	// ゲームシーンの初期化
 	gameScene = new GameScene();
 	gameScene->Initialize();
@@ -77,8 +91,31 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		imguiManager->Begin();
 		// 入力関連の毎フレーム処理
 		input->Update();
+
+		// シーン処理
+		switch (transition_->GetCurrentScene()) {
+		case TITLE:
+			// タイトルシーンの毎フレーム処理
+			titleScene->Update();
+			break;
+		case GAME:
+			// ゲームシーンの毎フレーム処理
+			gameScene->Update();
+			break;
+		default:
+			break;
+		}
+
 		// ゲームシーンの毎フレーム処理
-		gameScene->Update();
+		if (transition_->GetFadeOut()) {
+			gameScene->Update();
+		}
+
+		// 画面遷移の更新
+		if (titleScene->GetChangeGameScene()) {
+			transition_->Update();
+		}
+
 		// 軸表示の更新
 		axisIndicator->Update();
 		// ImGui受付終了
@@ -86,8 +123,25 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		// 描画開始
 		dxCommon->PreDraw();
-		// ゲームシーンの描画
-		gameScene->Draw();
+
+		// シーン処理
+		switch (transition_->GetCurrentScene()) {
+		case TITLE:
+			// タイトルシーンの描画
+			titleScene->Draw();
+			break;
+		case GAME:
+			// ゲームシーンの描画
+			gameScene->Draw();
+			break;
+		default:
+			break;
+		}
+
+		// 画面遷移の描画
+		if (titleScene->GetChangeGameScene()) {
+			// transition_->Draw();
+		}
 		// 軸表示の描画
 		axisIndicator->Draw();
 		// プリミティブ描画のリセット
@@ -99,6 +153,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	}
 
 	// 各種解放
+	SafeDelete(titleScene);
 	SafeDelete(gameScene);
 	audio->Finalize();
 	// ImGui解放

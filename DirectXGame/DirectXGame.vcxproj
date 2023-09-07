@@ -122,6 +122,7 @@
     <ClCompile Include="Rand.cpp" />
     <ClCompile Include="scene\GameScene.cpp" />
     <ClCompile Include="Skydome.cpp" />
+    <ClCompile Include="TitleScene.cpp" />
     <ClCompile Include="TransitionEffect.cpp" />
     <ClCompile Include="Vector3.cpp" />
     <ClCompile Include="WorldTransformEx.cpp" />
@@ -164,8 +165,10 @@
     <ClInclude Include="Option.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Rand.h" />
+    <ClInclude Include="scene.h" />
     <ClInclude Include="scene\GameScene.h" />
     <ClInclude Include="Skydome.h" />
+    <ClInclude Include="TitleScene.h" />
     <ClInclude Include="TransitionEffect.h" />
   </ItemGroup>
   <ItemGroup>
