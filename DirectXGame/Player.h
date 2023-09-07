@@ -148,6 +148,7 @@ private:
 
 	//SE
 	uint32_t crossAttackSE_ = 0u;
+	uint32_t upMoveSE_ = 0u;
 
 	//現在セットしている画像
 	uint32_t currentTex_ = 0u;

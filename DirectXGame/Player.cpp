@@ -62,6 +62,7 @@ void Player::Initialize(const std::vector<Model*>& models, const std::vector<uin
 	collisionManager_->SetCollision(GetGridX(), GetGridZ());
 
 	crossAttackSE_ = audio_->LoadWave("SE/crossattack.wav");
+	upMoveSE_ = audio_->LoadWave("SE/up.wav");
 
 }
 
@@ -275,6 +276,8 @@ void Player::Move(Command& command) {
 
 		if (MoveTimer_ == 60) {
 
+			audio_->PlayWave(upMoveSE_);
+
 			int tmpX = GetGridX();
 			int tmpZ = GetGridZ() - 1;
 
@@ -290,6 +293,7 @@ void Player::Move(Command& command) {
 			collisionManager_->SetCollision(tmpX, tmpZ);
 			collisionManager_->RemoveCollision(GetGridX(), GetGridZ());
 			SetGrid(tmpX, tmpZ);
+
 
 		}
 
