@@ -11,6 +11,7 @@
 #include <ViewProjection.h>
 #include "Collider.h"
 #include "CollisionManager.h"
+#include "Option.h"
 
 //コマンドの最大表示数
 const int kMaxCommand = 3;
@@ -31,7 +32,7 @@ public:
 	/// <summary>
 	/// 更新
 	/// </summary>
-	void Update();
+	void Update(Option* option);
 
 	/// <summary>
 	/// 描画
