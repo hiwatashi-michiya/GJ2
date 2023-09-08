@@ -6,10 +6,10 @@ enum Command {
 	MoveRight,
 	MoveUp,
 	MoveDown,
+	Stop,
 	AttackCross,
 	AttackCircle,
 	Guard,
-	Stop
 };
 
 //行動パターンの種類

@@ -267,6 +267,15 @@ void Enemy::Move(Command& command) {
 		worldTransform_.translation_ += velocity_;
 
 		break;
+	default:
+	case Stop:
+
+		velocity_ = {0.0f, 0.0f, 0.0f};
+
+		currentTex_ = textures_[3];
+
+		break;
+
 	case AttackCross:
 
 		if (MoveTimer_ == 60) {
@@ -296,14 +305,6 @@ void Enemy::Move(Command& command) {
 		velocity_ = {0.0f, 0.0f, 0.0f};
 
 		currentTex_ = textures_[2];
-
-		break;
-	default:
-	case Stop:
-
-		velocity_ = {0.0f, 0.0f, 0.0f};
-
-		currentTex_ = textures_[3];
 
 		break;
 	}
