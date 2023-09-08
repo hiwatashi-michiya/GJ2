@@ -52,6 +52,8 @@ void Enemy::Initialize(const std::vector<Model*>& models, const std::vector<uint
 	SetGrid(0, 0);
 	collisionManager_->SetCollision(GetGridX(), GetGridZ());
 
+	movePattern_ = MovePattern(rand() % 3);
+
 }
 
 void Enemy::Update(const ViewProjection& viewProjection) {
