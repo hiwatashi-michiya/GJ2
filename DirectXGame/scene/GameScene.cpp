@@ -29,7 +29,7 @@ void GameScene::Initialize() {
 	viewProjection_.Initialize();
 	viewProjection_.farZ = 2000.0f;
 	viewProjection_.translation_.y = 70.0f;
-	viewProjection_.translation_.z = -45.0f;
+	viewProjection_.translation_.z = -40.0f;
 	viewProjection_.rotation_.x = 3.14f / 3.0f;
 	// ビュープロジェクション更新
 	viewProjection_.UpdateMatrix();
@@ -66,17 +66,27 @@ void GameScene::Initialize() {
 	std::vector<Model*> enemyModels{enemyModel_.get(), crossEffectModel_.get()};
 	std::vector<uint32_t> enemyTextures{enemyTex_, redTex_, greenTex_, blueTex_, numberTex_, alphaDarkTex_};
 
-	Enemy* newEnemy = new Enemy();
-	newEnemy->Initialize(enemyModels, enemyTextures);
-	newEnemy->SetPlayer(player_.get());
-	newEnemy->SetPosition(5, 2);
-	enemies_.push_back(newEnemy);
+	for (int z = 0; z < 6; z++) {
 
-	Enemy* newEnemy2 = new Enemy();
+		for (int x = 0; x < 6; x++) {
+
+			Enemy* newEnemy = new Enemy();
+			newEnemy->Initialize(enemyModels, enemyTextures);
+			newEnemy->SetPlayer(player_.get());
+			newEnemy->SetPosition(x, z);
+			enemies_.push_back(newEnemy);
+
+		}
+
+	}
+
+	
+
+	/*Enemy* newEnemy2 = new Enemy();
 	newEnemy2->Initialize(enemyModels, enemyTextures);
 	newEnemy2->SetPlayer(player_.get());
-	newEnemy2->SetPosition(5, 3);
-	enemies_.push_back(newEnemy2);
+	newEnemy2->SetPosition(5, 5);
+	enemies_.push_back(newEnemy2);*/
 
 	// オプション 初期化
 	option->Initialize();
@@ -155,7 +165,7 @@ void GameScene::Update() {
 		}
 
 		for (Enemy* enemy : enemies_) {
-			enemy->Update();
+			enemy->Update(viewProjection_);
 		}
 
 		if (player_->GetIsPlayerTurn()) {
@@ -165,7 +175,7 @@ void GameScene::Update() {
 			for (Enemy* enemy : enemies_) {
 
 				if (enemy->GetIsEnemyTurn()) {
-					enemy->MoveTurn();
+					enemy->MoveTurn(viewProjection_);
 					break;
 				}
 			}

@@ -16,7 +16,7 @@ void Enemy::Initialize(const std::vector<Model*>& models, const std::vector<uint
 
 	for (int i = 0; i < kMaxEnemyCommand; i++) {
 		commandNumSprite_[i].reset(Sprite::Create(textures_[4], {0.0f, 0.0f}));
-		commandNumSprite_[i]->SetSize({64.0f, 64.0f});
+		commandNumSprite_[i]->SetSize({32.0f, 32.0f});
 		commandNumSprite_[i]->SetTextureRect(
 		    {
 		        0.0f,
@@ -47,13 +47,13 @@ void Enemy::Initialize(const std::vector<Model*>& models, const std::vector<uint
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = Vector3(25.0f, 2.0f, -5.0f);
 	worldTransform_.UpdateMatrix();
-	SetSelectCommands(kMaxEnemySelectNum);
+	SetSelectCommands();
 	SetGrid(5, 3);
 	collisionManager_->SetCollision(GetGridX(), GetGridZ());
 
 }
 
-void Enemy::Update() {
+void Enemy::Update(const ViewProjection& viewProjection) {
 
 #ifdef _DEBUG
 
@@ -122,9 +122,12 @@ void Enemy::Update() {
 	}
 
 	worldTransform_.UpdateMatrix();
+
+	SetCommandSprite(viewProjection);
+
 }
 
-void Enemy::MoveTurn() {
+void Enemy::MoveTurn(const ViewProjection& viewProjection) {
 
 	if (!isSelect_) {
 
@@ -144,7 +147,7 @@ void Enemy::MoveTurn() {
 			}
 		} 
 		else if(isMove_ == false) {
-			SetSelectCommands(kMaxEnemySelectNum);
+			SetSelectCommands();
 			isEnemyTurn_ = false;
 		}
 
@@ -157,6 +160,8 @@ void Enemy::MoveTurn() {
 	}
 
 	worldTransform_.UpdateMatrix();
+
+	SetCommandSprite(viewProjection);
 
 }
 
@@ -379,5 +384,36 @@ void Enemy::SetPosition(int x, int z) {
 	worldTransform_.UpdateMatrix();
 	SetGrid(x, z);
 	collisionManager_->SetCollision(GetGridX(), GetGridZ());
+
+}
+
+void Enemy::SetCommandSprite(const ViewProjection& viewProjection) {
+
+	// 3Dレティクルのワールド座標から2Dレティクルのスクリーン座標を計算
+	{
+		Vector3 positionReticle = Vector3(
+		    worldTransform_.matWorld_.m[3][0] - 2.0f,
+			worldTransform_.matWorld_.m[3][1] + 15.0f,
+		    worldTransform_.matWorld_.m[3][2]);
+
+		// ビューポート行列
+		Matrix4x4 matViewport =
+		    MakeViewportMatrix(0, 0, WinApp::kWindowWidth, WinApp::kWindowHeight, 0, 1);
+
+		// ビュー行列とプロジェクション行列、ビューポート行列を合成する
+		Matrix4x4 matViewProjectionViewport =
+		    Multiply(Multiply(viewProjection.matView, viewProjection.matProjection), matViewport);
+
+		// ワールド→スクリーン座標変換(ここで3Dから2Dになる)
+		positionReticle = Transform(positionReticle, matViewProjectionViewport);
+
+		// スプライトのレティクルに座標設定
+		for (int i = 0; i < GetmoveCommands().size(); i++) {
+
+			commandNumSprite_[i]->SetPosition(Vector2(positionReticle.x + i * 32.0f, positionReticle.y));
+
+		}
+		
+	}
 
 }

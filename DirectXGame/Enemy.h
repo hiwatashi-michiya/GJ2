@@ -30,7 +30,7 @@ public:
 	/// <summary>
 	/// 更新
 	/// </summary>
-	void Update();
+	void Update(const ViewProjection& viewProjection);
 
 	/// <summary>
 	/// 描画
@@ -57,7 +57,7 @@ public:
 	/// <summary>
 	/// 行動ターン
 	/// </summary>
-	void MoveTurn();
+	void MoveTurn(const ViewProjection& viewProjection);
 
 	bool GetIsDead() const { return isDead_; }
 
@@ -136,6 +136,9 @@ private:
 	std::unique_ptr<Sprite> selectCommandNumSprite_[kMaxEnemySelectNum];
 
 	std::unique_ptr<Sprite> currentNumSprite_;
+
+	//スプライトの位置をセット
+	void SetCommandSprite(const ViewProjection& viewProjection);
 
 	// モデル
 	std::vector<Model*> models_;

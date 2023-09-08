@@ -57,7 +57,7 @@ void Player::Initialize(const std::vector<Model*>& models, const std::vector<uin
 		worldTransformEffect_[i].UpdateMatrix();
 	}
 
-	SetSelectCommands(kMaxSelectNum);
+	SetSelectCommands();
 	SetGrid(0, 2);
 	collisionManager_->SetCollision(GetGridX(), GetGridZ());
 
@@ -217,7 +217,7 @@ void Player::MoveTurn() {
 			}
 
 		} else if(isMove_ == false){
-			SetSelectCommands(kMaxSelectNum);
+			SetSelectCommands();
 			isPlayerTurn_ = false;
 		}
 

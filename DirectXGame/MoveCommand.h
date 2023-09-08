@@ -34,7 +34,7 @@ public:
 
 	void ChangeCommand(int32_t num1, int32_t num2);
 
-	void SetSelectCommands(int32_t setNum);
+	void SetSelectCommands();
 
 	Command GetNextCommand() { return moveCommands_.front(); }
 

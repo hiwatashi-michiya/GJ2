@@ -49,19 +49,33 @@ void MoveCommand::ChangeCommand(int32_t num1, int32_t num2) {
 
 }
 
-void MoveCommand::SetSelectCommands(int32_t setNum) {
+void MoveCommand::SetSelectCommands() {
 
 	//次の選択コマンドが空の場合、最初に設定しておく
 	if (nextSelectCommands_.empty()) {
 
-		for (int32_t i = 0; i < setNum; i++) {
+		//移動パターンを三種類設定
+		for (int32_t i = 0; i < 3; i++) {
 
 			Command command;
 
-			command = Command(rand() % kMovePattern);
+			command = Command(rand() % (kMovePattern - 3));
 
 			nextSelectCommands_.push_back(command);
 		}
+
+		//攻撃パターンを二種類設定
+		for (int32_t i = 0; i < 2; i++) {
+
+			Command command;
+
+			command = Command(rand() % (kMovePattern - 6) + 5);
+
+			nextSelectCommands_.push_back(command);
+		}
+
+		//ガードを一つ設定
+		nextSelectCommands_.push_back(Guard);
 
 	}
 
@@ -69,13 +83,27 @@ void MoveCommand::SetSelectCommands(int32_t setNum) {
 
 	nextSelectCommands_.clear();
 
-	for (int32_t i = 0; i < setNum; i++) {
+	// 移動パターンを三種類設定
+	for (int32_t i = 0; i < 3; i++) {
 
 		Command command;
 
-		command = Command(rand() % kMovePattern);
+		command = Command(rand() % (kMovePattern - 3));
 
 		nextSelectCommands_.push_back(command);
 	}
+
+	// 攻撃パターンを二種類設定
+	for (int32_t i = 0; i < 2; i++) {
+
+		Command command;
+
+		command = Command(rand() % (kMovePattern - 6) + 5);
+
+		nextSelectCommands_.push_back(command);
+	}
+
+	// ガードを一つ設定
+	nextSelectCommands_.push_back(Guard);
 
 }
