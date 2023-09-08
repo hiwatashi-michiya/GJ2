@@ -74,6 +74,10 @@ void Player::Update(Option* option) {
 	ImGui::Text("HP %d", life_);
 	ImGui::End();
 
+	if (input_->TriggerKey(DIK_1)) {
+		life_ -= 20;
+	}
+
 #endif // _DEBUG
 
 	if (isHit_ == false) {
@@ -89,6 +93,11 @@ void Player::Update(Option* option) {
 	else if (isHit_ == true && collisionManager_->IsHitAttack(GetGridX(), GetGridZ(), 0)) {
 
 		isHit_ = false;
+	}
+
+	// 体力が0以下で死亡
+	if (life_ <= 0) {
+		isDead_ = true;
 	}
 
 	// ポインターを行動カードと接触してる状態でXボタンを押すと効果を表示

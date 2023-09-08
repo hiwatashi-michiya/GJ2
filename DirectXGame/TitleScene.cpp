@@ -22,6 +22,7 @@ void TitleScene::Initialize() {
 	audio_ = Audio::GetInstance();
 	primitiveDrawer_ = PrimitiveDrawer::GetInstance();
 	collisionManager_ = CollisionManager::GetInstance();
+	transition_ = TransitionEffect::GetInstance();
 
 	// ビュープロジェクション初期化
 	viewProjection_.Initialize();
@@ -58,36 +59,56 @@ void TitleScene::Initialize() {
 
 	// オプション 初期化
 	option->Initialize();
-
-	std::vector<uint32_t> transitionTextures{whiteTex_, blackTex_};
-	transition_ = std::make_unique<TransitionEffect>();
-	transition_->Initialize(transitionTextures);
+	
 }
 
 /// <summary>
 /// 毎フレーム処理
 /// </summary>
 void TitleScene::Update() {
+	
 	XINPUT_STATE joyState;
 
-	option->Update(viewProjection_);
+	//シーンチェンジ中の処理
+	if (transition_->GetIsChangeScene()) {
+
+		//ゲームシーンにフェードインする時、またはゲームシーンからフェードアウトする時更新
+		if ((transition_->GetFadeIn() && transition_->GetNextScene() == GAME) ||
+		    (transition_->GetFadeOut() && transition_->GetNextScene() == TITLE)) {
+			transition_->Update();
+		}
+		//ゲームシーンからのフェードアウト終了でシーン遷移を止める
+		else if (transition_->GetFadeIn() && transition_->GetNextScene() == TITLE) {
+			transition_->SetIsChangeScene(false);
+			transition_->Reset();
+		}
+		//ゲームシーンへのフェードインが完了したら
+		else {
+			//実際に遷移する
+			transition_->ChangeScene();
+		}
+
+	}
+	//シーンチェンジしていない時の処理
+	else {
+
+		option->Update(viewProjection_);
+
+		// シーンチェンジ
+		if (input_->GetJoystickState(0, joyState)) {
+			if ((input_->PushKey(DIK_LEFT) || option->GetActionTrigger(DASH))) {
+				transition_->SetIsChangeScene(true);
+				// 遷移先のシーンをゲームにする
+				transition_->SetNextScene(GAME);
+				audio_->PlayWave(debugSE_);
+			}
+		}
+
+	}
+
 	// ビュープロジェクション更新
 	viewProjection_.UpdateMatrix();
 
-	// シーンチェンジ
-	if (input_->GetJoystickState(0, joyState)) {
-		if ((input_->PushKey(DIK_LEFT) || option->GetActionTrigger(DASH))) {
-			isChangeGameScene_ = true;
-			audio_->PlayWave(debugSE_);
-		}
-	}
-	// 画面遷移の更新
-	if (isChangeGameScene_) {
-		transition_->Update();
-	}
-	/*if (transition_->GetFadeIn() != 1) {
-		isChangeGameScene_ = true;
-	}*/
 }
 
 /// <summary>
@@ -137,9 +158,7 @@ void TitleScene::Draw() {
 	option->Draw();
 
 	//タイトルの表示
-	if (transition_->GetFadeOut() != 1) {
-		titleSprite_->Draw();
-	}
+	titleSprite_->Draw();
 
 	// 画面遷移の描画
 	transition_->Draw();

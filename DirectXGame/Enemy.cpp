@@ -61,6 +61,10 @@ void Enemy::Update() {
 	ImGui::Text("HP %d", life_);
 	ImGui::End();
 
+	if (input_->TriggerKey(DIK_2)) {
+		life_ -= 20;
+	}
+
 #endif // _DEBUG
 
 	if (isHit_ == false) {
@@ -79,6 +83,11 @@ void Enemy::Update() {
 
 		isHit_ = false;
 
+	}
+
+	//体力が0以下で死亡
+	if (life_ <= 0) {
+		isDead_ = true;
 	}
 
 	/*XINPUT_STATE joyState;*/

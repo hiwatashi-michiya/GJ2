@@ -2,6 +2,10 @@
 #include "TextureManager.h"
 #include <cassert>
 
+#ifdef _DEBUG
+#include <ImGuiManager.h>
+#endif // _DEBUG
+
 GameScene::GameScene() {}
 
 GameScene::~GameScene() {
@@ -19,6 +23,7 @@ void GameScene::Initialize() {
 	audio_ = Audio::GetInstance();
 	primitiveDrawer_ = PrimitiveDrawer::GetInstance();
 	collisionManager_ = CollisionManager::GetInstance();
+	transition_ = TransitionEffect::GetInstance();
 
 	// ビュープロジェクション初期化
 	viewProjection_.Initialize();
@@ -26,6 +31,8 @@ void GameScene::Initialize() {
 	viewProjection_.translation_.y = 70.0f;
 	viewProjection_.translation_.z = -45.0f;
 	viewProjection_.rotation_.x = 3.14f / 3.0f;
+	// ビュープロジェクション更新
+	viewProjection_.UpdateMatrix();
 	// 3Dライン描画のビュープロジェクション設定
 	primitiveDrawer_->SetViewProjection(&viewProjection_);
 	// 天球初期化
@@ -76,61 +83,110 @@ void GameScene::Initialize() {
 
 	whiteTex_ = TextureManager::Load("player/player.png");
 	blackTex_ = TextureManager::Load("enemy/enemy.png");
-	std::vector<uint32_t> transitionTextures{whiteTex_, blackTex_};
-	transition_ = std::make_unique<TransitionEffect>();
-	transition_->Initialize(transitionTextures);
+	
 }
 
 void GameScene::Update() {
 
 	//XINPUT_STATE joyState;
 
-	enemies_.remove_if([](Enemy* enemy) {
-		if (enemy->GetIsDead()) {
+#ifdef _DEBUG
 
-			delete enemy;
-			return true;
+	ImGui::Begin("debug command");
+	ImGui::Text("1 key : player HP -= 20");
+	ImGui::Text("2 key : all enemy HP -= 20");
+	ImGui::End();
+
+#endif // _DEBUG
+
+	XINPUT_STATE joyState;
+
+	if (transition_->GetIsChangeScene()) {
+
+		// ゲームシーンにフェードインする時、またはゲームシーンからフェードアウトする時更新
+		if ((transition_->GetFadeIn() && transition_->GetNextScene() == TITLE) ||
+		    (transition_->GetFadeOut() && transition_->GetNextScene() == GAME)) {
+			transition_->Update();
 		}
-
-		return false;
-	});
-
-	player_->Update(option);
-
-	for (Enemy* enemy : enemies_) {
-		enemy->Update();
-	}
-
-	if (player_->GetIsPlayerTurn()) {
-		player_->MoveTurn();
-	}
-	else if(CheckAllEnemyTurn()) {
-
-		for (Enemy* enemy : enemies_) {
-
-			if (enemy->GetIsEnemyTurn()) {
-				enemy->MoveTurn();
-				break;
-			}
-
+		// ゲームシーンからのフェードアウト終了でシーン遷移を止める
+		else if (transition_->GetFadeIn() && transition_->GetNextScene() == GAME) {
+			transition_->SetIsChangeScene(false);
+			transition_->Reset();
 		}
-
+		// ゲームシーンへのフェードインが完了したら
+		else {
+			// 実際に遷移する
+			transition_->ChangeScene();
+		}
 	}
-	//全員のターンが終了したらコマンドを打てるようにする
 	else {
 
-		if (player_->GetIsSelect() == false) {
-			player_->SetIsSelect(true);
+		enemies_.remove_if([](Enemy* enemy) {
+			if (enemy->GetIsDead()) {
 
-			for (Enemy* enemy : enemies_) {
-				enemy->SetIsSelect(true);
+				delete enemy;
+				return true;
 			}
 
+			return false;
+		});
+
+		if (isGameClear_ == false && isGameOver_ == false) {
+
+			if (CheckAllEnemyIsDead()) {
+				isGameClear_ = true;
+			} else if (player_->GetIsDead()) {
+				isGameOver_ = true;
+			}
+
+			player_->Update(option);
+
+		} else {
+
+			// シーンチェンジ
+			if (input_->GetJoystickState(0, joyState)) {
+				if ((input_->PushKey(DIK_LEFT) || option->GetActionTrigger(DASH))) {
+					transition_->SetIsChangeScene(true);
+					// 遷移先のシーンをゲームにする
+					transition_->SetNextScene(TITLE);
+				}
+			}
+
+		}
+
+		for (Enemy* enemy : enemies_) {
+			enemy->Update();
+		}
+
+		if (player_->GetIsPlayerTurn()) {
+			player_->MoveTurn();
+		} else if (CheckAllEnemyTurn()) {
+
+			for (Enemy* enemy : enemies_) {
+
+				if (enemy->GetIsEnemyTurn()) {
+					enemy->MoveTurn();
+					break;
+				}
+			}
+
+		}
+		// 全員のターンが終了したらコマンドを打てるようにする
+		else {
+
+			if (player_->GetIsSelect() == false) {
+				player_->SetIsSelect(true);
+
+				for (Enemy* enemy : enemies_) {
+					enemy->SetIsSelect(true);
+				}
+			}
 		}
 
 	}
 	
 	option->Update(viewProjection_);
+
 	// ビュープロジェクション更新
 	viewProjection_.UpdateMatrix();
 
@@ -177,7 +233,9 @@ void GameScene::Draw() {
 	skydome_->Draw(viewProjection_);
 	ground_->Draw(viewProjection_);
 
-	player_->Draw(viewProjection_);
+	if (player_->GetIsDead() == false) {
+		player_->Draw(viewProjection_);
+	}
 
 	for (Enemy* enemy : enemies_) {
 		enemy->Draw(viewProjection_);
@@ -230,5 +288,20 @@ bool GameScene::CheckAllEnemyTurn() {
 	}
 
 	return false;
+
+}
+
+
+bool GameScene::CheckAllEnemyIsDead() {
+
+	//一人でも生きていたらfalseを返す
+	for (Enemy* enemy : enemies_) {
+
+		if (enemy->GetIsDead() == false) {
+			return false;
+		}
+	}
+
+	return true;
 
 }

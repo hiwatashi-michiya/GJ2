@@ -53,12 +53,20 @@ public: // メンバ関数
 	//画面遷移
 	//void AddStageTransition();
 
+	// シーン遷移ゲッター
+	bool GetChangeGameScene() { return isChangeGameScene_; }
+
+	// シーン遷移セッター
+	void SetChangeGameScene(bool flag) { isChangeGameScene_ = flag; }
+
 private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
 	Audio* audio_ = nullptr;
 	PrimitiveDrawer* primitiveDrawer_ = nullptr;
 	CollisionManager* collisionManager_ = nullptr;
+	// 画面遷移アニメーション
+	TransitionEffect* transition_ = nullptr;
 
 	/// <summary>
 	/// ゲームシーン用
@@ -74,6 +82,9 @@ private: // メンバ変数
 
 	//全ての敵の行動が終わったかどうか確認するフラグ
 	bool CheckAllEnemyTurn();
+
+	//全ての敵が死んだかどうか確認するフラグ
+	bool CheckAllEnemyIsDead();
 
 	// 天球
 	std::unique_ptr<Skydome> skydome_ = nullptr;
@@ -106,7 +117,13 @@ private: // メンバ変数
 	// オプション
 	Option* option = new Option;
 
-	// 画面遷移アニメーション
-	std::unique_ptr<TransitionEffect> transition_ = nullptr;
+	
 	/*bool isStageTransition_ = false;*/
+
+	bool isChangeGameScene_ = false;
+
+	bool isGameClear_ = false;
+
+	bool isGameOver_ = false;
+
 };

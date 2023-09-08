@@ -21,6 +21,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	PrimitiveDrawer* primitiveDrawer = nullptr;
 	TitleScene* titleScene = nullptr;
 	GameScene* gameScene = nullptr;
+	// 画面遷移アニメーションの初期化
+	TransitionEffect* transition_ = nullptr;
 	SetRandom();
 
 	// ゲームウィンドウの作成
@@ -65,8 +67,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	uint32_t whiteTex_ = TextureManager::Load("player/player.png");
 	uint32_t blackTex_ = TextureManager::Load("enemy/enemy.png");
 
-	// 画面遷移アニメーションの初期化
-	std::unique_ptr<TransitionEffect> transition_ = std::make_unique<TransitionEffect>();
+	transition_ = TransitionEffect::GetInstance();
 	std::vector<uint32_t> transitionTextures{whiteTex_, blackTex_};
 	transition_->Initialize(transitionTextures);
 
@@ -104,16 +105,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			break;
 		default:
 			break;
-		}
-
-		// ゲームシーンの毎フレーム処理
-		if (transition_->GetFadeOut()) {
-			gameScene->Update();
-		}
-
-		// 画面遷移の更新
-		if (titleScene->GetChangeGameScene()) {
-			transition_->Update();
 		}
 
 		// 軸表示の更新

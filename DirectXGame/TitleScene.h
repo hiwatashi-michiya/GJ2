@@ -50,7 +50,10 @@ public: // メンバ関数
 	void Draw();
 
 	// シーン遷移ゲッター
-	int32_t GetChangeGameScene() { return isChangeGameScene_; }
+	bool GetChangeGameScene() { return isChangeGameScene_; }
+
+	// シーン遷移セッター
+	void SetChangeGameScene(bool flag) { isChangeGameScene_ = flag; }
 
 private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
@@ -58,6 +61,8 @@ private: // メンバ変数
 	Audio* audio_ = nullptr;
 	PrimitiveDrawer* primitiveDrawer_ = nullptr;
 	CollisionManager* collisionManager_ = nullptr;
+	// 画面遷移アニメーション
+	TransitionEffect* transition_ = nullptr;
 
 	ViewProjection viewProjection_;
 
@@ -91,8 +96,6 @@ private: // メンバ変数
 	// オプション
 	Option* option = new Option;
 
-	int32_t isChangeGameScene_ = false;
+	bool isChangeGameScene_ = false;
 
-	// 画面遷移アニメーション
-	std::unique_ptr<TransitionEffect> transition_ = nullptr;
 };
