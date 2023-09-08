@@ -42,7 +42,7 @@ void GameScene::Initialize() {
 	redTex_ = TextureManager::Load("player/red.png");
 	greenTex_ = TextureManager::Load("player/green.png");
 	blueTex_ = TextureManager::Load("player/blue.png");
-	numberTex_ = TextureManager::Load("UI/command.png");
+	numberTex_ = TextureManager::Load("UI/commandUI.png");
 	alphaRedTex_ = TextureManager::Load("crosseffect/effectred.png");
 	alphaDarkTex_ = TextureManager::Load("crosseffect/effectdark.png");
 
