@@ -339,7 +339,7 @@ void Enemy::DrawUI() {
 
 void Enemy::UpdateMoveCommandsNum() {
 
-	for (int i = 0; i < moveCommands_.size(); i++) {
+		for (int i = 0; i < moveCommands_.size(); i++) {
 
 		auto itr = moveCommands_.begin();
 
@@ -349,7 +349,7 @@ void Enemy::UpdateMoveCommandsNum() {
 
 		int num = *itr;
 
-		commandNumSprite_[i]->SetTextureRect({num * 64.0f, 0.0f}, {64.0f, 64.0f});
+		commandNumSprite_[i]->SetTextureRect({num * 1024.0f, 0.0f}, {1024.0f, 1024.0f});
 	}
 
 	for (int i = 0; i < selectCommands_.size(); i++) {
@@ -362,7 +362,7 @@ void Enemy::UpdateMoveCommandsNum() {
 
 		int num = *itr;
 
-		selectCommandNumSprite_[i]->SetTextureRect({num * 64.0f, 0.0f}, {64.0f, 64.0f});
+		selectCommandNumSprite_[i]->SetTextureRect({num * 1024.0f, 0.0f}, {1024.0f, 1024.0f});
 	}
 
 	currentNumSprite_->SetPosition({selectNum_ * 64.0f + 610.0f, 80.0f});

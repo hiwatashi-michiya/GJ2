@@ -20,7 +20,7 @@ void Player::Initialize(const std::vector<Model*>& models, const std::vector<uin
 	for (int i = 0; i < kMaxCommand; i++) {
 		commandNumSprite_[i].reset(Sprite::Create(textures_[4], {0.0f, 0.0f}));
 		commandNumSprite_[i]->SetSize({64.0f, 64.0f});
-		commandNumSprite_[i]->SetTextureRect({0.0f,0.0f,}, {64.0f,64.0f});
+		commandNumSprite_[i]->SetTextureRect({0.0f,0.0f,}, {1024.0f,1024.0f});
 		commandNumSprite_[i]->SetPosition({10.0f, (kMaxCommand - 1 - i) * 64.0f + 10.0f});
 
 	}
@@ -29,7 +29,7 @@ void Player::Initialize(const std::vector<Model*>& models, const std::vector<uin
 
 		selectCommandNumSprite_[i].reset(Sprite::Create(textures_[4], {0.0f, 0.0f}));
 		selectCommandNumSprite_[i]->SetSize({64.0f, 64.0f});
-		selectCommandNumSprite_[i]->SetTextureRect({0.0f,0.0f,}, {64.0f,64.0f});
+		selectCommandNumSprite_[i]->SetTextureRect({0.0f,0.0f,}, {1024.0f,1024.0f});
 		selectCommandNumSprite_[i]->SetPosition({10.0f, i * 64.0f + 222.0f});
 
 	}
@@ -471,7 +471,7 @@ void Player::UpdateMoveCommandsNum() {
 
 		int num = *itr;
 
-		commandNumSprite_[i]->SetTextureRect({num * 64.0f, 0.0f}, {64.0f, 64.0f});
+		commandNumSprite_[i]->SetTextureRect({num * 1024.0f, 0.0f}, {1024.0f, 1024.0f});
 	}
 
 	for (int i = 0; i < selectCommands_.size(); i++) {
@@ -484,7 +484,7 @@ void Player::UpdateMoveCommandsNum() {
 
 		int num = *itr;
 
-		selectCommandNumSprite_[i]->SetTextureRect({num * 64.0f, 0.0f}, {64.0f, 64.0f});
+		selectCommandNumSprite_[i]->SetTextureRect({num * 1024.0f, 0.0f}, {1024.0f, 1024.0f});
 
 	}
 
