@@ -20,6 +20,18 @@ const int kMaxEnemyCommand = 3;
 // 選択できる個数
 const int kMaxEnemySelectNum = 6;
 
+enum MovePattern {
+	//基本行動
+	E_Move,
+	E_Attack,
+	E_Guard,
+	E_Rush,
+	E_Stan,
+	//特別行動
+	E_Special,
+
+};
+
 class Enemy : public MoveCommand, public Collider {
 public:
 	/// <summary>
@@ -130,7 +142,16 @@ private:
 	// 行動コマンド画像更新
 	void UpdateMoveCommandsNum();
 
-		// 現在プレイヤーのターンかどうか
+	//エネミーの行動パターン
+	MovePattern movePattern_ = E_Move;
+
+	//攻撃ラッシュに入るまでのカウント
+	int32_t rushCount_ = 0;
+
+	//行動パターン更新
+	void SetEnemyMovePattern();
+
+	// 現在プレイヤーのターンかどうか
 	bool isEnemyTurn_ = false;
 
 	// スプライト

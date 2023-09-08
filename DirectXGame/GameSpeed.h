@@ -19,7 +19,7 @@ public:
 
 private:
 
-	int gameSpeed_ = 1;
+	int gameSpeed_ = 2;
 
 private:
 

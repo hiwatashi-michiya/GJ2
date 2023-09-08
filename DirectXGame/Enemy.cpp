@@ -60,6 +60,7 @@ void Enemy::Update(const ViewProjection& viewProjection) {
 
 	ImGui::Begin("EnemyState");
 	ImGui::Text("HP %d", life_);
+	ImGui::Text("count %d", rushCount_);
 	ImGui::End();
 
 	if (input_->TriggerKey(DIK_9)) {
@@ -101,24 +102,10 @@ void Enemy::Update(const ViewProjection& viewProjection) {
 	// リストの要素が空なら新たに設定する
 	if (isSelect_) {
 
-		if (moveCommands_.size() < kMaxEnemyCommand) {
-
-				// ランダム行動
-			selectNum_ = rand() % selectCommands_.size();
-
-			SetMoveCommand(selectNum_);
-			PopSelectCommand(selectNum_);
-
-		}
-		else if(player_->GetIsSelect() == false){
-
-			isSelect_ = false;
-			isEnemyTurn_ = true;
-			inputCoolTimer_ = kInputCoolTime;
-
-		}
+		SetEnemyMovePattern();
 
 		UpdateMoveCommandsNum();
+
 	} else {
 
 	}
@@ -418,6 +405,191 @@ void Enemy::SetCommandSprite(const ViewProjection& viewProjection) {
 
 		}
 		
+	}
+
+}
+
+void Enemy::SetEnemyMovePattern() {
+
+	//コマンド決定
+	if (moveCommands_.size() < kMaxEnemyCommand) {
+
+		Command command;
+
+		int32_t randNum = 0;
+
+		switch (movePattern_) {
+		default:
+		case E_Move:
+
+			// 左右移動決定
+			command = Command(rand() % 2);
+			moveCommands_.push_back(command);
+
+			// 上下移動決定
+			command = Command(rand() % 2 + 2);
+			moveCommands_.push_back(command);
+
+			// 残りの移動決定
+			command = Command(rand() % 5);
+			moveCommands_.push_back(command);
+
+			// 次の行動パターンを決定
+			randNum = rand() % 2;
+
+			switch (randNum) {
+			default:
+			case 0:
+
+				movePattern_ = E_Attack;
+
+				break;
+			case 1:
+
+				movePattern_ = E_Guard;
+
+				break;
+			}
+
+			//ラッシュカウント加算
+			rushCount_++;
+
+			break;
+		case E_Attack:
+
+			//移動決定
+			command = Command(rand() % 5);
+			moveCommands_.push_back(command);
+
+			//攻撃決定
+			command = Command(rand() % 2 + 5);
+			moveCommands_.push_back(command);
+
+			//残りのコマンド決定
+			command = Command(rand() % 7);
+			moveCommands_.push_back(command);
+
+			// 次の行動パターンを決定
+			randNum = rand() % 2;
+
+			switch (randNum) {
+			default:
+			case 0:
+
+				movePattern_ = E_Move;
+
+				break;
+			case 1:
+
+				movePattern_ = E_Guard;
+
+				break;
+			}
+
+			break;
+		case E_Guard:
+
+			//移動決定
+			command = Command(rand() % 5);
+			moveCommands_.push_back(command);
+
+			//移動決定
+			command = Command(rand() % 5);
+			moveCommands_.push_back(command);
+
+			//移動後にガード
+			command = Guard;
+			moveCommands_.push_back(command);
+
+			// 次の行動パターンを決定
+			randNum = rand() % 2;
+
+			switch (randNum) {
+			default:
+			case 0:
+
+				movePattern_ = E_Move;
+
+				break;
+			case 1:
+
+				movePattern_ = E_Attack;
+
+				break;
+			}
+
+			// ラッシュカウント加算
+			rushCount_++;
+
+			break;
+		case E_Rush:
+
+			//攻撃を繰り返し決定
+			command = Command(rand() % 2 + 5);
+			moveCommands_.push_back(command);
+
+			command = Command(rand() % 2 + 5);
+			moveCommands_.push_back(command);
+
+			command = Command(rand() % 2 + 5);
+			moveCommands_.push_back(command);
+
+			//攻撃後スタン状態に入る
+			movePattern_ = E_Stan;
+
+			break;
+		case E_Stan:
+
+			//移動停止
+			command = Stop;
+
+			for (int i = 0; i < kMaxEnemyCommand; i++) {
+				moveCommands_.push_back(command);
+			}
+
+			// 次の行動パターンを決定
+			randNum = rand() % 3;
+
+			switch (randNum) {
+			default:
+			case 0:
+
+				movePattern_ = E_Move;
+
+				break;
+			case 1:
+
+				movePattern_ = E_Attack;
+
+				break;
+			case 2:
+
+				movePattern_ = E_Guard;
+
+				break;
+			}
+
+			break;
+		case E_Special:
+
+			break;
+		}
+
+	}
+
+	
+
+	if (player_->GetIsSelect() == false) {
+
+		//ラッシュカウントが溜まったらコマンドをラッシュに変更
+		if (rushCount_ == 3) {
+			movePattern_ = E_Rush;
+			rushCount_ = 0;
+		}
+
+		isSelect_ = false;
+		isEnemyTurn_ = true;
+		inputCoolTimer_ = kInputCoolTime;
 	}
 
 }
