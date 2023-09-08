@@ -8,6 +8,7 @@ void Enemy::Initialize(const std::vector<Model*>& models, const std::vector<uint
 
 	input_ = Input::GetInstance();
 	collisionManager_ = CollisionManager::GetInstance();
+	gameSpeed_ = GameSpeed::GetInstance();
 
 	SetModels(models);
 	SetTextures(textures);
@@ -48,7 +49,7 @@ void Enemy::Initialize(const std::vector<Model*>& models, const std::vector<uint
 	worldTransform_.translation_ = Vector3(25.0f, 2.0f, -5.0f);
 	worldTransform_.UpdateMatrix();
 	SetSelectCommands();
-	SetGrid(5, 3);
+	SetGrid(0, 0);
 	collisionManager_->SetCollision(GetGridX(), GetGridZ());
 
 }
@@ -61,7 +62,7 @@ void Enemy::Update(const ViewProjection& viewProjection) {
 	ImGui::Text("HP %d", life_);
 	ImGui::End();
 
-	if (input_->TriggerKey(DIK_2)) {
+	if (input_->TriggerKey(DIK_9)) {
 		life_ -= 20;
 	}
 
@@ -87,6 +88,7 @@ void Enemy::Update(const ViewProjection& viewProjection) {
 
 	//体力が0以下で死亡
 	if (life_ <= 0) {
+		collisionManager_->RemoveCollision(GetGridX(), GetGridZ());
 		isDead_ = true;
 	}
 
@@ -142,7 +144,7 @@ void Enemy::MoveTurn(const ViewProjection& viewProjection) {
 				// 数字更新
 				UpdateMoveCommandsNum();
 				// 行動開始フラグを立てる
-				MoveTimer_ = kMoveTime;
+				MoveTimer_ = kMoveTime / gameSpeed_->GetGameSpeed();
 				isMove_ = true;
 			}
 		} 
@@ -170,7 +172,7 @@ void Enemy::Move(Command& command) {
 	switch (command) {
 	case MoveLeft:
 
-		if (MoveTimer_ == 60) {
+		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed()) {
 
 			int tmpX = GetGridX() - 1;
 			int tmpZ = GetGridZ();
@@ -189,14 +191,14 @@ void Enemy::Move(Command& command) {
 			SetGrid(tmpX, tmpZ);
 		}
 
-		velocity_ = {-1.0f / 6.0f, 0.0f, 0.0f};
+		velocity_ = {-1.0f / 6.0f * gameSpeed_->GetGameSpeed(), 0.0f, 0.0f};
 
 		worldTransform_.translation_ += velocity_;
 
 		break;
 	case MoveRight:
 
-		if (MoveTimer_ == 60) {
+		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed()) {
 
 			int tmpX = GetGridX() + 1;
 			int tmpZ = GetGridZ();
@@ -215,14 +217,14 @@ void Enemy::Move(Command& command) {
 			SetGrid(tmpX, tmpZ);
 		}
 
-		velocity_ = {1.0f / 6.0f, 0.0f, 0.0f};
+		velocity_ = {1.0f / 6.0f * gameSpeed_->GetGameSpeed(), 0.0f, 0.0f};
 
 		worldTransform_.translation_ += velocity_;
 
 		break;
 	case MoveUp:
 
-		if (MoveTimer_ == 60) {
+		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed()) {
 
 			int tmpX = GetGridX();
 			int tmpZ = GetGridZ() - 1;
@@ -241,14 +243,14 @@ void Enemy::Move(Command& command) {
 			SetGrid(tmpX, tmpZ);
 		}
 
-		velocity_ = {0.0f, 0.0f, 1.0f / 6.0f};
+		velocity_ = {0.0f, 0.0f, 1.0f / 6.0f * gameSpeed_->GetGameSpeed()};
 
 		worldTransform_.translation_ += velocity_;
 
 		break;
 	case MoveDown:
 
-		if (MoveTimer_ == 60) {
+		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed()) {
 
 			int tmpX = GetGridX();
 			int tmpZ = GetGridZ() + 1;
@@ -267,7 +269,7 @@ void Enemy::Move(Command& command) {
 			SetGrid(tmpX, tmpZ);
 		}
 
-		velocity_ = {0.0f, 0.0f, -1.0f / 6.0f};
+		velocity_ = {0.0f, 0.0f, -1.0f / 6.0f * gameSpeed_->GetGameSpeed()};
 
 		worldTransform_.translation_ += velocity_;
 
@@ -283,7 +285,7 @@ void Enemy::Move(Command& command) {
 
 	case AttackCross:
 
-		if (MoveTimer_ == 60) {
+		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed()) {
 
 			collisionManager_->SetAttackCross(GetGridX(), GetGridZ(), EnemyAttack);
 
@@ -294,7 +296,7 @@ void Enemy::Move(Command& command) {
 		break;
 	case AttackCircle:
 
-		if (MoveTimer_ == 60) {
+		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed()) {
 
 			collisionManager_->SetAttackCircle(GetGridX(), GetGridZ(), EnemyAttack);
 
@@ -375,6 +377,8 @@ void Enemy::UpdateMoveCommandsNum() {
 }
 
 void Enemy::SetPosition(int x, int z) {
+
+	collisionManager_->RemoveCollision(GetGridX(), GetGridZ());
 
 	x = IntClamp(x, 0, 5);
 	z = IntClamp(z, 0, 5);

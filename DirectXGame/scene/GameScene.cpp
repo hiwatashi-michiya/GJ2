@@ -23,6 +23,7 @@ void GameScene::Initialize() {
 	audio_ = Audio::GetInstance();
 	primitiveDrawer_ = PrimitiveDrawer::GetInstance();
 	collisionManager_ = CollisionManager::GetInstance();
+	gameSpeed_ = GameSpeed::GetInstance();
 	transition_ = TransitionEffect::GetInstance();
 
 	// ビュープロジェクション初期化
@@ -66,7 +67,7 @@ void GameScene::Initialize() {
 	std::vector<Model*> enemyModels{enemyModel_.get(), crossEffectModel_.get()};
 	std::vector<uint32_t> enemyTextures{enemyTex_, redTex_, greenTex_, blueTex_, numberTex_, alphaDarkTex_};
 
-	for (int z = 0; z < 6; z++) {
+	/*for (int z = 0; z < 6; z++) {
 
 		for (int x = 0; x < 6; x++) {
 
@@ -78,15 +79,19 @@ void GameScene::Initialize() {
 
 		}
 
-	}
+	}*/
 
-	
+	Enemy* newEnemy = new Enemy();
+	newEnemy->Initialize(enemyModels, enemyTextures);
+	newEnemy->SetPlayer(player_.get());
+	newEnemy->SetPosition(3, 3);
+	enemies_.push_back(newEnemy);
 
-	/*Enemy* newEnemy2 = new Enemy();
+	Enemy* newEnemy2 = new Enemy();
 	newEnemy2->Initialize(enemyModels, enemyTextures);
 	newEnemy2->SetPlayer(player_.get());
 	newEnemy2->SetPosition(5, 5);
-	enemies_.push_back(newEnemy2);*/
+	enemies_.push_back(newEnemy2);
 
 	// オプション 初期化
 	option->Initialize();
@@ -103,8 +108,26 @@ void GameScene::Update() {
 #ifdef _DEBUG
 
 	ImGui::Begin("debug command");
-	ImGui::Text("1 key : player HP -= 20");
-	ImGui::Text("2 key : all enemy HP -= 20");
+	ImGui::Text("0 key : player HP -= 20");
+	ImGui::Text("9 key : all enemy HP -= 20");
+	
+	if (player_->GetIsPlayerTurn() == false && CheckAllEnemyTurn() == false) {
+
+		ImGui::Text("1, 2, 3 key : set game speed %d", gameSpeed_->GetGameSpeed());
+
+		if (input_->TriggerKey(DIK_1)) {
+			gameSpeed_->SetGameSpeed(1);
+		}
+
+		if (input_->TriggerKey(DIK_2)) {
+			gameSpeed_->SetGameSpeed(2);
+		}
+
+		if (input_->TriggerKey(DIK_3)) {
+			gameSpeed_->SetGameSpeed(3);
+		}
+	}
+
 	ImGui::End();
 
 #endif // _DEBUG

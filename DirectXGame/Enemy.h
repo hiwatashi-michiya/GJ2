@@ -12,6 +12,7 @@
 #include "Collider.h"
 #include "CollisionManager.h"
 #include "Player.h"
+#include "GameSpeed.h"
 
 // コマンドの最大表示数
 const int kMaxEnemyCommand = 3;
@@ -76,6 +77,8 @@ private:
 	Input* input_ = nullptr;
 
 	CollisionManager* collisionManager_ = nullptr;
+
+	GameSpeed* gameSpeed_ = nullptr;
 
 	Player* player_ = nullptr;
 

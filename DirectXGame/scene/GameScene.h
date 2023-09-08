@@ -18,6 +18,7 @@
 #include "WorldTransform.h"
 #include <memory>
 #include <list>
+#include "GameSpeed.h"
 
 /// <summary>
 /// ゲームシーン
@@ -65,6 +66,7 @@ private: // メンバ変数
 	Audio* audio_ = nullptr;
 	PrimitiveDrawer* primitiveDrawer_ = nullptr;
 	CollisionManager* collisionManager_ = nullptr;
+	GameSpeed* gameSpeed_ = nullptr;
 	// 画面遷移アニメーション
 	TransitionEffect* transition_ = nullptr;
 

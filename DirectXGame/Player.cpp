@@ -10,6 +10,7 @@ void Player::Initialize(const std::vector<Model*>& models, const std::vector<uin
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
 	collisionManager_ = CollisionManager::GetInstance();
+	gameSpeed_ = GameSpeed::GetInstance();
 
 	SetModels(models);
 	SetTextures(textures);
@@ -74,7 +75,7 @@ void Player::Update(Option* option) {
 	ImGui::Text("HP %d", life_);
 	ImGui::End();
 
-	if (input_->TriggerKey(DIK_1)) {
+	if (input_->TriggerKey(DIK_0)) {
 		life_ -= 20;
 	}
 
@@ -97,6 +98,7 @@ void Player::Update(Option* option) {
 
 	// 体力が0以下で死亡
 	if (life_ <= 0) {
+		collisionManager_->RemoveCollision(GetGridX(), GetGridZ());
 		isDead_ = true;
 	}
 
@@ -212,7 +214,7 @@ void Player::MoveTurn() {
 				// 数字更新
 				UpdateMoveCommandsNum();
 				// 行動開始フラグを立てる
-				MoveTimer_ = kMoveTime;
+				MoveTimer_ = kMoveTime / gameSpeed_->GetGameSpeed();
 				isMove_ = true;
 			}
 
@@ -244,7 +246,7 @@ void Player::Move(Command& command) {
 	switch (command) {
 	case MoveLeft:
 
-		if (MoveTimer_ == 60) {
+		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed()) {
 
 			int tmpX = GetGridX() - 1;
 			int tmpZ = GetGridZ();
@@ -264,14 +266,14 @@ void Player::Move(Command& command) {
 
 		}
 
-		velocity_ = {-1.0f / 6.0f, 0.0f, 0.0f};
+		velocity_ = {-1.0f / 6.0f * gameSpeed_->GetGameSpeed(), 0.0f, 0.0f};
 
 		worldTransform_.translation_ += velocity_;
 
 		break;
 	case MoveRight:
 
-		if (MoveTimer_ == 60) {
+		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed()) {
 
 			int tmpX = GetGridX() + 1;
 			int tmpZ = GetGridZ();
@@ -291,14 +293,14 @@ void Player::Move(Command& command) {
 
 		}
 
-		velocity_ = {1.0f / 6.0f, 0.0f, 0.0f};
+		velocity_ = {1.0f / 6.0f * gameSpeed_->GetGameSpeed(), 0.0f, 0.0f};
 
 		worldTransform_.translation_ += velocity_;
 
 		break;
 	case MoveUp:
 
-		if (MoveTimer_ == 60) {
+		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed()) {
 
 			audio_->PlayWave(upMoveSE_);
 
@@ -321,14 +323,14 @@ void Player::Move(Command& command) {
 
 		}
 
-		velocity_ = {0.0f, 0.0f, 1.0f / 6.0f};
+		velocity_ = {0.0f, 0.0f, 1.0f / 6.0f * gameSpeed_->GetGameSpeed()};
 
 		worldTransform_.translation_ += velocity_;
 
 		break;
 	case MoveDown:
 
-		if (MoveTimer_ == 60) {
+		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed()) {
 
 			int tmpX = GetGridX();
 			int tmpZ = GetGridZ() + 1;
@@ -348,7 +350,7 @@ void Player::Move(Command& command) {
 
 		}
 
-		velocity_ = {0.0f, 0.0f, -1.0f / 6.0f};
+		velocity_ = {0.0f, 0.0f, -1.0f / 6.0f * gameSpeed_->GetGameSpeed()};
 
 		worldTransform_.translation_ += velocity_;
 
@@ -364,7 +366,7 @@ void Player::Move(Command& command) {
 
 	case AttackCross:
 
-		if (MoveTimer_ == 60) {
+		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed()) {
 			
 			for (int i = 0; i < 4; i++) {
 				worldTransformEffect_[i].translation_ = Vector3(0.0f, 0.0f, 0.0f);
@@ -383,7 +385,9 @@ void Player::Move(Command& command) {
 		}
 
 		for (int i = 0; i < 4; i++) {
-			velocity_ = {cosf(i * 3.14f / 2.0f) / 3.0f,1.0f, sinf(i * 3.14f / 2.0f) / 3.0f};
+			velocity_ = {
+			    cosf(i * 3.14f / 2.0f) / 3.0f * gameSpeed_->GetGameSpeed(), 1.0f,
+			    sinf(i * 3.14f / 2.0f) / 3.0f * gameSpeed_->GetGameSpeed()};
 			worldTransformEffect_[i].translation_ += velocity_;
 		}
 
@@ -392,7 +396,7 @@ void Player::Move(Command& command) {
 		break;
 	case AttackCircle:
 
-		if (MoveTimer_ == 60) {
+		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed()) {
 
 			collisionManager_->SetAttackCircle(GetGridX(), GetGridZ(), PlayerAttack);
 

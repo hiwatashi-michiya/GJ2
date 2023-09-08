@@ -13,6 +13,7 @@
 #include "CollisionManager.h"
 #include "Option.h"
 #include <Audio.h>
+#include "GameSpeed.h"
 
 //コマンドの最大表示数
 const int kMaxCommand = 3;
@@ -78,6 +79,8 @@ private:
 	Audio* audio_ = nullptr;
 
 	CollisionManager* collisionManager_ = nullptr;
+
+	GameSpeed* gameSpeed_ = nullptr;
 
 	//入力クールタイム
 	const int kInputCoolTime = 5;
