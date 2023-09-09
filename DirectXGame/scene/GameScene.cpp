@@ -54,13 +54,16 @@ void GameScene::Initialize() {
 	alphaRedTex_ = TextureManager::Load("crosseffect/effectred.png");
 	alphaDarkTex_ = TextureManager::Load("crosseffect/effectdark.png");
 	baseBackTex_ = TextureManager::Load("UI/baseBack.png");
+	numPlateTex_ = TextureManager::Load("UI/numberPlate.png");
 
 	playerTex_ = TextureManager::Load("pawn/pawn.png");
 	playerSprite_.reset(Sprite::Create(playerTex_, {0.0f, 0.0f}));
 	playerModel_.reset(Model::CreateFromOBJ("pawn", true));
 
 	std::vector<Model*> playerModels{playerModel_.get(), crossEffectModel_.get()};
-	std::vector<uint32_t> playerTextures{playerTex_, redTex_, greenTex_, blueTex_, numberTex_, alphaRedTex_};
+	std::vector<uint32_t> playerTextures{playerTex_, redTex_,      greenTex_,   blueTex_,
+	                                     numberTex_, alphaRedTex_, numPlateTex_};
+
 	player_ = std::make_unique<Player>();
 	player_->Initialize(playerModels, playerTextures);
 
