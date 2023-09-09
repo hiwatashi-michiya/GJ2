@@ -34,7 +34,7 @@ public:
 	/// <summary>
 	/// 更新
 	/// </summary>
-	void Update(Option* option);
+	void Update(const ViewProjection& viewProjection,Option* option);
 
 	/// <summary>
 	/// 描画
@@ -154,7 +154,11 @@ private:
 
 	std::unique_ptr<Sprite> findUI_[kMaxSelectNum];
 	
+	std::unique_ptr<Sprite> hpFrameSprite_;
 	std::unique_ptr<Sprite> hpSprite_[3];
+
+	// スプライトの位置をセット
+	void SetCommandSprite(const ViewProjection& viewProjection);
 
 	//モデル
 	std::vector<Model*> models_;
