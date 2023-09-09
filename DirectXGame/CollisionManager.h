@@ -6,7 +6,8 @@ const int kMaxGrid = 6;
 enum AttackType {
 	PlayerAttack = 1,
 	EnemyAttack, 
-	EnemySpecialAttack
+	PlayerSpecialAttack,
+	EnemySpecialAttack,
 };
 
 class CollisionManager {
@@ -27,6 +28,8 @@ public:
 	void SetAttackCircle(int x, int z, int num);
 
 	void ResetAttack();
+
+	int GetAttackMass(int x, int z) { return attackMass_[z][x]; }
 
 private:
 	CollisionManager() = default;

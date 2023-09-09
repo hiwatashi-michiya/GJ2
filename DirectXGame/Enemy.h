@@ -148,6 +148,9 @@ private:
 	//攻撃ラッシュに入るまでのカウント
 	int32_t rushCount_ = 0;
 
+	//形態変化フラグ
+	bool isFormChange_ = false;
+
 	//行動パターン更新
 	void SetEnemyMovePattern();
 

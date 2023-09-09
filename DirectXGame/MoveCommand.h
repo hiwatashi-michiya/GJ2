@@ -10,10 +10,14 @@ enum Command {
 	AttackCross,
 	AttackCircle,
 	Guard,
+	//特殊行動
+	S_PlayerAttack,
+	S_EnemyAttack,
+
 };
 
-//行動パターンの種類
-const int32_t kMovePattern = 8;
+//通常行動パターンの種類
+//const int32_t kMovePattern = 8;
 
 class MoveCommand {
 public:

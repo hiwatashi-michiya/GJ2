@@ -54,6 +54,8 @@ void GameScene::Initialize() {
 	alphaRedTex_ = TextureManager::Load("crosseffect/effectred.png");
 	alphaDarkTex_ = TextureManager::Load("crosseffect/effectdark.png");
 	baseBackTex_ = TextureManager::Load("UI/baseBack.png");
+	playerAttackMassTex_ = TextureManager::Load("ground/playerattackmass.png");
+	enemyAttackMassTex_ = TextureManager::Load("ground/enemyattackmass.png");
 
 	playerTex_ = TextureManager::Load("pawn/pawn.png");
 	playerSprite_.reset(Sprite::Create(playerTex_, {0.0f, 0.0f}));
@@ -67,6 +69,21 @@ void GameScene::Initialize() {
 	enemyModel_.reset(Model::CreateFromOBJ("king", true));
 	std::vector<Model*> enemyModels{enemyModel_.get(), crossEffectModel_.get()};
 	std::vector<uint32_t> enemyTextures{enemyTex_, redTex_, greenTex_, blueTex_, numberTex_, alphaDarkTex_};
+
+	//攻撃マスのワールドトランスフォーム初期化
+	for (int z = 0; z < kMaxGrid; z++) {
+
+		for (int x = 0; x < kMaxGrid; x++) {
+
+			worldTransformAttackMass_[z][x].Initialize();
+			worldTransformAttackMass_[z][x].scale_ *= 5.0f;
+			worldTransformAttackMass_[z][x].translation_ =
+			    Vector3(-25.0f + x * 10.0f, 1.0f, 25.0f + z * -10.0f);
+			worldTransformAttackMass_[z][x].UpdateMatrix();
+
+		}
+
+	}
 
 	/*for (int z = 0; z < 6; z++) {
 
@@ -276,6 +293,28 @@ void GameScene::Draw() {
 
 	skydome_->Draw(viewProjection_);
 	ground_->Draw(viewProjection_);
+
+	for (int z = 0; z < kMaxGrid; z++) {
+
+		for (int x = 0; x < kMaxGrid; x++) {
+
+			if (collisionManager_->GetAttackMass(x, z) == PlayerAttack || 
+				collisionManager_->GetAttackMass(x, z) == PlayerSpecialAttack) {
+
+				groundModel_->Draw(worldTransformAttackMass_[z][x], viewProjection_, playerAttackMassTex_);
+
+			}
+
+			if (collisionManager_->GetAttackMass(x, z) == EnemyAttack || 
+				collisionManager_->GetAttackMass(x, z) == EnemySpecialAttack) {
+
+				groundModel_->Draw(
+				    worldTransformAttackMass_[z][x], viewProjection_, enemyAttackMassTex_);
+			}
+
+		}
+
+	}
 
 	if (player_->GetIsDead() == false) {
 		player_->Draw(viewProjection_);

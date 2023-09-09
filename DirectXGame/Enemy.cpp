@@ -80,6 +80,11 @@ void Enemy::Update(const ViewProjection& viewProjection) {
 			isHit_ = true;
 
 		}
+		else if (collisionManager_->IsHitAttack(GetGridX(), GetGridZ(), PlayerSpecialAttack)) {
+
+			life_ -= 20;
+			isHit_ = true;
+		}
 
 	}
 	//アタックが終了したらヒットフラグを降ろす
@@ -87,6 +92,13 @@ void Enemy::Update(const ViewProjection& viewProjection) {
 
 		isHit_ = false;
 
+	}
+
+	//体力半分以下で行動変化
+	if (life_ <= (kMaxLife / 2) && isFormChange_ == false) {
+		//半分以下で確定行動
+		movePattern_ = E_Special;
+		isFormChange_ = true;
 	}
 
 	//体力が0以下で死亡
@@ -303,6 +315,30 @@ void Enemy::Move(Command& command) {
 		currentTex_ = textures_[2];
 
 		break;
+	case S_EnemyAttack:
+
+		//一回目
+		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed() && moveCommands_.size() == 2) {
+
+			collisionManager_->SetAttackCross(GetGridX(), GetGridZ(), EnemyAttack);
+		}
+
+		//二回目
+		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed() && moveCommands_.size() == 1) {
+
+			collisionManager_->SetAttackCircle(GetGridX(), GetGridZ(), EnemyAttack);
+		}
+
+		//三回目
+		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed() && moveCommands_.size() == 0) {
+
+			collisionManager_->SetAttackCross(GetGridX(), GetGridZ(), EnemySpecialAttack);
+			collisionManager_->SetAttackCircle(GetGridX(), GetGridZ(), EnemySpecialAttack);
+
+		}
+
+		break;
+
 	}
 
 	worldTransform_.translation_.x = Clamp(worldTransform_.translation_.x, -25.0f, 25.0f);
@@ -574,6 +610,16 @@ void Enemy::SetEnemyMovePattern() {
 			break;
 		case E_Special:
 
+			//特殊攻撃をセット
+			command = S_EnemyAttack;
+
+			for (int i = 0; i < kMaxEnemyCommand; i++) {
+				moveCommands_.push_back(command);
+			}
+
+			// 攻撃後スタン状態に入る
+			movePattern_ = E_Stan;
+
 			break;
 		}
 
@@ -584,8 +630,13 @@ void Enemy::SetEnemyMovePattern() {
 	if (player_->GetIsSelect() == false) {
 
 		//ラッシュカウントが溜まったらコマンドをラッシュに変更
-		if (rushCount_ == 3) {
+		if (rushCount_ == 3 && isFormChange_ == false) {
 			movePattern_ = E_Rush;
+			rushCount_ = 0;
+		}
+		//体力半分以下でラッシュカウントが溜まったらスペシャル攻撃
+		else if (rushCount_ == 5 && isFormChange_ == true) {
+			movePattern_ = E_Special;
 			rushCount_ = 0;
 		}
 

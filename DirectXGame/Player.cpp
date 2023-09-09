@@ -87,8 +87,11 @@ void Player::Update(Option* option) {
 	if (isHit_ == false) {
 
 		if (collisionManager_->IsHitAttack(GetGridX(), GetGridZ(), EnemyAttack)) {
-
 			life_ -= 10;
+			isHit_ = true;
+		}
+		else if (collisionManager_->IsHitAttack(GetGridX(), GetGridZ(), EnemySpecialAttack)) {
+			life_ -= 20;
 			isHit_ = true;
 		}
 

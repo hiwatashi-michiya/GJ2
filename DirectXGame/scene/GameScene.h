@@ -74,6 +74,9 @@ private: // メンバ変数
 	/// ゲームシーン用
 	/// </summary>
 
+	//攻撃マスのワールドトランスフォーム
+	WorldTransform worldTransformAttackMass_[kMaxGrid][kMaxGrid];
+
 	ViewProjection viewProjection_;
 
 	std::unique_ptr<Player> player_ = nullptr;
@@ -116,6 +119,8 @@ private: // メンバ変数
 	uint32_t alphaRedTex_ = 0u;
 	uint32_t alphaDarkTex_ = 0u;
 	uint32_t baseBackTex_ = 0u;
+	uint32_t playerAttackMassTex_ = 0u;
+	uint32_t enemyAttackMassTex_ = 0u;
 
 	// BGM
 	uint32_t gameBGM_ = 0u;

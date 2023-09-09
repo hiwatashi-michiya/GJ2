@@ -59,7 +59,7 @@ void MoveCommand::SetSelectCommands() {
 
 			Command command;
 
-			command = Command(rand() % (kMovePattern - 3));
+			command = Command(rand() % 5);
 
 			nextSelectCommands_.push_back(command);
 		}
@@ -69,7 +69,7 @@ void MoveCommand::SetSelectCommands() {
 
 			Command command;
 
-			command = Command(rand() % (kMovePattern - 6) + 5);
+			command = Command(rand() % 2 + 5);
 
 			nextSelectCommands_.push_back(command);
 		}
@@ -88,7 +88,7 @@ void MoveCommand::SetSelectCommands() {
 
 		Command command;
 
-		command = Command(rand() % (kMovePattern - 3));
+		command = Command(rand() % 5);
 
 		nextSelectCommands_.push_back(command);
 	}
@@ -98,7 +98,7 @@ void MoveCommand::SetSelectCommands() {
 
 		Command command;
 
-		command = Command(rand() % (kMovePattern - 6) + 5);
+		command = Command(rand() % 2 + 5);
 
 		nextSelectCommands_.push_back(command);
 	}
