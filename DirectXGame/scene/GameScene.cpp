@@ -54,7 +54,7 @@ void GameScene::Initialize() {
 	alphaRedTex_ = TextureManager::Load("crosseffect/effectred.png");
 	alphaDarkTex_ = TextureManager::Load("crosseffect/effectdark.png");
 	baseBackTex_ = TextureManager::Load("UI/baseBack.png");
-	numPlateTex_ = TextureManager::Load("UI/numberPlate.png");
+	numPlateTex_ = TextureManager::Load("UI/numberPlateBlue.png");
 	playerAttackMassTex_ = TextureManager::Load("ground/playerattackmass.png");
 	enemyAttackMassTex_ = TextureManager::Load("ground/enemyattackmass.png");
 

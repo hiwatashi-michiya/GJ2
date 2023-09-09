@@ -51,9 +51,9 @@ void Player::Initialize(const std::vector<Model*>& models, const std::vector<uin
 
 	for (int i = 0; i < 3; i++) {
 		hpSprite_[i].reset(Sprite::Create(textures_[6], {0.0f, 0.0f}));
-		hpSprite_[i]->SetSize({48.0f, 64.0f});
+		hpSprite_[i]->SetSize({64.0f, 64.0f});
 		hpSprite_[i]->SetTextureRect({0.0f,0.0f,},{1024.0f, 1024.0f});
-		hpSprite_[i]->SetPosition({(float)(i + 1) * 48, 10.0f});
+		hpSprite_[i]->SetPosition({(float)(i + 1) * 64, 10.0f});
 	}
 
 	currentNumSprite_.reset(Sprite::Create(textures_[0], {0.0f, 0.0f}));
