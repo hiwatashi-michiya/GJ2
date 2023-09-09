@@ -16,6 +16,8 @@ void Player::Initialize(const std::vector<Model*>& models, const std::vector<uin
 
 	currentTex_ = textures_[0];
 	findUITexture_ = TextureManager::Load("findUI.png");
+	hpFrameSprite_.reset(Sprite::Create(textures_[2], {0.0f, 0.0f}));
+	hpFrameSprite_->SetTextureRect({0.0f,0.0f,},{1024.0f, 1024.0f});
 
 	for (int i = 0; i < kMaxCommand; i++) {
 		commandNumSprite_[i].reset(Sprite::Create(textures_[4], {0.0f, 0.0f}));
@@ -83,7 +85,7 @@ void Player::Initialize(const std::vector<Model*>& models, const std::vector<uin
 	cancelSE_ = audio_->LoadWave("SE/cancel.wav");
 }
 
-void Player::Update(Option* option) {
+void Player::Update(const ViewProjection& viewProjection,Option* option) {
 
 #ifdef _DEBUG
 
@@ -251,6 +253,8 @@ void Player::Update(Option* option) {
 	}
 
 	UpdateMoveCommandsNum();
+
+	SetCommandSprite(viewProjection);
 }
 
 void Player::MoveTurn() {
@@ -508,7 +512,7 @@ void Player::DrawUI() {
 		}
 	}
 
-	int divideNum = 100;
+	/*int divideNum = 100;
 	int lifeIndex = life_;
 	for (int i = 0; i < 3; i++) {
 
@@ -525,7 +529,9 @@ void Player::DrawUI() {
 		    {1024.0f, 1024.0f});
 
 		hpSprite_[i]->Draw();
-	}
+	}*/
+
+	hpFrameSprite_->Draw();
 
 	// currentNumSprite_->Draw();
 }
@@ -559,4 +565,30 @@ void Player::UpdateMoveCommandsNum() {
 	}
 
 	currentNumSprite_->SetPosition({74.0f, selectNum_ * 64.0f + 246.0f});
+}
+
+void Player::SetCommandSprite(const ViewProjection& viewProjection) {
+
+	// 3Dレティクルのワールド座標から2Dレティクルのスクリーン座標を計算
+	{
+		Vector3 positionReticle = Vector3(
+		    worldTransform_.matWorld_.m[3][0] - 2.0f, worldTransform_.matWorld_.m[3][1] + 15.0f,
+		    worldTransform_.matWorld_.m[3][2]);
+
+		// ビューポート行列
+		Matrix4x4 matViewport =
+		    MakeViewportMatrix(0, 0, WinApp::kWindowWidth, WinApp::kWindowHeight, 0, 1);
+
+		// ビュー行列とプロジェクション行列、ビューポート行列を合成する
+		Matrix4x4 matViewProjectionViewport =
+		    Multiply(Multiply(viewProjection.matView, viewProjection.matProjection), matViewport);
+
+		// ワールド→スクリーン座標変換(ここで3Dから2Dになる)
+		positionReticle = Transform(positionReticle, matViewProjectionViewport);
+
+		// スプライトのレティクルに座標設定
+		hpFrameSprite_->SetSize({(128.0f * (float(life_) / kMaxLife)), 16.0f});
+		hpFrameSprite_->SetPosition(Vector2(positionReticle.x - 16.0f, positionReticle.y));
+		
+	}
 }

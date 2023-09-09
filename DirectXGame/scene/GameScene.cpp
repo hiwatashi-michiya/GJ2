@@ -57,6 +57,7 @@ void GameScene::Initialize() {
 	numPlateTex_ = TextureManager::Load("UI/numberPlateBlue.png");
 	playerAttackMassTex_ = TextureManager::Load("ground/playerattackmass.png");
 	enemyAttackMassTex_ = TextureManager::Load("ground/enemyattackmass.png");
+	frameTex_ = TextureManager::Load("UI/frame.png");
 
 	playerTex_ = TextureManager::Load("pawn/pawn.png");
 	playerSprite_.reset(Sprite::Create(playerTex_, {0.0f, 0.0f}));
@@ -64,14 +65,15 @@ void GameScene::Initialize() {
 
 	std::vector<Model*> playerModels{playerModel_.get(), crossEffectModel_.get()};
 	std::vector<uint32_t> playerTextures{playerTex_, redTex_,      greenTex_,   blueTex_,
-	                                     numberTex_, alphaRedTex_, numPlateTex_};
+	                                     numberTex_, alphaRedTex_, numPlateTex_, frameTex_};
 
 	player_ = std::make_unique<Player>();
 	player_->Initialize(playerModels, playerTextures);
 
 	enemyModel_.reset(Model::CreateFromOBJ("king", true));
 	std::vector<Model*> enemyModels{enemyModel_.get(), crossEffectModel_.get()};
-	std::vector<uint32_t> enemyTextures{enemyTex_, redTex_, greenTex_, blueTex_, numberTex_, alphaDarkTex_};
+	std::vector<uint32_t> enemyTextures{enemyTex_,  redTex_,       greenTex_, blueTex_,
+	                                    numberTex_, alphaDarkTex_, frameTex_};
 
 	//攻撃マスのワールドトランスフォーム初期化
 	for (int z = 0; z < kMaxGrid; z++) {
@@ -198,7 +200,7 @@ void GameScene::Update() {
 				isGameOver_ = true;
 			}
 
-			player_->Update(option);
+			player_->Update(viewProjection_,option);
 
 		} else {
 
