@@ -59,7 +59,7 @@ void MoveCommand::SetSelectCommands() {
 
 			Command command;
 
-			command = Command(rand() % 5);
+			command = Command(rand() % 4);
 
 			nextSelectCommands_.push_back(command);
 		}
@@ -88,7 +88,7 @@ void MoveCommand::SetSelectCommands() {
 
 		Command command;
 
-		command = Command(rand() % 5);
+		command = Command(rand() % 4);
 
 		nextSelectCommands_.push_back(command);
 	}

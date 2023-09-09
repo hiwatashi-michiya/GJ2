@@ -6,7 +6,7 @@
 Option::Option() {
 	// 初期キー設定
 	m_InputButton[ActCode::MOVE] = Gamepad::getStick(Gamepad::Stick::LEFT_X);
-	m_InputButton[ActCode::JUMP] = (int)Gamepad::Button::LEFT_THUMB;
+	m_InputButton[ActCode::JUMP] = (int)Gamepad::Button::RIGHT_SHOULDER;
 	m_InputButton[ActCode::DASH] = (int)Gamepad::Button::RIGHT_THUMB;
 	m_InputButton[ActCode::ACT] = (int)Gamepad::Button::B;
 	m_InputButton[ActCode::MENU] = (int)Gamepad::Button::START;

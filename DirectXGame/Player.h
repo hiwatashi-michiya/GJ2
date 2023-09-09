@@ -137,6 +137,11 @@ private:
 	//ガードしたかどうか
 	bool isGuard_ = false;
 
+	//特殊攻撃発動までのカウント
+	const int kMaxSpecialCount = 10;
+
+	int specialCount_ = 10;
+
 	//現在プレイヤーのターンかどうか
 	bool isPlayerTurn_ = false;
 

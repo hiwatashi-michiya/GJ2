@@ -89,6 +89,7 @@ void Player::Update(Option* option) {
 
 	ImGui::Begin("State");
 	ImGui::Text("HP %d", life_);
+	ImGui::Text("special Count %d", specialCount_);
 	ImGui::End();
 
 	if (input_->TriggerKey(DIK_0)) {
@@ -202,7 +203,22 @@ void Player::Update(Option* option) {
 				inputCoolTimer_ = kInputCoolTime;
 			}
 
-			if ((input_->PushKey(DIK_E) || option->GetActionTrigger(ACT)) && inputCoolTimer_ == 0 &&
+			//スペシャルカウントが溜まっていたら特殊攻撃可能にする
+			if (specialCount_ >= kMaxSpecialCount && option->GetActionTrigger(JUMP)) {
+
+				//コマンドリセット
+				selectCommands_.clear();
+
+				for (int i = 0; i < kMaxSelectNum; i++) {
+
+					selectCommands_.push_back(S_PlayerAttack);
+
+				}
+
+				specialCount_ = 0;
+
+			}
+			else if ((input_->PushKey(DIK_E) || option->GetActionTrigger(ACT)) && inputCoolTimer_ == 0 &&
 			    moveCommands_.size() < kMaxCommand) {
 
 				SetMoveCommand(selectNum_);
@@ -216,7 +232,8 @@ void Player::Update(Option* option) {
 				}
 				audio_->PlayWave(clickSE_, false, 1.0f * option->m_seVol);
 
-			} else if (
+			} 
+			else if (
 			    (input_->PushKey(DIK_E) || option->GetActionTrigger(ACT)) && inputCoolTimer_ == 0) {
 				isSelect_ = false;
 				isPlayerTurn_ = true;
@@ -297,6 +314,10 @@ void Player::Move(Command& command) {
 
 		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed()) {
 
+			if (specialCount_ < kMaxSpecialCount) {
+				specialCount_++;
+			}
+
 			int tmpX = GetGridX() - 1;
 			int tmpZ = GetGridZ();
 
@@ -322,6 +343,10 @@ void Player::Move(Command& command) {
 	case MoveRight:
 
 		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed()) {
+
+			if (specialCount_ < kMaxSpecialCount) {
+				specialCount_++;
+			}
 
 			int tmpX = GetGridX() + 1;
 			int tmpZ = GetGridZ();
@@ -349,7 +374,11 @@ void Player::Move(Command& command) {
 
 		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed()) {
 
-			audio_->PlayWave(upMoveSE_);
+			if (specialCount_ < kMaxSpecialCount) {
+				specialCount_++;
+			}
+
+			/*audio_->PlayWave(upMoveSE_);*/
 
 			int tmpX = GetGridX();
 			int tmpZ = GetGridZ() - 1;
@@ -376,6 +405,10 @@ void Player::Move(Command& command) {
 	case MoveDown:
 
 		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed()) {
+
+			if (specialCount_ < kMaxSpecialCount) {
+				specialCount_++;
+			}
 
 			int tmpX = GetGridX();
 			int tmpZ = GetGridZ() + 1;
@@ -451,11 +484,36 @@ void Player::Move(Command& command) {
 		break;
 	case Guard:
 
+		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed()) {
+			specialCount_++;
+			isGuard_ = true;
+		}
+
 		velocity_ = {0.0f, 0.0f, 0.0f};
 
-		isGuard_ = true;
-
 		currentTex_ = textures_[2];
+
+		break;
+	case S_PlayerAttack:
+
+		// 一回目
+		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed() && moveCommands_.size() == 2) {
+
+			collisionManager_->SetAttackCross(GetGridX(), GetGridZ(), PlayerAttack);
+		}
+
+		// 二回目
+		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed() && moveCommands_.size() == 1) {
+
+			collisionManager_->SetAttackCircle(GetGridX(), GetGridZ(), PlayerAttack);
+		}
+
+		// 三回目
+		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed() && moveCommands_.size() == 0) {
+
+			collisionManager_->SetAttackCross(GetGridX(), GetGridZ(), PlayerSpecialAttack);
+			collisionManager_->SetAttackCircle(GetGridX(), GetGridZ(), PlayerSpecialAttack);
+		}
 
 		break;
 	}
