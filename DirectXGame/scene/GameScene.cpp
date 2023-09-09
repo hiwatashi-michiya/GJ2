@@ -53,6 +53,7 @@ void GameScene::Initialize() {
 	numberTex_ = TextureManager::Load("UI/commandUI.png");
 	alphaRedTex_ = TextureManager::Load("crosseffect/effectred.png");
 	alphaDarkTex_ = TextureManager::Load("crosseffect/effectdark.png");
+	baseBackTex_ = TextureManager::Load("UI/baseBack.png");
 
 	playerTex_ = TextureManager::Load("pawn/pawn.png");
 	playerSprite_.reset(Sprite::Create(playerTex_, {0.0f, 0.0f}));
@@ -99,6 +100,9 @@ void GameScene::Initialize() {
 	whiteTex_ = TextureManager::Load("player/player.png");
 	blackTex_ = TextureManager::Load("enemy/enemy.png");
 	
+	// BGM
+	gameBGM_ = audio_->LoadWave("BGM/Battle1.wav");
+
 }
 
 void GameScene::Update() {
@@ -145,11 +149,13 @@ void GameScene::Update() {
 		else if (transition_->GetFadeIn() && transition_->GetNextScene() == GAME) {
 			transition_->SetIsChangeScene(false);
 			transition_->Reset();
+			gameHandale_ = audio_->PlayWave(gameBGM_, true, option->m_bgmVol);
 		}
 		// ゲームシーンへのフェードインが完了したら
 		else {
 			// 実際に遷移する
 			transition_->ChangeScene();
+			
 		}
 	}
 	else {
@@ -179,9 +185,14 @@ void GameScene::Update() {
 			// シーンチェンジ
 			if (input_->GetJoystickState(0, joyState)) {
 				if ((input_->PushKey(DIK_LEFT) || option->GetActionTrigger(DASH))) {
+					
 					transition_->SetIsChangeScene(true);
 					// 遷移先のシーンをゲームにする
 					transition_->SetNextScene(TITLE);
+
+					if (audio_->IsPlaying(gameHandale_)) {
+						audio_->StopWave(gameHandale_);
+					}
 				}
 			}
 
@@ -218,7 +229,7 @@ void GameScene::Update() {
 
 	}
 	
-	option->Update(viewProjection_);
+	option->Update();
 
 	// ビュープロジェクション更新
 	viewProjection_.UpdateMatrix();

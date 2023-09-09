@@ -15,6 +15,9 @@ Option::Option() {
 	m_InputButton[ActCode::R_SELECT] = (int(Gamepad::Button::DOWN));
 	m_InputButton[ActCode::UI_SELECT] = (int(Gamepad::Button::X));
 
+	m_bgmVol = 0.5f;
+	m_seVol = 0.5f;
+
 	this->Initialize();
 }
 
@@ -34,14 +37,14 @@ void Option::Initialize()
 
 }
 
-void Option::Update(const ViewProjection& viewprojection) {
+void Option::Update() {
 
 	// ゲームパッドのインスタンスを取得
 	Gamepad::Input();
 
 	// カーソルの更新処理
 	CursorUpdate();
-	viewprojection;
+
 	// ビューポート
 	m_cursorSprite->SetPosition({m_cursorPos.x, m_cursorPos.y});
 

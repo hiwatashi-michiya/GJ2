@@ -92,7 +92,7 @@ void TitleScene::Update() {
 	//シーンチェンジしていない時の処理
 	else {
 
-		option->Update(viewProjection_);
+		option->Update();
 
 		// シーンチェンジ
 		if (input_->GetJoystickState(0, joyState)) {

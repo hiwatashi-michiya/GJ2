@@ -64,6 +64,9 @@ void Player::Initialize(const std::vector<Model*>& models, const std::vector<uin
 
 	crossAttackSE_ = audio_->LoadWave("SE/crossattack.wav");
 	upMoveSE_ = audio_->LoadWave("SE/up.wav");
+	clickSE_ = audio_->LoadWave("SE/click.wav");
+	selectSE_ = audio_->LoadWave("SE/select.wav");
+	cancelSE_ = audio_->LoadWave("SE/cancel.wav");
 
 }
 
@@ -138,6 +141,12 @@ void Player::Update(Option* option) {
 
 				if (selectNum_ > 0) {
 					selectNum_--;
+
+					// 移動時にSEを鳴らす
+					if (audio_->IsPlaying(selectSE_)) {
+						audio_->StopWave(selectSE_);
+					}
+					audio_->PlayWave(selectSE_, false, 0.4f * option->m_seVol);
 				}
 
 				inputCoolTimer_ = kInputCoolTime;
@@ -150,6 +159,12 @@ void Player::Update(Option* option) {
 
 				if (selectNum_ < selectCommands_.size() - 1) {
 					selectNum_++;
+
+					// 移動時にSEを鳴らす
+					if (audio_->IsPlaying(selectSE_)) {
+						audio_->StopWave(selectSE_);
+					}
+					audio_->PlayWave(selectSE_, false, 0.4f * option->m_seVol);
 				}
 
 				inputCoolTimer_ = kInputCoolTime;
@@ -165,12 +180,24 @@ void Player::Update(Option* option) {
 
 				inputCoolTimer_ = kInputCoolTime;
 
+				// 行動選択時にSEを鳴らす
+				if (audio_->IsPlaying(clickSE_)) {
+					audio_->StopWave(clickSE_);
+				}
+				audio_->PlayWave(clickSE_, false, 1.0f * option->m_seVol);
+
 			} else if (
 			    (input_->PushKey(DIK_E) || option->GetActionTrigger(ACT)) &&
 				inputCoolTimer_ == 0) {
 				isSelect_ = false;
 				isPlayerTurn_ = true;
 				inputCoolTimer_ = kInputCoolTime;
+
+				// 行動選択時にSEを鳴らす
+				if (audio_->IsPlaying(clickSE_)) {
+					audio_->StopWave(clickSE_);
+				}
+				audio_->PlayWave(clickSE_, false, 1.0f * option->m_seVol);
 			}
 
 			if ((input_->PushKey(DIK_Q) || option->GetActionTrigger(CANCEL)) &&
@@ -179,6 +206,12 @@ void Player::Update(Option* option) {
 				PushSelectCommand(moveCommands_.back());
 				PopBackMoveCommand();
 				inputCoolTimer_ = kInputCoolTime;
+
+				// 行動キャンセル時にSEを鳴らす
+				if (audio_->IsPlaying(cancelSE_)) {
+					audio_->StopWave(cancelSE_);
+				}
+				audio_->PlayWave(cancelSE_, false, 1.0f * option->m_seVol);
 			}
 
 			if (selectNum_ >= selectCommands_.size()) {
@@ -451,6 +484,14 @@ void Player::DrawUI() {
 	}
 
 	for (int i = 0; i < selectCommands_.size(); i++) {
+
+		// 選択中のコマンドの色を変更する
+		if (i == selectNum_) 
+		{
+			selectCommandNumSprite_[i]->SetColor({1.0f, 1.0f, 1.0f, 0.5f});
+		} else {
+			selectCommandNumSprite_[i]->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+		}
 		selectCommandNumSprite_[i]->Draw();
 	}
 
@@ -460,7 +501,7 @@ void Player::DrawUI() {
 		}
 	}
 
-	currentNumSprite_->Draw();
+	//currentNumSprite_->Draw();
 
 }
 

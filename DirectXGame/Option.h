@@ -26,7 +26,7 @@ public:
 	Option();
 	~Option();
 	void Initialize();
-	void Update(const ViewProjection& viewprojection);
+	void Update();
 	void Draw();
 
 	bool GetActionTrigger(ActCode act);
@@ -45,13 +45,15 @@ private:
 
 	uint32_t cursorTextureHandle = 0u;
 
+public:
+
 	// BGM
 	float m_bgmVol;
 
 	// SE
 	float m_seVol;
 
-	public:
+
 
 	// 設定キー
 	int m_InputButton[ActCode::END];

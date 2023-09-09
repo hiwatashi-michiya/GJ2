@@ -115,6 +115,11 @@ private: // メンバ変数
 	uint32_t numberTex_ = 0u;
 	uint32_t alphaRedTex_ = 0u;
 	uint32_t alphaDarkTex_ = 0u;
+	uint32_t baseBackTex_ = 0u;
+
+	// BGM
+	uint32_t gameBGM_ = 0u;
+	uint32_t gameHandale_ = 0u;
 
 	// オプション
 	Option* option = new Option;
