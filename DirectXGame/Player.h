@@ -134,6 +134,9 @@ private:
 	//攻撃したかどうか
 	bool isAttack_ = false;
 
+	//ガードしたかどうか
+	bool isGuard_ = false;
+
 	//現在プレイヤーのターンかどうか
 	bool isPlayerTurn_ = false;
 

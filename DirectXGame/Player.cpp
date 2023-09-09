@@ -100,12 +100,31 @@ void Player::Update(Option* option) {
 	if (isHit_ == false) {
 
 		if (collisionManager_->IsHitAttack(GetGridX(), GetGridZ(), EnemyAttack)) {
-			life_ -= 10;
+
+			//ガード状態なら半減し、その後ガードを解除する
+			if (isGuard_) {
+				life_ -= 5;
+				isGuard_ = false;
+			}
+			else {
+				life_ -= 10;
+			}
+
 			isHit_ = true;
+
 		}
 		else if (collisionManager_->IsHitAttack(GetGridX(), GetGridZ(), EnemySpecialAttack)) {
-			life_ -= 20;
+
+			// ガード状態なら半減し、その後ガードを解除する
+			if (isGuard_) {
+				life_ -= 10;
+				isGuard_ = false;
+			} else {
+				life_ -= 20;
+			}
+
 			isHit_ = true;
+
 		}
 
 	}
@@ -144,7 +163,7 @@ void Player::Update(Option* option) {
 		inputCoolTimer_--;
 	}
 
-	// リストの要素が空なら新たに設定する
+	// 行動選択
 	if (isSelect_) {
 
 		if (input_->GetJoystickState(0, joyState)) {
@@ -433,6 +452,8 @@ void Player::Move(Command& command) {
 	case Guard:
 
 		velocity_ = {0.0f, 0.0f, 0.0f};
+
+		isGuard_ = true;
 
 		currentTex_ = textures_[2];
 

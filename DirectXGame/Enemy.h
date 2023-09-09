@@ -139,6 +139,9 @@ private:
 	// 攻撃したかどうか
 	bool isAttack_ = false;
 
+	// ガードしたかどうか
+	bool isGuard_ = false;
+
 	// 行動コマンド画像更新
 	void UpdateMoveCommandsNum();
 

@@ -76,13 +76,31 @@ void Enemy::Update(const ViewProjection& viewProjection) {
 		//プレイヤーの攻撃を受けたら
 		if (collisionManager_->IsHitAttack(GetGridX(), GetGridZ(), PlayerAttack)) {
 
-			life_ -= 10;
+			// ガード状態なら半減し、その後ガードを解除する
+			if (isGuard_) {
+				life_ -= 5;
+				isGuard_ = false;
+			}
+			else {
+				life_ -= 10;
+			}
+
+			
 			isHit_ = true;
 
 		}
 		else if (collisionManager_->IsHitAttack(GetGridX(), GetGridZ(), PlayerSpecialAttack)) {
 
-			life_ -= 20;
+			// ガード状態なら半減し、その後ガードを解除する
+			if (isGuard_) {
+				life_ -= 10;
+				isGuard_ = false;
+			}
+			else {
+				life_ -= 20;
+			}
+
+			
 			isHit_ = true;
 		}
 
@@ -311,6 +329,8 @@ void Enemy::Move(Command& command) {
 	case Guard:
 
 		velocity_ = {0.0f, 0.0f, 0.0f};
+
+		isGuard_ = true;
 
 		currentTex_ = textures_[2];
 
