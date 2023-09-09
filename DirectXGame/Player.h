@@ -100,6 +100,7 @@ private:
 	const int kMaxLife = 100;
 
 	int life_ = kMaxLife;
+	int lifeNum_[3] = {0, 0, 0};
 
 	//攻撃が当たったかどうか
 	bool isHit_ = false;
@@ -143,6 +144,10 @@ private:
 
 	std::unique_ptr<Sprite> currentNumSprite_;
 
+	std::unique_ptr<Sprite> findUI_[kMaxSelectNum];
+	
+	std::unique_ptr<Sprite> hpSprite_[3];
+
 	//モデル
 	std::vector<Model*> models_;
 
@@ -161,6 +166,6 @@ private:
 
 	// 行動UIの表示
 	bool isFindUI_[kMaxSelectNum] = {};
-	std::unique_ptr<Sprite> findUI_[kMaxSelectNum];
+	
 	uint32_t findUITexture_;
 };

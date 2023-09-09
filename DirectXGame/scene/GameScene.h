@@ -119,6 +119,7 @@ private: // メンバ変数
 	uint32_t alphaRedTex_ = 0u;
 	uint32_t alphaDarkTex_ = 0u;
 	uint32_t baseBackTex_ = 0u;
+	uint32_t numPlateTex_ = 0u;
 	uint32_t playerAttackMassTex_ = 0u;
 	uint32_t enemyAttackMassTex_ = 0u;
 
