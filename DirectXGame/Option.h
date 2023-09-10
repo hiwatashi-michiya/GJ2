@@ -40,7 +40,7 @@ private:
 	// カーソル
 	WorldTransform m_cursorWorldTransform;
 	Sprite* m_cursorSprite = nullptr;
-	Vector3 m_cursorPos = {640, 320, 0};
+	Vector3 m_cursorPos = {60, 120, 0};
 	Vector3 m_cursorVel = {6, 6, 0};
 
 	uint32_t cursorTextureHandle = 0u;

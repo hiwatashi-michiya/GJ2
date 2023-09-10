@@ -21,7 +21,7 @@ void Player::Initialize(
 	
 	findUITexture_ = TextureManager::Load("findUI.png");
 	
-	hpFrameSprite_.reset(Sprite::Create(textures_[2], {0.0f, 0.0f}));
+	hpFrameSprite_.reset(Sprite::Create(textures_[2], {-100.0f, 0.0f}));
 	hpFrameSprite_->SetTextureRect({0.0f,0.0f,},{1024.0f, 1024.0f});
 	
 	nextUISprite_.reset(Sprite::Create(textures_[8], {0.0f, 0.0f}));
