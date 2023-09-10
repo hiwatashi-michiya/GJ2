@@ -13,6 +13,7 @@
 #include "CollisionManager.h"
 #include "Player.h"
 #include "GameSpeed.h"
+#include <Audio.h>
 
 // コマンドの最大表示数
 const int kMaxEnemyCommand = 3;
@@ -38,12 +39,14 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <param name="sprite">スプライト</param>
-	void Initialize(const std::vector<Model*>& models, const std::vector<uint32_t>& textures);
+	void Initialize(
+	    const std::vector<Model*>& models, const std::vector<uint32_t>& textures,
+	    const std::vector<uint32_t>& sounds);
 
 	/// <summary>
 	/// 更新
 	/// </summary>
-	void Update(const ViewProjection& viewProjection);
+	void Update(const ViewProjection& viewProjection, Option* option);
 
 	/// <summary>
 	/// 描画
@@ -68,6 +71,12 @@ public:
 	void SetTextures(const std::vector<uint32_t>& textures) { textures_ = textures; }
 
 	/// <summary>
+	/// 音声配列のセット
+	/// </summary>
+	/// <param name="sounds">音声配列</param>
+	void SetSounds(const std::vector<uint32_t>& sounds) { sounds_ = sounds; }
+
+	/// <summary>
 	/// 行動ターン
 	/// </summary>
 	void MoveTurn(const ViewProjection& viewProjection);
@@ -87,6 +96,8 @@ public:
 private:
 	// 入力
 	Input* input_ = nullptr;
+	// 音再生
+	Audio* audio_ = nullptr;
 
 	CollisionManager* collisionManager_ = nullptr;
 
@@ -175,6 +186,9 @@ private:
 
 	// 画像
 	std::vector<uint32_t> textures_;
+
+	// SE
+	std::vector<uint32_t> sounds_;
 
 	// 現在セットしている画像
 	uint32_t currentTex_ = 0u;

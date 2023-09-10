@@ -46,6 +46,7 @@ void GameScene::Initialize() {
 	ground_->Initialize(groundModel_.get());
 	crossEffectModel_.reset(Model::CreateFromOBJ("crosseffect", true));
 
+	// テクスチャ
 	enemyTex_ = TextureManager::Load("king/king.png");
 	redTex_ = TextureManager::Load("player/red.png");
 	greenTex_ = TextureManager::Load("player/green.png");
@@ -60,6 +61,11 @@ void GameScene::Initialize() {
 	frameTex_ = TextureManager::Load("UI/frame.png");
 	nextTex_ = TextureManager::Load("UI/nextUI.png");
 
+	// SE
+	damageSE_ = audio_->LoadWave("SE/damage.wav");
+	damageHandle_ = damageSE_;
+
+
 	playerTex_ = TextureManager::Load("pawn/pawn.png");
 	playerSprite_.reset(Sprite::Create(playerTex_, {0.0f, 0.0f}));
 	playerModel_.reset(Model::CreateFromOBJ("pawn", true));
@@ -67,14 +73,16 @@ void GameScene::Initialize() {
 	std::vector<Model*> playerModels{playerModel_.get(), crossEffectModel_.get()};
 	std::vector<uint32_t> playerTextures{playerTex_, redTex_,      greenTex_,   blueTex_,     numberTex_, alphaRedTex_,
 	                                     numPlateTex_, frameTex_,  nextTex_};
+	std::vector<uint32_t> playerSounds{damageSE_,damageHandle_};
 
 	player_ = std::make_unique<Player>();
-	player_->Initialize(playerModels, playerTextures);
+	player_->Initialize(playerModels, playerTextures, playerSounds);
 
 	enemyModel_.reset(Model::CreateFromOBJ("king", true));
 	std::vector<Model*> enemyModels{enemyModel_.get(), crossEffectModel_.get()};
 	std::vector<uint32_t> enemyTextures{enemyTex_,  redTex_,       greenTex_, blueTex_,
 	                                    numberTex_, alphaDarkTex_, frameTex_};
+	std::vector<uint32_t> enemySounds{damageSE_, damageHandle_};
 
 	//攻撃マスのワールドトランスフォーム初期化
 	for (int z = 0; z < kMaxGrid; z++) {
@@ -106,13 +114,13 @@ void GameScene::Initialize() {
 	}*/
 
 	Enemy* newEnemy = new Enemy();
-	newEnemy->Initialize(enemyModels, enemyTextures);
+	newEnemy->Initialize(enemyModels, enemyTextures, enemySounds);
 	newEnemy->SetPlayer(player_.get());
 	newEnemy->SetPosition(3, 3);
 	enemies_.push_back(newEnemy);
 
 	Enemy* newEnemy2 = new Enemy();
-	newEnemy2->Initialize(enemyModels, enemyTextures);
+	newEnemy2->Initialize(enemyModels, enemyTextures, enemySounds);
 	newEnemy2->SetPlayer(player_.get());
 	newEnemy2->SetPosition(5, 5);
 	enemies_.push_back(newEnemy2);
@@ -222,7 +230,7 @@ void GameScene::Update() {
 		}
 
 		for (Enemy* enemy : enemies_) {
-			enemy->Update(viewProjection_);
+			enemy->Update(viewProjection_, option);
 		}
 
 		if (player_->GetIsPlayerTurn()) {

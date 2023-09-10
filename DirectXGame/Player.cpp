@@ -4,7 +4,9 @@
 #include <ImGuiManager.h>
 #endif // _DEBUG
 
-void Player::Initialize(const std::vector<Model*>& models, const std::vector<uint32_t>& textures) {
+void Player::Initialize(
+    const std::vector<Model*>& models, const std::vector<uint32_t>& textures,
+    const std::vector<uint32_t>& sounds) {
 
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
@@ -13,6 +15,7 @@ void Player::Initialize(const std::vector<Model*>& models, const std::vector<uin
 
 	SetModels(models);
 	SetTextures(textures);
+	SetSounds(sounds);
 
 	currentTex_ = textures_[0];
 	
@@ -124,7 +127,8 @@ void Player::Update(const ViewProjection& viewProjection,Option* option) {
 			else {
 				life_ -= 10;
 			}
-
+			
+			audio_->PlayWave(sounds_[0], false, option->m_seVol);
 			isHit_ = true;
 
 		}
@@ -136,8 +140,10 @@ void Player::Update(const ViewProjection& viewProjection,Option* option) {
 				isGuard_ = false;
 			} else {
 				life_ -= 20;
+				
 			}
-
+			
+			audio_->PlayWave(sounds_[0], false, option->m_seVol);
 			isHit_ = true;
 
 		}

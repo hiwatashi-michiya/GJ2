@@ -4,14 +4,18 @@
 #include <ImGuiManager.h>
 #endif // _DEBUG
 
-void Enemy::Initialize(const std::vector<Model*>& models, const std::vector<uint32_t>& textures) {
+void Enemy::Initialize(
+    const std::vector<Model*>& models, const std::vector<uint32_t>& textures,
+    const std::vector<uint32_t>& sounds) {
 
 	input_ = Input::GetInstance();
+	audio_ = Audio::GetInstance();
 	collisionManager_ = CollisionManager::GetInstance();
 	gameSpeed_ = GameSpeed::GetInstance();
 
 	SetModels(models);
 	SetTextures(textures);
+	SetSounds(sounds);
 
 	currentTex_ = textures_[0];
 
@@ -56,7 +60,7 @@ void Enemy::Initialize(const std::vector<Model*>& models, const std::vector<uint
 
 }
 
-void Enemy::Update(const ViewProjection& viewProjection) {
+void Enemy::Update(const ViewProjection& viewProjection, Option* option) {
 
 #ifdef _DEBUG
 
@@ -84,7 +88,7 @@ void Enemy::Update(const ViewProjection& viewProjection) {
 			else {
 				life_ -= 10;
 			}
-
+			audio_->PlayWave(sounds_[0], false, option->m_seVol);
 			
 			isHit_ = true;
 
@@ -100,7 +104,7 @@ void Enemy::Update(const ViewProjection& viewProjection) {
 				life_ -= 20;
 			}
 
-			
+			audio_->PlayWave(sounds_[0], false, option->m_seVol);
 			isHit_ = true;
 		}
 

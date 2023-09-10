@@ -29,7 +29,9 @@ public:
 	/// 初期化
 	/// </summary>
 	/// <param name="sprite">スプライト</param>
-	void Initialize(const std::vector<Model*>& models, const std::vector<uint32_t>& textures);
+	void Initialize(
+	    const std::vector<Model*>& models, const std::vector<uint32_t>& textures,
+	    const std::vector<uint32_t>& sounds);
 
 	/// <summary>
 	/// 更新
@@ -57,6 +59,12 @@ public:
 	/// </summary>
 	/// <param name="textures">画像配列</param>
 	void SetTextures(const std::vector<uint32_t>& textures) { textures_ = textures; }
+
+	/// <summary>
+	/// 音声配列のセット
+	/// </summary>
+	/// <param name="sounds">音声配列</param>
+	void SetSounds(const std::vector<uint32_t>& sounds) { sounds_ = sounds; }
 
 	/// <summary>
 	/// 行動ターン
@@ -169,6 +177,7 @@ private:
 	std::vector<uint32_t> textures_;
 
 	//SE
+	std::vector<uint32_t> sounds_;
 	uint32_t crossAttackSE_ = 0u;
 	uint32_t upMoveSE_ = 0u;
 	uint32_t clickSE_ = 0u;
