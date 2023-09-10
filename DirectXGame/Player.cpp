@@ -67,7 +67,7 @@ void Player::Initialize(const std::vector<Model*>& models, const std::vector<uin
 	worldTransform_.translation_ = Vector3(-25.0f, 2.0f, 5.0f);
 	worldTransform_.UpdateMatrix();
 
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < 8; i++) {
 		worldTransformEffect_[i].Initialize();
 		worldTransformEffect_[i].scale_ *= 2.0f;
 		worldTransformEffect_[i].parent_ = &worldTransform_;
@@ -306,7 +306,7 @@ void Player::MoveTurn() {
 	}
 
 	worldTransform_.UpdateMatrix();
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < 8; i++) {
 		worldTransformEffect_[i].UpdateMatrix();
 	}
 }
@@ -449,7 +449,7 @@ void Player::Move(Command& command) {
 
 		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed()) {
 
-			for (int i = 0; i < 4; i++) {
+			for (int i = 0; i < 8; i++) {
 				worldTransformEffect_[i].translation_ = Vector3(0.0f, 0.0f, 0.0f);
 			}
 
@@ -478,10 +478,40 @@ void Player::Move(Command& command) {
 
 		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed()) {
 
+			for (int i = 0; i < 8; i++) {
+				worldTransformEffect_[i].translation_ = Vector3(0.0f, 0.0f, 0.0f);
+			}
+
 			collisionManager_->SetAttackCircle(GetGridX(), GetGridZ(), PlayerAttack);
 		}
 
-		velocity_ = {0.0f, 0.0f, 0.0f};
+		if (MoveTimer_ % 5 == 0) {
+			for (int i = 0; i < 8; i++) {
+				worldTransformEffect_[i].translation_.y = -3.0f;
+			}
+		}
+
+		for (int i = 0; i < 8; i++) {
+			if (i == 2 || i == 6 || i == 7) {
+				velocity_.x = cosf(2.0f * 3.14f / 2.0f) / 5.5f * gameSpeed_->GetGameSpeed();
+			} else if (i == 0 || i == 4 || i == 5) {
+				velocity_.x = cosf(0.0f * 3.14f / 2.0f) / 5.5f * gameSpeed_->GetGameSpeed();
+			} else {
+				velocity_.x = cosf(i * 3.14f / 2.0f) / 5.5f * gameSpeed_->GetGameSpeed(); 
+			}
+
+			velocity_.y = 1.0f;
+
+			if (i == 1 || i == 5 || i == 6) {
+				velocity_.z = sinf(1.0f * 3.14f / 2.0f) / 5.5f * gameSpeed_->GetGameSpeed();
+			} else if (i == 3 || i == 4 || i == 7) {
+				velocity_.z = sinf(3.0f * 3.14f / 2.0f) / 5.5f * gameSpeed_->GetGameSpeed();
+			} else {
+				velocity_.z = sinf(i * 3.14f / 2.0f) / 5.5f * gameSpeed_->GetGameSpeed();
+			}
+
+			worldTransformEffect_[i].translation_ += velocity_;
+		}
 
 		currentTex_ = textures_[1];
 
@@ -526,7 +556,7 @@ void Player::Move(Command& command) {
 	worldTransform_.translation_.z = Clamp(worldTransform_.translation_.z, -25.0f, 25.0f);
 
 	if (--MoveTimer_ <= 0) {
-		velocity_.y = 0.0f;
+		velocity_ = {0.0f, 0.0f, 0.0f};
 		currentTex_ = textures_[0];
 		currentMoveCommand_ = Stop;
 		collisionManager_->ResetAttack();
@@ -539,9 +569,9 @@ void Player::Draw(const ViewProjection& viewProjection) {
 
 	models_[0]->Draw(worldTransform_, viewProjection, currentTex_);
 
-	if (currentMoveCommand_ == AttackCross) {
+	if (currentMoveCommand_ == AttackCross || currentMoveCommand_ == AttackCircle) {
 
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 8; i++) {
 			models_[1]->Draw(worldTransformEffect_[i], viewProjection, textures_[5]);
 		}
 	}

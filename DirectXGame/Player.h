@@ -91,7 +91,7 @@ private:
 	WorldTransform worldTransform_;
 
 	//エフェクトのワールドトランスフォーム
-	WorldTransform worldTransformEffect_[4];
+	WorldTransform worldTransformEffect_[8];
 
 	//速度
 	Vector3 velocity_;
