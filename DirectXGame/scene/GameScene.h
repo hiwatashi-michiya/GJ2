@@ -123,6 +123,7 @@ private: // メンバ変数
 	uint32_t playerAttackMassTex_ = 0u;
 	uint32_t enemyAttackMassTex_ = 0u;
 	uint32_t frameTex_ = 0u;
+	uint32_t nextTex_ = 0u;
 
 	// BGM
 	uint32_t gameBGM_ = 0u;

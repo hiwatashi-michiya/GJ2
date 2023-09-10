@@ -15,9 +15,21 @@ void Player::Initialize(const std::vector<Model*>& models, const std::vector<uin
 	SetTextures(textures);
 
 	currentTex_ = textures_[0];
+	
 	findUITexture_ = TextureManager::Load("findUI.png");
+	
 	hpFrameSprite_.reset(Sprite::Create(textures_[2], {0.0f, 0.0f}));
 	hpFrameSprite_->SetTextureRect({0.0f,0.0f,},{1024.0f, 1024.0f});
+	
+	nextUISprite_.reset(Sprite::Create(textures_[8], {0.0f, 0.0f}));
+	nextUISprite_->SetSize({128.0f, 64.0f});
+	nextUISprite_->SetTextureRect(
+	    {
+	        0.0f,
+	        0.0f,
+	    },
+	    {1024.0f, 256.0f});
+	nextUISprite_->SetPosition({10.0f, 10.0f});
 
 	for (int i = 0; i < kMaxCommand; i++) {
 		commandNumSprite_[i].reset(Sprite::Create(textures_[4], {0.0f, 0.0f}));
@@ -28,7 +40,7 @@ void Player::Initialize(const std::vector<Model*>& models, const std::vector<uin
 		        0.0f,
 		    },
 		    {1024.0f, 1024.0f});
-		commandNumSprite_[i]->SetPosition({10.0f, (kMaxCommand - 1 - i) * 64.0f + 10.0f});
+		commandNumSprite_[i]->SetPosition({(kMaxCommand - 1 + i) * 64.0f + 10.0f, 10.0f});
 	}
 
 	for (int i = 0; i < kMaxSelectNum; i++) {
@@ -270,6 +282,8 @@ void Player::Update(const ViewProjection& viewProjection,Option* option) {
 	}
 
 	UpdateMoveCommandsNum();
+
+
 
 	SetCommandSprite(viewProjection);
 }
@@ -620,6 +634,7 @@ void Player::DrawUI() {
 	}*/
 
 	hpFrameSprite_->Draw();
+	nextUISprite_->Draw();
 
 	// currentNumSprite_->Draw();
 }

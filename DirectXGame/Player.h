@@ -157,6 +157,8 @@ private:
 	std::unique_ptr<Sprite> hpFrameSprite_;
 	std::unique_ptr<Sprite> hpSprite_[3];
 
+	std::unique_ptr<Sprite> nextUISprite_;
+
 	// スプライトの位置をセット
 	void SetCommandSprite(const ViewProjection& viewProjection);
 
