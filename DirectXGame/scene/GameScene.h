@@ -100,6 +100,7 @@ private: // メンバ変数
 	std::unique_ptr<Model> playerModel_;
 	std::unique_ptr<Model> enemyModel_;
 	std::unique_ptr<Model> crossEffectModel_;
+	std::unique_ptr<Model> guardEffectModel_;
 	// 天球モデル
 	std::unique_ptr<Model> skydomeModel_ = nullptr;
 	// 地面モデル
@@ -117,6 +118,7 @@ private: // メンバ変数
 	uint32_t blackTex_ = 0u;
 	uint32_t numberTex_ = 0u;
 	uint32_t alphaRedTex_ = 0u;
+	uint32_t alphaBlueTex_ = 0u;
 	uint32_t alphaDarkTex_ = 0u;
 	uint32_t baseBackTex_ = 0u;
 	uint32_t numPlateTex_ = 0u;

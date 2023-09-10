@@ -18,12 +18,17 @@ void Player::Initialize(
 	SetSounds(sounds);
 
 	currentTex_ = textures_[0];
-	
+
 	findUITexture_ = TextureManager::Load("findUI.png");
-	
+
 	hpFrameSprite_.reset(Sprite::Create(textures_[2], {-100.0f, 0.0f}));
-	hpFrameSprite_->SetTextureRect({0.0f,0.0f,},{1024.0f, 1024.0f});
-	
+	hpFrameSprite_->SetTextureRect(
+	    {
+	        0.0f,
+	        0.0f,
+	    },
+	    {1024.0f, 1024.0f});
+
 	nextUISprite_.reset(Sprite::Create(textures_[8], {0.0f, 0.0f}));
 	nextUISprite_->SetSize({128.0f, 64.0f});
 	nextUISprite_->SetTextureRect(
@@ -62,14 +67,26 @@ void Player::Initialize(
 	for (int i = 0; i < kMaxSelectNum; i++) {
 		findUI_[i].reset(Sprite::Create(findUITexture_, {0.0f, 0.0f}));
 		findUI_[i]->SetSize({64.0f, 64.0f});
-		findUI_[i]->SetTextureRect({0.0f, 0.0f,},{32.0f, 32.0f});
-		findUI_[i]->SetPosition({selectCommandNumSprite_[i]->GetPosition().x,selectCommandNumSprite_[i]->GetPosition().y});
+		findUI_[i]->SetTextureRect(
+		    {
+		        0.0f,
+		        0.0f,
+		    },
+		    {32.0f, 32.0f});
+		findUI_[i]->SetPosition(
+		    {selectCommandNumSprite_[i]->GetPosition().x,
+		     selectCommandNumSprite_[i]->GetPosition().y});
 	}
 
 	for (int i = 0; i < 3; i++) {
 		hpSprite_[i].reset(Sprite::Create(textures_[6], {0.0f, 0.0f}));
 		hpSprite_[i]->SetSize({64.0f, 64.0f});
-		hpSprite_[i]->SetTextureRect({0.0f,0.0f,},{1024.0f, 1024.0f});
+		hpSprite_[i]->SetTextureRect(
+		    {
+		        0.0f,
+		        0.0f,
+		    },
+		    {1024.0f, 1024.0f});
 		hpSprite_[i]->SetPosition({(float)(i + 1) * 64, 10.0f});
 	}
 
@@ -89,6 +106,8 @@ void Player::Initialize(
 		worldTransformEffect_[i].UpdateMatrix();
 	}
 
+	moveAngle_ = 0.0f;
+
 	SetSelectCommands();
 	SetGrid(0, 2);
 	collisionManager_->SetCollision(GetGridX(), GetGridZ());
@@ -100,7 +119,7 @@ void Player::Initialize(
 	cancelSE_ = audio_->LoadWave("SE/cancel.wav");
 }
 
-void Player::Update(const ViewProjection& viewProjection,Option* option) {
+void Player::Update(const ViewProjection& viewProjection, Option* option) {
 
 #ifdef _DEBUG
 
@@ -119,20 +138,18 @@ void Player::Update(const ViewProjection& viewProjection,Option* option) {
 
 		if (collisionManager_->IsHitAttack(GetGridX(), GetGridZ(), EnemyAttack)) {
 
-			//ガード状態なら半減し、その後ガードを解除する
+			// ガード状態なら半減し、その後ガードを解除する
 			if (isGuard_) {
 				life_ -= 5;
 				isGuard_ = false;
-			}
-			else {
+			} else {
 				life_ -= 10;
 			}
-			
+
 			audio_->PlayWave(sounds_[0], false, option->m_seVol);
 			isHit_ = true;
 
-		}
-		else if (collisionManager_->IsHitAttack(GetGridX(), GetGridZ(), EnemySpecialAttack)) {
+		} else if (collisionManager_->IsHitAttack(GetGridX(), GetGridZ(), EnemySpecialAttack)) {
 
 			// ガード状態なら半減し、その後ガードを解除する
 			if (isGuard_) {
@@ -140,12 +157,10 @@ void Player::Update(const ViewProjection& viewProjection,Option* option) {
 				isGuard_ = false;
 			} else {
 				life_ -= 20;
-				
 			}
-			
+
 			audio_->PlayWave(sounds_[0], false, option->m_seVol);
 			isHit_ = true;
-
 		}
 
 	}
@@ -223,22 +238,21 @@ void Player::Update(const ViewProjection& viewProjection,Option* option) {
 				inputCoolTimer_ = kInputCoolTime;
 			}
 
-			//スペシャルカウントが溜まっていたら特殊攻撃可能にする
+			// スペシャルカウントが溜まっていたら特殊攻撃可能にする
 			if (specialCount_ >= kMaxSpecialCount && option->GetActionTrigger(JUMP)) {
 
-				//コマンドリセット
+				// コマンドリセット
 				selectCommands_.clear();
 
 				for (int i = 0; i < kMaxSelectNum; i++) {
 
 					selectCommands_.push_back(S_PlayerAttack);
-
 				}
 
 				specialCount_ = 0;
 
-			}
-			else if ((input_->PushKey(DIK_E) || option->GetActionTrigger(ACT)) && inputCoolTimer_ == 0 &&
+			} else if (
+			    (input_->PushKey(DIK_E) || option->GetActionTrigger(ACT)) && inputCoolTimer_ == 0 &&
 			    moveCommands_.size() < kMaxCommand) {
 
 				SetMoveCommand(selectNum_);
@@ -252,8 +266,7 @@ void Player::Update(const ViewProjection& viewProjection,Option* option) {
 				}
 				audio_->PlayWave(clickSE_, false, 1.0f * option->m_seVol);
 
-			} 
-			else if (
+			} else if (
 			    (input_->PushKey(DIK_E) || option->GetActionTrigger(ACT)) && inputCoolTimer_ == 0) {
 				isSelect_ = false;
 				isPlayerTurn_ = true;
@@ -288,8 +301,6 @@ void Player::Update(const ViewProjection& viewProjection,Option* option) {
 	}
 
 	UpdateMoveCommandsNum();
-
-
 
 	SetCommandSprite(viewProjection);
 }
@@ -517,7 +528,7 @@ void Player::Move(Command& command) {
 			} else if (i == 0 || i == 4 || i == 5) {
 				velocity_.x = cosf(0.0f * 3.14f / 2.0f) / 5.5f * gameSpeed_->GetGameSpeed();
 			} else {
-				velocity_.x = cosf(i * 3.14f / 2.0f) / 5.5f * gameSpeed_->GetGameSpeed(); 
+				velocity_.x = cosf(i * 3.14f / 2.0f) / 5.5f * gameSpeed_->GetGameSpeed();
 			}
 
 			velocity_.y = 1.0f;
@@ -541,9 +552,34 @@ void Player::Move(Command& command) {
 		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed()) {
 			specialCount_++;
 			isGuard_ = true;
+
+			for (int i = 0; i < 8; i++) {
+				worldTransformEffect_[i].translation_ = {
+				    cosf((i * 10.0f) * 3.14f / 180.0f), 0.0f, sinf((i * 10.0f) * 3.14f / 180.0f)};
+			}
+
 		}
 
-		velocity_ = {0.0f, 0.0f, 0.0f};
+		if (MoveTimer_ % 5 == 0) {
+			for (int i = 0; i < 8; i++) {
+				worldTransformEffect_[i].translation_.y = -3.0f;
+			}
+		}
+
+		for (int i = 0; i < 5; i++) {
+			const float length = 10.0f;
+			float radius = moveAngle_ * 3.14f / 180.0f;
+
+			velocity_.x = cosf(i * 10.0f + radius) * length;
+			velocity_.y = 1.0f;
+			velocity_.z = sinf(i * 10.0f + radius) * length;
+
+			worldTransformEffect_[i].translation_.x = velocity_.x;
+			worldTransformEffect_[i].translation_.y += velocity_.y;
+			worldTransformEffect_[i].translation_.z = velocity_.z;
+
+			moveAngle_ += 1.0f;
+		}
 
 		currentTex_ = textures_[2];
 
@@ -576,6 +612,7 @@ void Player::Move(Command& command) {
 	worldTransform_.translation_.z = Clamp(worldTransform_.translation_.z, -25.0f, 25.0f);
 
 	if (--MoveTimer_ <= 0) {
+		moveAngle_ = 0.0f;
 		velocity_ = {0.0f, 0.0f, 0.0f};
 		currentTex_ = textures_[0];
 		currentMoveCommand_ = Stop;
@@ -592,7 +629,13 @@ void Player::Draw(const ViewProjection& viewProjection) {
 	if (currentMoveCommand_ == AttackCross || currentMoveCommand_ == AttackCircle) {
 
 		for (int i = 0; i < 8; i++) {
-			models_[1]->Draw(worldTransformEffect_[i], viewProjection, textures_[5]);
+				models_[1]->Draw(worldTransformEffect_[i], viewProjection, textures_[5]);
+		}
+	}
+	else if (currentMoveCommand_ == Guard) {
+
+		for (int i = 0; i < 5; i++) {
+			    models_[2]->Draw(worldTransformEffect_[i], viewProjection, textures_[9]);
 		}
 	}
 }
@@ -624,19 +667,19 @@ void Player::DrawUI() {
 	int lifeIndex = life_;
 	for (int i = 0; i < 3; i++) {
 
-		lifeNum_[i] = lifeIndex / divideNum;
-		
-		lifeIndex = lifeIndex % divideNum;
-		divideNum = divideNum / 10;
-		
-		hpSprite_[i]->SetTextureRect(
-		    {
-		        lifeNum_[i] * 1024.0f,
-		        0.0f,
-		    },
-		    {1024.0f, 1024.0f});
+	    lifeNum_[i] = lifeIndex / divideNum;
 
-		hpSprite_[i]->Draw();
+	    lifeIndex = lifeIndex % divideNum;
+	    divideNum = divideNum / 10;
+
+	    hpSprite_[i]->SetTextureRect(
+	        {
+	            lifeNum_[i] * 1024.0f,
+	            0.0f,
+	        },
+	        {1024.0f, 1024.0f});
+
+	    hpSprite_[i]->Draw();
 	}*/
 
 	hpFrameSprite_->Draw();
@@ -698,6 +741,5 @@ void Player::SetCommandSprite(const ViewProjection& viewProjection) {
 		// スプライトのレティクルに座標設定
 		hpFrameSprite_->SetSize({(128.0f * (float(life_) / kMaxLife)), 16.0f});
 		hpFrameSprite_->SetPosition(Vector2(positionReticle.x - 16.0f, positionReticle.y));
-		
 	}
 }

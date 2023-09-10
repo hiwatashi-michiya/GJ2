@@ -44,7 +44,9 @@ void GameScene::Initialize() {
 	groundModel_.reset(Model::CreateFromOBJ("ground", true));
 	ground_ = std::make_unique<Ground>();
 	ground_->Initialize(groundModel_.get());
+
 	crossEffectModel_.reset(Model::CreateFromOBJ("crosseffect", true));
+	guardEffectModel_.reset(Model::CreateFromOBJ("guardEffect", true));
 
 	// テクスチャ
 	enemyTex_ = TextureManager::Load("king/king.png");
@@ -53,6 +55,7 @@ void GameScene::Initialize() {
 	blueTex_ = TextureManager::Load("player/blue.png");
 	numberTex_ = TextureManager::Load("UI/commandUI.png");
 	alphaRedTex_ = TextureManager::Load("crosseffect/effectred.png");
+	alphaBlueTex_ = TextureManager::Load("guardEffect/effectblue.png");
 	alphaDarkTex_ = TextureManager::Load("crosseffect/effectdark.png");
 	baseBackTex_ = TextureManager::Load("UI/baseBack.png");
 	numPlateTex_ = TextureManager::Load("UI/numberPlateBlue.png");
@@ -70,16 +73,19 @@ void GameScene::Initialize() {
 	playerSprite_.reset(Sprite::Create(playerTex_, {0.0f, 0.0f}));
 	playerModel_.reset(Model::CreateFromOBJ("pawn", true));
 
-	std::vector<Model*> playerModels{playerModel_.get(), crossEffectModel_.get()};
-	std::vector<uint32_t> playerTextures{playerTex_, redTex_,      greenTex_,   blueTex_,     numberTex_, alphaRedTex_,
-	                                     numPlateTex_, frameTex_,  nextTex_};
+	std::vector<Model*> playerModels{playerModel_.get(), crossEffectModel_.get(), guardEffectModel_.get()};
+	std::vector<uint32_t> playerTextures{
+	    playerTex_, redTex_, greenTex_, blueTex_,
+	    numberTex_, alphaRedTex_,
+		numPlateTex_, frameTex_,  nextTex_
+			, alphaBlueTex_};
 	std::vector<uint32_t> playerSounds{damageSE_,damageHandle_};
 
 	player_ = std::make_unique<Player>();
 	player_->Initialize(playerModels, playerTextures, playerSounds);
 
 	enemyModel_.reset(Model::CreateFromOBJ("king", true));
-	std::vector<Model*> enemyModels{enemyModel_.get(), crossEffectModel_.get()};
+	std::vector<Model*> enemyModels{enemyModel_.get(), crossEffectModel_.get(), guardEffectModel_.get()};
 	std::vector<uint32_t> enemyTextures{enemyTex_,  redTex_,       greenTex_, blueTex_,
 	                                    numberTex_, alphaDarkTex_, frameTex_};
 	std::vector<uint32_t> enemySounds{damageSE_, damageHandle_};

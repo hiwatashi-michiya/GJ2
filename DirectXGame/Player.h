@@ -191,4 +191,6 @@ private:
 	bool isFindUI_[kMaxSelectNum] = {};
 	
 	uint32_t findUITexture_;
+
+	float moveAngle_;
 };
