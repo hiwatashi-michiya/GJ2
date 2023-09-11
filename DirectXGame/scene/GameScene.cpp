@@ -206,9 +206,9 @@ void GameScene::Update() {
 
 		if (isGameClear_ == false && isGameOver_ == false) {
 
-			if (CheckAllEnemyIsDead()) {
+			if (CheckAllEnemyIsDead() && player_->GetIsPlayerTurn() == false) {
 				isGameClear_ = true;
-			} else if (player_->GetIsDead()) {
+			} else if (player_->GetIsDead() && CheckAllEnemyTurn() == false) {
 				isGameOver_ = true;
 			}
 
@@ -246,11 +246,12 @@ void GameScene::Update() {
 
 		if (player_->GetIsPlayerTurn()) {
 			player_->MoveTurn();
-		} else if (CheckAllEnemyTurn()) {
+		} 
+		else if (CheckAllEnemyTurn()) {
 
 			for (Enemy* enemy : enemies_) {
 
-				if (enemy->GetIsEnemyTurn()) {
+				if (enemy->GetIsEnemyTurn() && enemy->GetIsEffect() == false) {
 					enemy->MoveTurn(viewProjection_);
 					break;
 				}

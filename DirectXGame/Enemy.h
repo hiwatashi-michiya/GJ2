@@ -92,6 +92,8 @@ public:
 
 	bool GetIsSelect() const { return isSelect_; }
 
+	bool GetIsEffect() const { return isEffect_; }
+
 	void SetIsSelect(bool flag) { isSelect_ = flag; }
 
 	void Reset();
