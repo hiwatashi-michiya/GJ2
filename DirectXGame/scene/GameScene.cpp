@@ -13,7 +13,6 @@ GameScene::~GameScene() {
 	for (Enemy* enemy : enemies_) {
 		delete enemy;
 	}
-
 }
 
 void GameScene::Initialize() {
@@ -68,29 +67,28 @@ void GameScene::Initialize() {
 	damageSE_ = audio_->LoadWave("SE/damage.wav");
 	damageHandle_ = damageSE_;
 
-
 	playerTex_ = TextureManager::Load("pawn/pawn.png");
 	playerSprite_.reset(Sprite::Create(playerTex_, {0.0f, 0.0f}));
 	playerModel_.reset(Model::CreateFromOBJ("pawn", true));
 
-	std::vector<Model*> playerModels{playerModel_.get(), crossEffectModel_.get(), guardEffectModel_.get()};
-	std::vector<uint32_t> playerTextures{
-	    playerTex_, redTex_, greenTex_, blueTex_,
-	    numberTex_, alphaRedTex_,
-		numPlateTex_, frameTex_,  nextTex_
-			, alphaBlueTex_};
-	std::vector<uint32_t> playerSounds{damageSE_,damageHandle_};
+	std::vector<Model*> playerModels{
+	    playerModel_.get(), crossEffectModel_.get(), guardEffectModel_.get()};
+	std::vector<uint32_t> playerTextures{playerTex_, redTex_,      greenTex_,    blueTex_,
+	                                     numberTex_, alphaRedTex_, numPlateTex_, frameTex_,
+	                                     nextTex_,   alphaBlueTex_};
+	std::vector<uint32_t> playerSounds{damageSE_, damageHandle_};
 
 	player_ = std::make_unique<Player>();
 	player_->Initialize(playerModels, playerTextures, playerSounds);
 
 	enemyModel_.reset(Model::CreateFromOBJ("king", true));
-	std::vector<Model*> enemyModels{enemyModel_.get(), crossEffectModel_.get(), guardEffectModel_.get()};
+	std::vector<Model*> enemyModels{
+	    enemyModel_.get(), crossEffectModel_.get(), guardEffectModel_.get()};
 	std::vector<uint32_t> enemyTextures{enemyTex_,  redTex_,       greenTex_, blueTex_,
 	                                    numberTex_, alphaDarkTex_, frameTex_};
 	std::vector<uint32_t> enemySounds{damageSE_, damageHandle_};
 
-	//攻撃マスのワールドトランスフォーム初期化
+	// 攻撃マスのワールドトランスフォーム初期化
 	for (int z = 0; z < kMaxGrid; z++) {
 
 		for (int x = 0; x < kMaxGrid; x++) {
@@ -100,22 +98,20 @@ void GameScene::Initialize() {
 			worldTransformAttackMass_[z][x].translation_ =
 			    Vector3(-25.0f + x * 10.0f, 1.0f, 25.0f + z * -10.0f);
 			worldTransformAttackMass_[z][x].UpdateMatrix();
-
 		}
-
 	}
 
 	/*for (int z = 0; z < 6; z++) {
 
-		for (int x = 0; x < 6; x++) {
+	    for (int x = 0; x < 6; x++) {
 
-			Enemy* newEnemy = new Enemy();
-			newEnemy->Initialize(enemyModels, enemyTextures);
-			newEnemy->SetPlayer(player_.get());
-			newEnemy->SetPosition(x, z);
-			enemies_.push_back(newEnemy);
+	        Enemy* newEnemy = new Enemy();
+	        newEnemy->Initialize(enemyModels, enemyTextures);
+	        newEnemy->SetPlayer(player_.get());
+	        newEnemy->SetPosition(x, z);
+	        enemies_.push_back(newEnemy);
 
-		}
+	    }
 
 	}*/
 
@@ -136,22 +132,21 @@ void GameScene::Initialize() {
 
 	whiteTex_ = TextureManager::Load("player/player.png");
 	blackTex_ = TextureManager::Load("enemy/enemy.png");
-	
+
 	// BGM
 	gameBGM_ = audio_->LoadWave("BGM/Battle1.wav");
-
 }
 
 void GameScene::Update() {
 
-	//XINPUT_STATE joyState;
+	// XINPUT_STATE joyState;
 
 #ifdef _DEBUG
 
 	ImGui::Begin("debug command");
 	ImGui::Text("0 key : player HP -= 20");
 	ImGui::Text("9 key : all enemy HP -= 20");
-	
+
 	if (player_->GetIsPlayerTurn() == false && CheckAllEnemyTurn() == false) {
 
 		ImGui::Text("1, 2, 3 key : set game speed %d", gameSpeed_->GetGameSpeed());
@@ -173,8 +168,6 @@ void GameScene::Update() {
 
 #endif // _DEBUG
 
-	XINPUT_STATE joyState;
-
 	if (transition_->GetIsChangeScene()) {
 
 		// ゲームシーンにフェードインする時、またはゲームシーンからフェードアウトする時更新
@@ -186,16 +179,14 @@ void GameScene::Update() {
 		else if (transition_->GetFadeIn() && transition_->GetNextScene() == GAME) {
 			transition_->SetIsChangeScene(false);
 			transition_->Reset();
-			//gameHandale_ = audio_->PlayWave(gameBGM_, true, option->m_bgmVol);
+			// gameHandale_ = audio_->PlayWave(gameBGM_, true, option->m_bgmVol);
 		}
 		// ゲームシーンへのフェードインが完了したら
 		else {
 			// 実際に遷移する
 			transition_->ChangeScene();
-			
 		}
-	}
-	else {
+	} else {
 
 		enemies_.remove_if([](Enemy* enemy) {
 			if (enemy->GetIsDead()) {
@@ -215,24 +206,21 @@ void GameScene::Update() {
 				isGameOver_ = true;
 			}
 
-			player_->Update(viewProjection_,option);
+			player_->Update(viewProjection_, option);
 
 		} else {
 
 			// シーンチェンジ
-			if (input_->GetJoystickState(0, joyState)) {
-				if ((input_->PushKey(DIK_LEFT) || option->GetActionTrigger(DASH))) {
-					
-					transition_->SetIsChangeScene(true);
-					// 遷移先のシーンをゲームにする
-					transition_->SetNextScene(TITLE);
+			if ((input_->TriggerKey(DIK_RETURN) || option->GetActionTrigger(ACT))) {
 
-					if (audio_->IsPlaying(gameHandale_)) {
-						audio_->StopWave(gameHandale_);
-					}
+				transition_->SetIsChangeScene(true);
+				// 遷移先のシーンをゲームにする
+				transition_->SetNextScene(TITLE);
+
+				if (audio_->IsPlaying(gameHandale_)) {
+					audio_->StopWave(gameHandale_);
 				}
 			}
-
 		}
 
 		for (Enemy* enemy : enemies_) {
@@ -263,24 +251,23 @@ void GameScene::Update() {
 				}
 			}
 		}
-
 	}
-	
+
 	option->Update();
 
 	// ビュープロジェクション更新
 	viewProjection_.UpdateMatrix();
 
 	/*if (input_->GetJoystickState(0, joyState)) {
-		if ((input_->PushKey(DIK_LEFT) || option->GetActionTrigger(DASH))) {
-			AddStageTransition();
-		} 
-		else if ((input_->PushKey(DIK_RIGHT) || option->GetActionTrigger(JUMP))) {
-			isStageTransition_ = false;
-		}
+	    if ((input_->PushKey(DIK_LEFT) || option->GetActionTrigger(DASH))) {
+	        AddStageTransition();
+	    }
+	    else if ((input_->PushKey(DIK_RIGHT) || option->GetActionTrigger(JUMP))) {
+	        isStageTransition_ = false;
+	    }
 	}
 	if (isStageTransition_) {
-		transition_->Update();
+	    transition_->Update();
 	}*/
 }
 
@@ -318,22 +305,20 @@ void GameScene::Draw() {
 
 		for (int x = 0; x < kMaxGrid; x++) {
 
-			if (collisionManager_->GetAttackMass(x, z) == PlayerAttack || 
-				collisionManager_->GetAttackMass(x, z) == PlayerSpecialAttack) {
+			if (collisionManager_->GetAttackMass(x, z) == PlayerAttack ||
+			    collisionManager_->GetAttackMass(x, z) == PlayerSpecialAttack) {
 
-				groundModel_->Draw(worldTransformAttackMass_[z][x], viewProjection_, playerAttackMassTex_);
-
+				groundModel_->Draw(
+				    worldTransformAttackMass_[z][x], viewProjection_, playerAttackMassTex_);
 			}
 
-			if (collisionManager_->GetAttackMass(x, z) == EnemyAttack || 
-				collisionManager_->GetAttackMass(x, z) == EnemySpecialAttack) {
+			if (collisionManager_->GetAttackMass(x, z) == EnemyAttack ||
+			    collisionManager_->GetAttackMass(x, z) == EnemySpecialAttack) {
 
 				groundModel_->Draw(
 				    worldTransformAttackMass_[z][x], viewProjection_, enemyAttackMassTex_);
 			}
-
 		}
-
 	}
 
 	if (player_->GetIsDead() == false) {
@@ -374,7 +359,7 @@ void GameScene::Draw() {
 }
 
 // 画面遷移
-//void GameScene::AddStageTransition() {
+// void GameScene::AddStageTransition() {
 //	std::vector<uint32_t> transitionTextures{whiteTex_, blackTex_};
 //	transition_ = std::make_unique<TransitionEffect>();
 //	transition_->Initialize(transitionTextures);
@@ -391,13 +376,11 @@ bool GameScene::CheckAllEnemyTurn() {
 	}
 
 	return false;
-
 }
-
 
 bool GameScene::CheckAllEnemyIsDead() {
 
-	//一人でも生きていたらfalseを返す
+	// 一人でも生きていたらfalseを返す
 	for (Enemy* enemy : enemies_) {
 
 		if (enemy->GetIsDead() == false) {
@@ -406,5 +389,4 @@ bool GameScene::CheckAllEnemyIsDead() {
 	}
 
 	return true;
-
 }
