@@ -19,6 +19,7 @@
 #include <memory>
 #include <list>
 #include "GameSpeed.h"
+#include "Effect.h"
 
 /// <summary>
 /// ゲームシーン
@@ -76,6 +77,8 @@ private: // メンバ変数
 
 	//攻撃マスのワールドトランスフォーム
 	WorldTransform worldTransformAttackMass_[kMaxGrid][kMaxGrid];
+	//エフェクト表示
+	Effect effectMass_[kMaxGrid][kMaxGrid];
 
 	ViewProjection viewProjection_;
 

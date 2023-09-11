@@ -171,6 +171,11 @@ private:
 	// 現在プレイヤーのターンかどうか
 	bool isEnemyTurn_ = false;
 
+	// インターバルタイム。行動後一瞬止める
+	const int kMaxInterval = 10;
+
+	int interval_ = 0;
+
 	// スプライト
 	std::unique_ptr<Sprite> commandNumSprite_[kMaxEnemyCommand];
 

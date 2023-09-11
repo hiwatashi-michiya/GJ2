@@ -156,8 +156,12 @@ void Enemy::MoveTurn(const ViewProjection& viewProjection) {
 
 	if (!isSelect_) {
 
-			// リスト内が空でないなら行動開始
-		if (moveCommands_.empty() == false) {
+		//行動後に間を置く
+		if (interval_ > 0) {
+			interval_--;
+		}
+		// リスト内が空でないなら行動開始
+		else if (moveCommands_.empty() == false) {
 
 			if (isMove_ == false) {
 				// 次の行動コマンドを現在の行動コマンドに設定
@@ -372,6 +376,7 @@ void Enemy::Move(Command& command) {
 		velocity_.y = 0.0f;
 		currentTex_ = textures_[0];
 		collisionManager_->ResetAttack();
+		interval_ = kMaxInterval;
 		isMove_ = false;
 	}
 }

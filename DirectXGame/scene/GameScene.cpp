@@ -95,6 +95,11 @@ void GameScene::Initialize() {
 
 		for (int x = 0; x < kMaxGrid; x++) {
 
+			effectMass_[z][x].Initialize();
+			effectMass_[z][x].SetEffectType(Up);
+			effectMass_[z][x].SetStartPosition(
+			    Vector3(-25.0f + x * 10.0f, 1.0f, 25.0f + z * -10.0f));
+
 			worldTransformAttackMass_[z][x].Initialize();
 			worldTransformAttackMass_[z][x].scale_ *= 5.0f;
 			worldTransformAttackMass_[z][x].translation_ =
@@ -239,6 +244,17 @@ void GameScene::Update() {
 			enemy->Update(viewProjection_, option);
 		}
 
+			// エフェクト配置
+		for (int z = 0; z < kMaxGrid; z++) {
+
+			for (int x = 0; x < kMaxGrid; x++) {
+
+				if (effectMass_[z][x].IsDead() == false) {
+					effectMass_[z][x].Update();
+				}
+			}
+		}
+
 		if (player_->GetIsPlayerTurn()) {
 			player_->MoveTurn();
 		} else if (CheckAllEnemyTurn()) {
@@ -264,8 +280,20 @@ void GameScene::Update() {
 			}
 		}
 
+			// エフェクト配置
+		for (int z = 0; z < kMaxGrid; z++) {
+
+			for (int x = 0; x < kMaxGrid; x++) {
+
+				if (collisionManager_->GetAttackMass(x, z) != 0 && effectMass_[z][x].IsDead()) {
+					effectMass_[z][x].Reset(60 / gameSpeed_->GetGameSpeed());
+					effectMass_[z][x].SetEffect();
+				}
+			}
+		}
+
 	}
-	
+
 	option->Update();
 
 	// ビュープロジェクション更新
@@ -330,6 +358,10 @@ void GameScene::Draw() {
 
 				groundModel_->Draw(
 				    worldTransformAttackMass_[z][x], viewProjection_, enemyAttackMassTex_);
+			}
+
+			if (collisionManager_->GetAttackMass(x, z) != 0) {
+				effectMass_[z][x].Draw(viewProjection_);
 			}
 
 		}

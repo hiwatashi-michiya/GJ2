@@ -309,8 +309,12 @@ void Player::MoveTurn() {
 
 	if (!isSelect_) {
 
+		//行動後に間を置く
+		if (interval_ > 0) {
+			interval_--;
+		}
 		// リスト内が空でないなら行動開始
-		if (moveCommands_.empty() == false) {
+		else if (moveCommands_.empty() == false) {
 
 			if (isMove_ == false) {
 				// 次の行動コマンドを現在の行動コマンドに設定
@@ -617,6 +621,7 @@ void Player::Move(Command& command) {
 		currentTex_ = textures_[0];
 		currentMoveCommand_ = Stop;
 		collisionManager_->ResetAttack();
+		interval_ = kMaxInterval;
 		isMove_ = false;
 		isHit_ = false;
 	}
@@ -626,7 +631,7 @@ void Player::Draw(const ViewProjection& viewProjection) {
 
 	models_[0]->Draw(worldTransform_, viewProjection, currentTex_);
 
-	if (currentMoveCommand_ == AttackCross || currentMoveCommand_ == AttackCircle) {
+	/*if (currentMoveCommand_ == AttackCross || currentMoveCommand_ == AttackCircle) {
 
 		for (int i = 0; i < 8; i++) {
 				models_[1]->Draw(worldTransformEffect_[i], viewProjection, textures_[5]);
@@ -637,7 +642,7 @@ void Player::Draw(const ViewProjection& viewProjection) {
 		for (int i = 0; i < 5; i++) {
 			    models_[2]->Draw(worldTransformEffect_[i], viewProjection, textures_[9]);
 		}
-	}
+	}*/
 }
 
 void Player::DrawUI() {
