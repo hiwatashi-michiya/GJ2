@@ -54,61 +54,61 @@ void TitleScene::Initialize() {
 
 	titleSprite_.reset(Sprite::Create(titleTex_, {0.0f, 0.0f}));
 	titleSprite_->SetSize({1280.0f, 720.0f});
-	titleSprite_->SetTextureRect({ 0.0f, 0.0f,},{1280.0f, 720.0f});
+	titleSprite_->SetTextureRect(
+	    {
+	        0.0f,
+	        0.0f,
+	    },
+	    {1280.0f, 720.0f});
 	titleSprite_->SetPosition({0.0f, 0.0f});
 
 	// オプション 初期化
 	option->Initialize();
-	
 }
 
 /// <summary>
 /// 毎フレーム処理
 /// </summary>
 void TitleScene::Update() {
-	
-	XINPUT_STATE joyState;
 
-	//シーンチェンジ中の処理
+	// XINPUT_STATE joyState;
+
+	// シーンチェンジ中の処理
 	if (transition_->GetIsChangeScene()) {
 
-		//ゲームシーンにフェードインする時、またはゲームシーンからフェードアウトする時更新
+		// ゲームシーンにフェードインする時、またはゲームシーンからフェードアウトする時更新
 		if ((transition_->GetFadeIn() && transition_->GetNextScene() == GAME) ||
 		    (transition_->GetFadeOut() && transition_->GetNextScene() == TITLE)) {
 			transition_->Update();
 		}
-		//ゲームシーンからのフェードアウト終了でシーン遷移を止める
+		// ゲームシーンからのフェードアウト終了でシーン遷移を止める
 		else if (transition_->GetFadeIn() && transition_->GetNextScene() == TITLE) {
 			transition_->SetIsChangeScene(false);
 			transition_->Reset();
 		}
-		//ゲームシーンへのフェードインが完了したら
+		// ゲームシーンへのフェードインが完了したら
 		else {
-			//実際に遷移する
+			// 実際に遷移する
 			transition_->ChangeScene();
 		}
 
 	}
-	//シーンチェンジしていない時の処理
+	// シーンチェンジしていない時の処理
 	else {
 
 		option->Update();
 
 		// シーンチェンジ
-		if (input_->GetJoystickState(0, joyState)) {
-			if ((input_->PushKey(DIK_LEFT) || option->GetActionTrigger(DASH))) {
-				transition_->SetIsChangeScene(true);
-				// 遷移先のシーンをゲームにする
-				transition_->SetNextScene(GAME);
-				//audio_->PlayWave(debugSE_);
-			}
+		if ((input_->TriggerKey(DIK_RETURN) || option->GetActionTrigger(ACT))) {
+			transition_->SetIsChangeScene(true);
+			// 遷移先のシーンをゲームにする
+			transition_->SetNextScene(GAME);
+			// audio_->PlayWave(debugSE_);
 		}
-
 	}
 
 	// ビュープロジェクション更新
 	viewProjection_.UpdateMatrix();
-
 }
 
 /// <summary>
@@ -157,7 +157,7 @@ void TitleScene::Draw() {
 
 	option->Draw();
 
-	//タイトルの表示
+	// タイトルの表示
 	titleSprite_->Draw();
 
 	// 画面遷移の描画

@@ -7,15 +7,16 @@
 #include "DirectXCommon.h"
 
 enum ActCode {
-	MOVE,
-	JUMP,
-	DASH,
-	ACT,
-	MENU,
+	ACT = 1,
+	SPECIAL ,
 	CANCEL,
+	MENU,
 	L_SELECT,
 	R_SELECT,
+	U_SELECT,
+	D_SELECT,
 	UI_SELECT,
+	DASH,
 
 	END = 64,
 };
@@ -52,7 +53,6 @@ public:
 
 	// SE
 	float m_seVol;
-
 
 
 	// 設定キー

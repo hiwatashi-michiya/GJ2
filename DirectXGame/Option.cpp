@@ -5,15 +5,16 @@
 
 Option::Option() {
 	// 初期キー設定
-	m_InputButton[ActCode::MOVE] = Gamepad::getStick(Gamepad::Stick::LEFT_X);
-	m_InputButton[ActCode::JUMP] = (int)Gamepad::Button::RIGHT_SHOULDER;
-	m_InputButton[ActCode::DASH] = (int)Gamepad::Button::RIGHT_THUMB;
+	m_InputButton[ActCode::SPECIAL] = (int)Gamepad::Button::RIGHT_SHOULDER;
 	m_InputButton[ActCode::ACT] = (int)Gamepad::Button::B;
-	m_InputButton[ActCode::MENU] = (int)Gamepad::Button::START;
 	m_InputButton[ActCode::CANCEL] = (int)Gamepad::Button::A;
-	m_InputButton[ActCode::L_SELECT] = (int(Gamepad::Button::UP));
-	m_InputButton[ActCode::R_SELECT] = (int(Gamepad::Button::DOWN));
+	m_InputButton[ActCode::MENU] = (int)Gamepad::Button::START;
+	m_InputButton[ActCode::L_SELECT] = (int(Gamepad::Button::LEFT));
+	m_InputButton[ActCode::R_SELECT] = (int(Gamepad::Button::RIGHT));
+	m_InputButton[ActCode::U_SELECT] = (int(Gamepad::Button::UP));
+	m_InputButton[ActCode::D_SELECT] = (int(Gamepad::Button::DOWN));
 	m_InputButton[ActCode::UI_SELECT] = (int(Gamepad::Button::X));
+	m_InputButton[ActCode::DASH] = (int)Gamepad::Button::RIGHT_THUMB;
 
 	m_bgmVol = 0.5f;
 	m_seVol = 0.5f;
@@ -67,7 +68,6 @@ void Option::Update() {
 
 void Option::Draw() 
 {
-	
 	m_cursorSprite->Draw();
 }
 
@@ -75,92 +75,11 @@ bool Option::GetActionTrigger(ActCode act) {
 
 	switch (act) {
 
-	case JUMP:
+	case SPECIAL:
 
 		for (int i = 0; i < 16; i++) {
 
-			if (m_InputButton[ActCode::JUMP] == i) {
-				switch (i) {
-				case 0:
-					if (Gamepad::Pushed(Gamepad::Button::UP)) {
-						return true;
-					}
-					break;
-				case 1:
-					if (Gamepad::Pushed(Gamepad::Button::DOWN)) {
-						return true;
-					}
-					break;
-				case 2:
-					if (Gamepad::Pushed(Gamepad::Button::LEFT)) {
-						return true;
-					}
-					break;
-				case 3:
-					if (Gamepad::Pushed(Gamepad::Button::RIGHT)) {
-						return true;
-					}
-					break;
-				case 4:
-					if (Gamepad::Pushed(Gamepad::Button::START)) {
-						return true;
-					}
-					break;
-				case 5:
-					if (Gamepad::Pushed(Gamepad::Button::BACK)) {
-						return true;
-					}
-					break;
-				case 6:
-					if (Gamepad::Pushed(Gamepad::Button::LEFT_THUMB)) {
-						return true;
-					}
-					break;
-				case 7:
-					if (Gamepad::Pushed(Gamepad::Button::RIGHT_THUMB)) {
-						return true;
-					}
-					break;
-				case 8:
-					if (Gamepad::Pushed(Gamepad::Button::LEFT_SHOULDER)) {
-						return true;
-					}
-					break;
-				case 9:
-					if (Gamepad::Pushed(Gamepad::Button::RIGHT_SHOULDER)) {
-						return true;
-					}
-					break;
-				case 12:
-					if (Gamepad::Pushed(Gamepad::Button::A)) {
-						return true;
-					}
-					break;
-				case 13:
-					if (Gamepad::Pushed(Gamepad::Button::B)) {
-						return true;
-					}
-					break;
-				case 14:
-					if (Gamepad::Pushed(Gamepad::Button::X)) {
-						return true;
-					}
-					break;
-				case 15:
-					if (Gamepad::Pushed(Gamepad::Button::Y)) {
-						return true;
-					}
-					break;
-				}
-			}
-		}
-
-		break;
-	case DASH:
-
-		for (int i = 0; i < 16; i++) {
-
-			if (m_InputButton[ActCode::DASH] == i) {
+			if (m_InputButton[ActCode::SPECIAL] == i) {
 				switch (i) {
 				case 0:
 					if (Gamepad::Pushed(Gamepad::Button::UP)) {
@@ -566,6 +485,168 @@ bool Option::GetActionTrigger(ActCode act) {
 		for (int i = 0; i < 16; i++) {
 
 			if (m_InputButton[ActCode::R_SELECT] == i) {
+				switch (i) {
+				case 0:
+					if (Gamepad::Pushed(Gamepad::Button::UP)) {
+						return true;
+					}
+					break;
+				case 1:
+					if (Gamepad::Pushed(Gamepad::Button::DOWN)) {
+						return true;
+					}
+					break;
+				case 2:
+					if (Gamepad::Pushed(Gamepad::Button::LEFT)) {
+						return true;
+					}
+					break;
+				case 3:
+					if (Gamepad::Pushed(Gamepad::Button::RIGHT)) {
+						return true;
+					}
+					break;
+				case 4:
+					if (Gamepad::Pushed(Gamepad::Button::START)) {
+						return true;
+					}
+					break;
+				case 5:
+					if (Gamepad::Pushed(Gamepad::Button::BACK)) {
+						return true;
+					}
+					break;
+				case 6:
+					if (Gamepad::Pushed(Gamepad::Button::LEFT_THUMB)) {
+						return true;
+					}
+					break;
+				case 7:
+					if (Gamepad::Pushed(Gamepad::Button::RIGHT_THUMB)) {
+						return true;
+					}
+					break;
+				case 8:
+					if (Gamepad::Pushed(Gamepad::Button::LEFT_SHOULDER)) {
+						return true;
+					}
+					break;
+				case 9:
+					if (Gamepad::Pushed(Gamepad::Button::RIGHT_SHOULDER)) {
+						return true;
+					}
+					break;
+				case 12:
+					if (Gamepad::Pushed(Gamepad::Button::A)) {
+						return true;
+					}
+					break;
+				case 13:
+					if (Gamepad::Pushed(Gamepad::Button::B)) {
+						return true;
+					}
+					break;
+				case 14:
+					if (Gamepad::Pushed(Gamepad::Button::X)) {
+						return true;
+					}
+					break;
+				case 15:
+					if (Gamepad::Pushed(Gamepad::Button::Y)) {
+						return true;
+					}
+					break;
+				}
+			}
+		}
+
+		break;
+	case U_SELECT:
+
+		for (int i = 0; i < 16; i++) {
+
+			if (m_InputButton[ActCode::U_SELECT] == i) {
+				switch (i) {
+				case 0:
+					if (Gamepad::Pushed(Gamepad::Button::UP)) {
+						return true;
+					}
+					break;
+				case 1:
+					if (Gamepad::Pushed(Gamepad::Button::DOWN)) {
+						return true;
+					}
+					break;
+				case 2:
+					if (Gamepad::Pushed(Gamepad::Button::LEFT)) {
+						return true;
+					}
+					break;
+				case 3:
+					if (Gamepad::Pushed(Gamepad::Button::RIGHT)) {
+						return true;
+					}
+					break;
+				case 4:
+					if (Gamepad::Pushed(Gamepad::Button::START)) {
+						return true;
+					}
+					break;
+				case 5:
+					if (Gamepad::Pushed(Gamepad::Button::BACK)) {
+						return true;
+					}
+					break;
+				case 6:
+					if (Gamepad::Pushed(Gamepad::Button::LEFT_THUMB)) {
+						return true;
+					}
+					break;
+				case 7:
+					if (Gamepad::Pushed(Gamepad::Button::RIGHT_THUMB)) {
+						return true;
+					}
+					break;
+				case 8:
+					if (Gamepad::Pushed(Gamepad::Button::LEFT_SHOULDER)) {
+						return true;
+					}
+					break;
+				case 9:
+					if (Gamepad::Pushed(Gamepad::Button::RIGHT_SHOULDER)) {
+						return true;
+					}
+					break;
+				case 12:
+					if (Gamepad::Pushed(Gamepad::Button::A)) {
+						return true;
+					}
+					break;
+				case 13:
+					if (Gamepad::Pushed(Gamepad::Button::B)) {
+						return true;
+					}
+					break;
+				case 14:
+					if (Gamepad::Pushed(Gamepad::Button::X)) {
+						return true;
+					}
+					break;
+				case 15:
+					if (Gamepad::Pushed(Gamepad::Button::Y)) {
+						return true;
+					}
+					break;
+				}
+			}
+		}
+
+		break;
+	case D_SELECT:
+
+		for (int i = 0; i < 16; i++) {
+
+			if (m_InputButton[ActCode::D_SELECT] == i) {
 				switch (i) {
 				case 0:
 					if (Gamepad::Pushed(Gamepad::Button::UP)) {
@@ -738,11 +819,11 @@ bool Option::GetActionLongPush(ActCode act) {
 
 	switch (act) {
 
-	case JUMP:
+	case SPECIAL:
 
 		for (int i = 0; i < 16; i++) {
 
-			if (m_InputButton[ActCode::JUMP] == i) {
+			if (m_InputButton[ActCode::SPECIAL] == i) {
 				switch (i) {
 				case 0:
 					if (Gamepad::LongPush(Gamepad::Button::UP)) {
@@ -1229,6 +1310,168 @@ bool Option::GetActionLongPush(ActCode act) {
 		for (int i = 0; i < 16; i++) {
 
 			if (m_InputButton[ActCode::R_SELECT] == i) {
+				switch (i) {
+				case 0:
+					if (Gamepad::LongPush(Gamepad::Button::UP)) {
+						return true;
+					}
+					break;
+				case 1:
+					if (Gamepad::LongPush(Gamepad::Button::DOWN)) {
+						return true;
+					}
+					break;
+				case 2:
+					if (Gamepad::LongPush(Gamepad::Button::LEFT)) {
+						return true;
+					}
+					break;
+				case 3:
+					if (Gamepad::LongPush(Gamepad::Button::RIGHT)) {
+						return true;
+					}
+					break;
+				case 4:
+					if (Gamepad::LongPush(Gamepad::Button::START)) {
+						return true;
+					}
+					break;
+				case 5:
+					if (Gamepad::LongPush(Gamepad::Button::BACK)) {
+						return true;
+					}
+					break;
+				case 6:
+					if (Gamepad::LongPush(Gamepad::Button::LEFT_THUMB)) {
+						return true;
+					}
+					break;
+				case 7:
+					if (Gamepad::LongPush(Gamepad::Button::RIGHT_THUMB)) {
+						return true;
+					}
+					break;
+				case 8:
+					if (Gamepad::LongPush(Gamepad::Button::LEFT_SHOULDER)) {
+						return true;
+					}
+					break;
+				case 9:
+					if (Gamepad::LongPush(Gamepad::Button::RIGHT_SHOULDER)) {
+						return true;
+					}
+					break;
+				case 12:
+					if (Gamepad::LongPush(Gamepad::Button::A)) {
+						return true;
+					}
+					break;
+				case 13:
+					if (Gamepad::LongPush(Gamepad::Button::B)) {
+						return true;
+					}
+					break;
+				case 14:
+					if (Gamepad::LongPush(Gamepad::Button::X)) {
+						return true;
+					}
+					break;
+				case 15:
+					if (Gamepad::LongPush(Gamepad::Button::Y)) {
+						return true;
+					}
+					break;
+				}
+			}
+		}
+
+		break;
+	case U_SELECT:
+
+		for (int i = 0; i < 16; i++) {
+
+			if (m_InputButton[ActCode::U_SELECT] == i) {
+				switch (i) {
+				case 0:
+					if (Gamepad::LongPush(Gamepad::Button::UP)) {
+						return true;
+					}
+					break;
+				case 1:
+					if (Gamepad::LongPush(Gamepad::Button::DOWN)) {
+						return true;
+					}
+					break;
+				case 2:
+					if (Gamepad::LongPush(Gamepad::Button::LEFT)) {
+						return true;
+					}
+					break;
+				case 3:
+					if (Gamepad::LongPush(Gamepad::Button::RIGHT)) {
+						return true;
+					}
+					break;
+				case 4:
+					if (Gamepad::LongPush(Gamepad::Button::START)) {
+						return true;
+					}
+					break;
+				case 5:
+					if (Gamepad::LongPush(Gamepad::Button::BACK)) {
+						return true;
+					}
+					break;
+				case 6:
+					if (Gamepad::LongPush(Gamepad::Button::LEFT_THUMB)) {
+						return true;
+					}
+					break;
+				case 7:
+					if (Gamepad::LongPush(Gamepad::Button::RIGHT_THUMB)) {
+						return true;
+					}
+					break;
+				case 8:
+					if (Gamepad::LongPush(Gamepad::Button::LEFT_SHOULDER)) {
+						return true;
+					}
+					break;
+				case 9:
+					if (Gamepad::LongPush(Gamepad::Button::RIGHT_SHOULDER)) {
+						return true;
+					}
+					break;
+				case 12:
+					if (Gamepad::LongPush(Gamepad::Button::A)) {
+						return true;
+					}
+					break;
+				case 13:
+					if (Gamepad::LongPush(Gamepad::Button::B)) {
+						return true;
+					}
+					break;
+				case 14:
+					if (Gamepad::LongPush(Gamepad::Button::X)) {
+						return true;
+					}
+					break;
+				case 15:
+					if (Gamepad::LongPush(Gamepad::Button::Y)) {
+						return true;
+					}
+					break;
+				}
+			}
+		}
+
+		break;
+	case D_SELECT:
+
+		for (int i = 0; i < 16; i++) {
+
+			if (m_InputButton[ActCode::D_SELECT] == i) {
 				switch (i) {
 				case 0:
 					if (Gamepad::LongPush(Gamepad::Button::UP)) {

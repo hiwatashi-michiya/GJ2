@@ -193,7 +193,7 @@ void Player::Update(const ViewProjection& viewProjection, Option* option) {
 		}
 	}
 
-	XINPUT_STATE joyState;
+	// XINPUT_STATE joyState;
 
 	if (inputCoolTimer_ > 0) {
 		inputCoolTimer_--;
@@ -202,102 +202,101 @@ void Player::Update(const ViewProjection& viewProjection, Option* option) {
 	// 行動選択
 	if (isSelect_) {
 
-		if (input_->GetJoystickState(0, joyState)) {
+		if ((input_->TriggerKey(DIK_UP) || option->GetActionTrigger(U_SELECT)) &&
+		    inputCoolTimer_ == 0) {
 
-			if ((input_->PushKey(DIK_LEFT) || option->GetActionTrigger(L_SELECT)) &&
-			    inputCoolTimer_ == 0) {
+			if (selectNum_ > 0) {
+				selectNum_--;
 
-				if (selectNum_ > 0) {
-					selectNum_--;
-
-					// 移動時にSEを鳴らす
-					if (audio_->IsPlaying(selectSE_)) {
-						audio_->StopWave(selectSE_);
-					}
-					audio_->PlayWave(selectSE_, false, 0.4f * option->m_seVol);
+				// 移動時にSEを鳴らす
+				if (audio_->IsPlaying(selectSE_)) {
+					audio_->StopWave(selectSE_);
 				}
-
-				inputCoolTimer_ = kInputCoolTime;
-
+				audio_->PlayWave(selectSE_, false, 0.4f * option->m_seVol);
 			}
 
-			else if (
-			    (input_->PushKey(DIK_RIGHT) || option->GetActionTrigger(R_SELECT)) &&
-			    inputCoolTimer_ == 0) {
+			inputCoolTimer_ = kInputCoolTime;
 
-				if (selectNum_ < selectCommands_.size() - 1) {
-					selectNum_++;
+		}
 
-					// 移動時にSEを鳴らす
-					if (audio_->IsPlaying(selectSE_)) {
-						audio_->StopWave(selectSE_);
-					}
-					audio_->PlayWave(selectSE_, false, 0.4f * option->m_seVol);
+		else if (
+		    (input_->TriggerKey(DIK_DOWN) || option->GetActionTrigger(D_SELECT)) &&
+		    inputCoolTimer_ == 0) {
+
+			if (selectNum_ < selectCommands_.size() - 1) {
+				selectNum_++;
+
+				// 移動時にSEを鳴らす
+				if (audio_->IsPlaying(selectSE_)) {
+					audio_->StopWave(selectSE_);
 				}
-
-				inputCoolTimer_ = kInputCoolTime;
+				audio_->PlayWave(selectSE_, false, 0.4f * option->m_seVol);
 			}
 
-			// スペシャルカウントが溜まっていたら特殊攻撃可能にする
-			if (specialCount_ >= kMaxSpecialCount && option->GetActionTrigger(JUMP)) {
+			inputCoolTimer_ = kInputCoolTime;
+		}
 
-				// コマンドリセット
-				selectCommands_.clear();
+		// スペシャルカウントが溜まっていたら特殊攻撃可能にする
+		if (specialCount_ >= kMaxSpecialCount && option->GetActionTrigger(SPECIAL)) {
 
-				for (int i = 0; i < kMaxSelectNum; i++) {
+			// コマンドリセット
+			selectCommands_.clear();
 
-					selectCommands_.push_back(S_PlayerAttack);
-				}
+			for (int i = 0; i < kMaxSelectNum; i++) {
 
-				specialCount_ = 0;
-
-			} else if (
-			    (input_->PushKey(DIK_E) || option->GetActionTrigger(ACT)) && inputCoolTimer_ == 0 &&
-			    moveCommands_.size() < kMaxCommand) {
-
-				SetMoveCommand(selectNum_);
-				PopSelectCommand(selectNum_);
-
-				inputCoolTimer_ = kInputCoolTime;
-
-				// 行動選択時にSEを鳴らす
-				if (audio_->IsPlaying(clickSE_)) {
-					audio_->StopWave(clickSE_);
-				}
-				audio_->PlayWave(clickSE_, false, 1.0f * option->m_seVol);
-
-			} else if (
-			    (input_->PushKey(DIK_E) || option->GetActionTrigger(ACT)) && inputCoolTimer_ == 0) {
-				isSelect_ = false;
-				isPlayerTurn_ = true;
-				inputCoolTimer_ = kInputCoolTime;
-
-				// 行動選択時にSEを鳴らす
-				if (audio_->IsPlaying(clickSE_)) {
-					audio_->StopWave(clickSE_);
-				}
-				audio_->PlayWave(clickSE_, false, 1.0f * option->m_seVol);
+				selectCommands_.push_back(S_PlayerAttack);
 			}
 
-			if ((input_->PushKey(DIK_Q) || option->GetActionTrigger(CANCEL)) &&
-			    inputCoolTimer_ == 0 && moveCommands_.size() != 0) {
-				PushSelectCommand(moveCommands_.back());
-				PopBackMoveCommand();
-				inputCoolTimer_ = kInputCoolTime;
+			specialCount_ = 0;
 
-				// 行動キャンセル時にSEを鳴らす
-				if (audio_->IsPlaying(cancelSE_)) {
-					audio_->StopWave(cancelSE_);
-				}
-				audio_->PlayWave(cancelSE_, false, 1.0f * option->m_seVol);
-			}
+		} else if (
+		    (input_->TriggerKey(DIK_RETURN) || option->GetActionTrigger(ACT)) &&
+		    inputCoolTimer_ == 0 && moveCommands_.size() < kMaxCommand) {
 
-			if (selectNum_ >= selectCommands_.size()) {
-				selectNum_ = int(selectCommands_.size() - 1);
+			SetMoveCommand(selectNum_);
+			PopSelectCommand(selectNum_);
+
+			inputCoolTimer_ = kInputCoolTime;
+
+			// 行動選択時にSEを鳴らす
+			if (audio_->IsPlaying(clickSE_)) {
+				audio_->StopWave(clickSE_);
 			}
+			audio_->PlayWave(clickSE_, false, 1.0f * option->m_seVol);
+		
+		} else if (
+		    (input_->TriggerKey(DIK_RETURN) || option->GetActionTrigger(ACT)) &&
+		    inputCoolTimer_ == 0) {
+			isSelect_ = false;
+			isPlayerTurn_ = true;
+			inputCoolTimer_ = kInputCoolTime;
+
+			// 行動選択時にSEを鳴らす
+			if (audio_->IsPlaying(clickSE_)) {
+				audio_->StopWave(clickSE_);
+			}
+			audio_->PlayWave(clickSE_, false, 1.0f * option->m_seVol);
+		}
+
+		if ((input_->TriggerKey(DIK_BACKSPACE) || option->GetActionTrigger(CANCEL)) &&
+		    inputCoolTimer_ == 0 && moveCommands_.size() != 0) {
+			PushSelectCommand(moveCommands_.back());
+			PopBackMoveCommand();
+			inputCoolTimer_ = kInputCoolTime;
+
+			// 行動キャンセル時にSEを鳴らす
+			if (audio_->IsPlaying(cancelSE_)) {
+				audio_->StopWave(cancelSE_);
+			}
+			audio_->PlayWave(cancelSE_, false, 1.0f * option->m_seVol);
+		}
+
+		if (selectNum_ >= selectCommands_.size()) {
+			selectNum_ = int(selectCommands_.size() - 1);
 		}
 
 	} else {
+
 	}
 
 	UpdateMoveCommandsNum();
@@ -561,7 +560,6 @@ void Player::Move(Command& command) {
 				worldTransformEffect_[i].translation_ = {
 				    cosf((i * 10.0f) * 3.14f / 180.0f), 0.0f, sinf((i * 10.0f) * 3.14f / 180.0f)};
 			}
-
 		}
 
 		if (MoveTimer_ % 5 == 0) {
@@ -634,13 +632,12 @@ void Player::Draw(const ViewProjection& viewProjection) {
 	/*if (currentMoveCommand_ == AttackCross || currentMoveCommand_ == AttackCircle) {
 
 		for (int i = 0; i < 8; i++) {
-				models_[1]->Draw(worldTransformEffect_[i], viewProjection, textures_[5]);
+			models_[1]->Draw(worldTransformEffect_[i], viewProjection, textures_[5]);
 		}
-	}
-	else if (currentMoveCommand_ == Guard) {
+	} else if (currentMoveCommand_ == Guard) {
 
 		for (int i = 0; i < 5; i++) {
-			    models_[2]->Draw(worldTransformEffect_[i], viewProjection, textures_[9]);
+			models_[2]->Draw(worldTransformEffect_[i], viewProjection, textures_[9]);
 		}
 	}*/
 }
