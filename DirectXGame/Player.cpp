@@ -634,12 +634,14 @@ void Player::Draw(const ViewProjection& viewProjection) {
 		for (int i = 0; i < 8; i++) {
 			models_[1]->Draw(worldTransformEffect_[i], viewProjection, textures_[5]);
 		}
-	} else if (currentMoveCommand_ == Guard) {
+	}*/
+
+	if (currentMoveCommand_ == Guard) {
 
 		for (int i = 0; i < 5; i++) {
 			models_[2]->Draw(worldTransformEffect_[i], viewProjection, textures_[9]);
 		}
-	}*/
+	}
 }
 
 void Player::DrawUI() {
@@ -744,4 +746,36 @@ void Player::SetCommandSprite(const ViewProjection& viewProjection) {
 		hpFrameSprite_->SetSize({(128.0f * (float(life_) / kMaxLife)), 16.0f});
 		hpFrameSprite_->SetPosition(Vector2(positionReticle.x - 16.0f, positionReticle.y));
 	}
+}
+
+void Player::Reset() {
+
+	isHit_ = false;
+	isDead_ = false;
+	life_ = kMaxLife;
+
+	moveAngle_ = 0.0f;
+
+	MoveTimer_ = 0;
+	isSelect_ = true;
+	selectNum_ = 0;
+	isMove_ = false;
+	isAttack_ = false;
+	isGuard_ = false;
+	isPlayerTurn_ = false;
+	currentMoveCommand_ = Stop;
+
+	inputCoolTimer_ = 0;
+
+	specialCount_ = 0;
+	interval_ = 0;
+
+	velocity_ = {0.0f, 0.0f, 0.0f};
+	worldTransform_.translation_ = Vector3(-25.0f, 2.0f, 5.0f);
+	worldTransform_.UpdateMatrix();
+
+	SetSelectCommands();
+	SetGrid(0, 2);
+	collisionManager_->SetCollision(GetGridX(), GetGridZ());
+
 }

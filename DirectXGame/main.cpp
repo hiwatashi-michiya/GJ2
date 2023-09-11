@@ -79,6 +79,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	gameScene = new GameScene();
 	gameScene->Initialize();
 
+	//ゲームシーンのリセットフラグ
+	bool isReset = false;
+
 	// メインループ
 	while (true) {
 		// メッセージ処理
@@ -96,10 +99,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// シーン処理
 		switch (transition_->GetCurrentScene()) {
 		case TITLE:
+
+			if (isReset) {
+				isReset = false;
+			}
+
 			// タイトルシーンの毎フレーム処理
 			titleScene->Update();
 			break;
 		case GAME:
+
+			if (isReset == false) {
+				gameScene->Reset();
+				isReset = true;
+			}
+
 			// ゲームシーンの毎フレーム処理
 			gameScene->Update();
 			break;

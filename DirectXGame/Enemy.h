@@ -93,6 +93,8 @@ public:
 
 	void SetIsSelect(bool flag) { isSelect_ = flag; }
 
+	void Reset();
+
 private:
 	// 入力
 	Input* input_ = nullptr;

@@ -424,3 +424,35 @@ bool GameScene::CheckAllEnemyIsDead() {
 
 	return true;
 }
+
+void GameScene::Reset() {
+
+	isGameClear_ = false;
+	isGameOver_ = false;
+
+	player_->Reset();
+
+	enemies_.remove_if([](Enemy* enemy) {
+		delete enemy;
+		return true;
+	});
+
+	std::vector<Model*> enemyModels{
+	    enemyModel_.get(), crossEffectModel_.get(), guardEffectModel_.get()};
+	std::vector<uint32_t> enemyTextures{enemyTex_,  redTex_,       greenTex_, blueTex_,
+	                                    numberTex_, alphaDarkTex_, frameTex_};
+	std::vector<uint32_t> enemySounds{damageSE_, damageHandle_};
+
+	Enemy* newEnemy = new Enemy();
+	newEnemy->Initialize(enemyModels, enemyTextures, enemySounds);
+	newEnemy->SetPlayer(player_.get());
+	newEnemy->SetPosition(3, 3);
+	enemies_.push_back(newEnemy);
+
+	Enemy* newEnemy2 = new Enemy();
+	newEnemy2->Initialize(enemyModels, enemyTextures, enemySounds);
+	newEnemy2->SetPlayer(player_.get());
+	newEnemy2->SetPosition(5, 5);
+	enemies_.push_back(newEnemy2);
+
+}

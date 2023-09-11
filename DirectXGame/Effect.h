@@ -52,6 +52,6 @@ private:
 
 	EffectType effectType_ = Up;
 
-	uint32_t effectTex_ = 0u;
+	uint32_t effectTex_[2];
 
 };

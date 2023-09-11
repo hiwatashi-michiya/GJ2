@@ -675,3 +675,7 @@ void Enemy::SetEnemyMovePattern() {
 	}
 
 }
+
+void Enemy::Reset() {
+
+}

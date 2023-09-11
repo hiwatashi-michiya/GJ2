@@ -61,6 +61,11 @@ public: // メンバ関数
 	// シーン遷移セッター
 	void SetChangeGameScene(bool flag) { isChangeGameScene_ = flag; }
 
+	/// <summary>
+	/// リセット
+	/// </summary>
+	void Reset();
+
 private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
