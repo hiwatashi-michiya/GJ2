@@ -14,6 +14,7 @@
 #include "Player.h"
 #include "GameSpeed.h"
 #include <Audio.h>
+#include "Effect.h"
 
 // コマンドの最大表示数
 const int kMaxEnemyCommand = 3;
@@ -106,6 +107,11 @@ private:
 	GameSpeed* gameSpeed_ = nullptr;
 
 	Player* player_ = nullptr;
+
+	//エフェクト
+	Effect effect_;
+
+	bool isEffect_ = false;
 
 	// 入力クールタイム
 	const int kInputCoolTime = 15;

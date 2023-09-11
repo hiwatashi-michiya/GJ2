@@ -94,7 +94,7 @@ void GameScene::Initialize() {
 		for (int x = 0; x < kMaxGrid; x++) {
 
 			effectMass_[z][x].Initialize();
-			effectMass_[z][x].SetEffectType(Up);
+			effectMass_[z][x].SetEffectType(Crash);
 			effectMass_[z][x].SetStartPosition(
 			    Vector3(-25.0f + x * 10.0f, 1.0f, 25.0f + z * -10.0f));
 
@@ -197,6 +197,7 @@ void GameScene::Update() {
 			if (enemy->GetIsDead()) {
 
 				delete enemy;
+
 				return true;
 			}
 
@@ -275,6 +276,7 @@ void GameScene::Update() {
 
 				if (collisionManager_->GetAttackMass(x, z) != 0 && effectMass_[z][x].IsDead()) {
 					effectMass_[z][x].Reset(60 / gameSpeed_->GetGameSpeed());
+					effectMass_[z][x].SetEffectType(Up);
 					effectMass_[z][x].SetEffect();
 				}
 			}

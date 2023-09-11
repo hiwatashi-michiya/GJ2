@@ -29,6 +29,11 @@ void Effect::Update() {
 			for (int i = 0; i < kMaxParticles; i++) {
 				velocities_[i].y -= 0.3f;
 				worldTransforms_[i].translation_ += velocities_[i];
+
+				if (worldTransforms_[i].translation_.y <= 0.0f) {
+					velocities_[i].y += 1.5f;
+				}
+
 				worldTransforms_[i].rotation_ += Vector3(0.3f, 0.0f, 0.0f);
 				worldTransforms_[i].UpdateMatrix();
 			}
@@ -37,7 +42,16 @@ void Effect::Update() {
 		case Crash:
 
 			for (int i = 0; i < kMaxParticles; i++) {
+
+				velocities_[i].y -= 0.3f;
+
+				worldTransforms_[i].scale_ -= Vector3(0.01f, 0.01f, 0.01f);
 				worldTransforms_[i].translation_ += velocities_[i];
+
+				if (worldTransforms_[i].translation_.y <= 0.0f) {
+					velocities_[i].y = 1.0f * float(lifeTimer_ / 10);
+				}
+
 				worldTransforms_[i].UpdateMatrix();
 			}
 
@@ -73,11 +87,13 @@ void Effect::SetEffect() {
 
 			worldTransforms_[i].translation_ = startPosition_[i];
 
-			velocities_[i].x = cosf(i * 3.14f / 5.0f) / 2.0f;
+			velocities_[i].x = cosf(i * 3.14f / 5.0f) / 3.0f;
 			velocities_[i].y = 3.0f + float(rand() % 5) + float((rand() % 10) / 10.0f);
-			velocities_[i].z = sinf(i * 3.14f / 5.0f) / 2.0f;
+			velocities_[i].z = sinf(i * 3.14f / 5.0f) / 3.0f;
 
 			velocities_[i] *= 0.5f;
+
+			worldTransforms_[i].scale_ = Vector3(0.5f, 0.5f, 0.5f);
 
 			worldTransforms_[i].UpdateMatrix();
 
@@ -93,19 +109,21 @@ void Effect::SetEffect() {
 			if (i % 2 == 0) {
 
 				velocities_[i].x = cosf(i * 3.14f / 5.0f);
-				velocities_[i].y = 0.5f;
+				velocities_[i].y = 3.0f + float((rand() % 10) / 10.0f);
 				velocities_[i].z = sinf(i * 3.14f / 5.0f);
 
-				velocities_[i] *= 0.1f;
+				velocities_[i] *= 0.5f;
 
 			} else {
 
 				velocities_[i].x = cosf(i * 3.14f / 5.0f);
-				velocities_[i].y = 1.0f;
+				velocities_[i].y = 2.0f + float((rand() % 10) / 10.0f);
 				velocities_[i].z = sinf(i * 3.14f / 5.0f);
 
-				velocities_[i] *= 0.1f;
+				velocities_[i] *= 0.5f;
 			}
+
+			worldTransforms_[i].scale_ = Vector3(0.5f, 0.5f, 0.5f);
 
 			worldTransforms_[i].UpdateMatrix();
 		}

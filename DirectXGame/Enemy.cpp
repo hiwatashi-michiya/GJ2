@@ -58,6 +58,9 @@ void Enemy::Initialize(
 
 	movePattern_ = MovePattern(rand() % 3);
 
+	effect_.Initialize();
+	effect_.SetEffectType(Crash);
+
 }
 
 void Enemy::Update(const ViewProjection& viewProjection, Option* option) {
@@ -75,80 +78,91 @@ void Enemy::Update(const ViewProjection& viewProjection, Option* option) {
 
 #endif // _DEBUG
 
-	if (isHit_ == false) {
+	if (isEffect_ == false) {
 
-		//プレイヤーの攻撃を受けたら
-		if (collisionManager_->IsHitAttack(GetGridX(), GetGridZ(), PlayerAttack)) {
+		if (isHit_ == false) {
 
-			// ガード状態なら半減し、その後ガードを解除する
-			if (isGuard_) {
-				life_ -= 5;
-				isGuard_ = false;
+			// プレイヤーの攻撃を受けたら
+			if (collisionManager_->IsHitAttack(GetGridX(), GetGridZ(), PlayerAttack)) {
+
+				// ガード状態なら半減し、その後ガードを解除する
+				if (isGuard_) {
+					life_ -= 5;
+					isGuard_ = false;
+				} else {
+					life_ -= 10;
+				}
+				audio_->PlayWave(sounds_[0], false, option->m_seVol);
+
+				isHit_ = true;
+
+			} else if (collisionManager_->IsHitAttack(
+			               GetGridX(), GetGridZ(), PlayerSpecialAttack)) {
+
+				// ガード状態なら半減し、その後ガードを解除する
+				if (isGuard_) {
+					life_ -= 10;
+					isGuard_ = false;
+				} else {
+					life_ -= 20;
+				}
+
+				audio_->PlayWave(sounds_[0], false, option->m_seVol);
+				isHit_ = true;
 			}
-			else {
-				life_ -= 10;
-			}
-			audio_->PlayWave(sounds_[0], false, option->m_seVol);
-			
-			isHit_ = true;
 
 		}
-		else if (collisionManager_->IsHitAttack(GetGridX(), GetGridZ(), PlayerSpecialAttack)) {
+		// アタックが終了したらヒットフラグを降ろす
+		else if (isHit_ == true && collisionManager_->IsHitAttack(GetGridX(), GetGridZ(), 0)) {
 
-			// ガード状態なら半減し、その後ガードを解除する
-			if (isGuard_) {
-				life_ -= 10;
-				isGuard_ = false;
-			}
-			else {
-				life_ -= 20;
-			}
+			isHit_ = false;
+		}
 
-			audio_->PlayWave(sounds_[0], false, option->m_seVol);
-			isHit_ = true;
+		// 体力半分以下で行動変化
+		if (life_ <= (kMaxLife / 2) && isFormChange_ == false) {
+			// 半分以下で確定行動
+			movePattern_ = E_Special;
+			isFormChange_ = true;
+		}
+
+		// 体力が0以下で死亡。エフェクト開始
+		if (life_ <= 0) {
+			collisionManager_->RemoveCollision(GetGridX(), GetGridZ());
+			effect_.Reset(60 / gameSpeed_->GetGameSpeed());
+			effect_.SetStartPosition(worldTransform_.translation_);
+			effect_.SetEffect();
+			isEffect_ = true;
+		}
+
+		/*XINPUT_STATE joyState;*/
+
+		if (inputCoolTimer_ > 0) {
+			inputCoolTimer_--;
+		}
+
+		// リストの要素が空なら新たに設定する
+		if (isSelect_) {
+
+			SetEnemyMovePattern();
+
+			UpdateMoveCommandsNum();
+
+		} else {
+		}
+
+		worldTransform_.UpdateMatrix();
+
+		SetCommandSprite(viewProjection);
+
+	}
+	else {
+		effect_.Update();
+
+		if (effect_.IsDead()) {
+			isDead_ = true;
 		}
 
 	}
-	//アタックが終了したらヒットフラグを降ろす
-	else if (isHit_ == true && collisionManager_->IsHitAttack(GetGridX(), GetGridZ(), 0)) {
-
-		isHit_ = false;
-
-	}
-
-	//体力半分以下で行動変化
-	if (life_ <= (kMaxLife / 2) && isFormChange_ == false) {
-		//半分以下で確定行動
-		movePattern_ = E_Special;
-		isFormChange_ = true;
-	}
-
-	//体力が0以下で死亡
-	if (life_ <= 0) {
-		collisionManager_->RemoveCollision(GetGridX(), GetGridZ());
-		isDead_ = true;
-	}
-
-	/*XINPUT_STATE joyState;*/
-
-	if (inputCoolTimer_ > 0) {
-		inputCoolTimer_--;
-	}
-
-	// リストの要素が空なら新たに設定する
-	if (isSelect_) {
-
-		SetEnemyMovePattern();
-
-		UpdateMoveCommandsNum();
-
-	} else {
-
-	}
-
-	worldTransform_.UpdateMatrix();
-
-	SetCommandSprite(viewProjection);
 
 }
 
@@ -383,7 +397,12 @@ void Enemy::Move(Command& command) {
 
 void Enemy::Draw(const ViewProjection& viewProjection) {
 
-	models_[0]->Draw(worldTransform_, viewProjection, currentTex_);
+	if (isEffect_) {
+		effect_.Draw(viewProjection);
+	}
+	else {
+		models_[0]->Draw(worldTransform_, viewProjection, currentTex_);
+	}
 }
 
 void Enemy::DrawUI() {

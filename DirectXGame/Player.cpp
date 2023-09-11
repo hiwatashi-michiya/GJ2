@@ -553,7 +553,11 @@ void Player::Move(Command& command) {
 	case Guard:
 
 		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed()) {
-			specialCount_++;
+			
+			if (specialCount_ < kMaxSpecialCount) {
+				specialCount_++;
+			}
+
 			isGuard_ = true;
 
 			for (int i = 0; i < 8; i++) {
