@@ -145,7 +145,7 @@ private: // メンバ変数
 
 
 	// オプション
-	Option* option = new Option;
+	Option* option = Option::GetInstance();
 
 	
 	/*bool isStageTransition_ = false;*/

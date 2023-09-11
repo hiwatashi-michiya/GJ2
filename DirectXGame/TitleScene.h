@@ -94,7 +94,7 @@ private: // メンバ変数
 	std::unique_ptr<Sprite> titleSprite_;
 
 	// オプション
-	Option* option = new Option;
+	Option* option = Option::GetInstance();
 
 	bool isChangeGameScene_ = false;
 

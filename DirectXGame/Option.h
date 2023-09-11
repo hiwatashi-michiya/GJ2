@@ -21,11 +21,23 @@ enum ActCode {
 	END = 64,
 };
 
-class Option {
-public: 
+class Option final{
+private: 
 	
 	Option();
 	~Option();
+
+public:
+
+	// コピーや代入演算子を無効化
+	Option(const Option& option) = delete;
+	Option& operator=(const Option& option) = delete;
+
+	static Option* GetInstance() { 
+		static Option instance;
+		return &instance;
+	}
+
 	void Initialize();
 	void Update();
 	void Draw();
