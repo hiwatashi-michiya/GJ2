@@ -117,6 +117,7 @@ void Player::Initialize(
 	clickSE_ = audio_->LoadWave("SE/click.wav");
 	selectSE_ = audio_->LoadWave("SE/select.wav");
 	cancelSE_ = audio_->LoadWave("SE/cancel.wav");
+	fallSE_ = audio_->LoadWave("SE/fall.wav");
 }
 
 void Player::Update(const ViewProjection& viewProjection, Option* option) {
@@ -153,6 +154,11 @@ void Player::Update(const ViewProjection& viewProjection, Option* option) {
 		if (worldTransform_.translation_.y <= 2.0f) {
 			worldTransform_.translation_.y = 2.0f;
 			velocity_ = {0.0f, 3.0f * float(startCount_ / 60.0f), 0.0f};
+
+			if (startCount_ >= 10) {
+				audio_->PlayWave(fallSE_);
+			}
+
 		}
 
 		startCount_--;

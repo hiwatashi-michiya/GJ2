@@ -117,7 +117,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			// ゲームシーンの毎フレーム処理
 			gameScene->Update();
 			break;
-		default:
+		case RESET:
+
+			isReset = false;
+			transition_->SetNextScene(GAME);
+			transition_->ChangeScene();
+
 			break;
 		}
 
@@ -135,11 +140,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			// タイトルシーンの描画
 			titleScene->Draw();
 			break;
+		case RESET:
 		case GAME:
 			// ゲームシーンの描画
 			gameScene->Draw();
-			break;
-		default:
 			break;
 		}
 
