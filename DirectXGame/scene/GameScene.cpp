@@ -67,7 +67,7 @@ void GameScene::Initialize() {
 	nextTex_ = TextureManager::Load("UI/nextUI.png");
 	clearTex_ = TextureManager::Load("UI/clear.png");
 	gameoverTex_ = TextureManager::Load("UI/gameover.png");
-	petalTex_ = TextureManager::Load("white1x1.png");
+	petalTex_ = TextureManager::Load("UI/petal.png");
 
 	// SE
 	damageSE_ = audio_->LoadWave("SE/damage.wav");
@@ -101,14 +101,14 @@ void GameScene::Initialize() {
 
 	for (uint32_t i = 0; i < 100; i++) {
 		petalSprite_[i].reset(Sprite::Create(petalTex_, {0.0f, 0.0f}));
-		petalSprite_[i]->SetSize({32.0f, 32.0f});
+		petalSprite_[i]->SetSize({8.0f, 8.0f});
 		petalSprite_[i]->SetTextureRect(
 		    {
 		        0.0f,
 		        0.0f,
 		    },
-		    {32.0f, 32.0f});
-		petalSprite_[i]->SetPosition({640.0f, 0.0f});
+		    {8.0f, 8.0f});
+		petalSprite_[i]->SetPosition({float(rand() % 1280), -10.0f});
 		isPetalDead[i] = false;
 	}
 	playerTex_ = TextureManager::Load("pawn/pawn.png");
@@ -339,9 +339,9 @@ void GameScene::Update() {
 			}
 		}
 
-		/*if ((input_->TriggerKey(DIK_SPACE))) {
+		if ((input_->TriggerKey(DIK_SPACE))) {
 			isGameClear_ = true;
-		}*/
+		}
 
 		// ゲームクリア時の画面エフェクト
 		if (isGameClear_) {
@@ -352,10 +352,11 @@ void GameScene::Update() {
 				    {petalSprite_[i]->GetPosition().x + randPos[i].x + gameSpeed_->GetGameSpeed(),
 				     petalSprite_[i]->GetPosition().y + randPos[i].y + gameSpeed_->GetGameSpeed()});
 
-				if (petalSprite_[i]->GetPosition().y < -50.0f ||
+				if (petalSprite_[i]->GetPosition().x < 0.0f ||
+				    petalSprite_[i]->GetPosition().x > 1280.0f ||
 				    petalSprite_[i]->GetPosition().y > 720.0f) {
 					isPetalDead[i] = false;
-					petalSprite_[i]->SetPosition({640.0f, 0.0f});
+					petalSprite_[i]->SetPosition({float(rand() % 1280), -10.0f});
 					shuffle(randPos[i].x);
 					randPos[i].y = float(rand() % 8 + 3);
 					isPetalDead[i] = true;
@@ -608,31 +609,12 @@ void GameScene::Reset() {
 
 	for (uint32_t i = 0; i < 100; i++) {
 		isPetalDead[i] = false;
-		petalSprite_[i]->SetPosition({640.0f, 0.0f});
+		petalSprite_[i]->SetPosition({float(rand() % 1280), -10.0f});
 	}
 }
 
 void GameScene::shuffle(float array) {
-	// int i, j;
 	int tmp;
-	///* シャッフル対象の末尾を設定 */
-	// i = size - 1;
-
-	// while (i > 0) {
-	//	/* シャッフル対象(0〜i)から位置をランダム決定 */
-	//	j = rand() % (i + 1);
-
-	//	/* ランダムに決めた位置と
-	//	   シャッフル対象の末尾の位置のデータを交換 */
-	//	tmp = int(array);
-	//	array = array;
-	//	//array[i].y = float(rand() % 8 + 3);
-	//	array = float(tmp);
-
-	//	/* シャッフル対象の範囲を狭める */
-	//	i--;
-	//}
 	tmp = int(array);
-	array = array;
 	array = float(tmp);
 }
