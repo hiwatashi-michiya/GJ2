@@ -453,7 +453,6 @@ void GameScene::Draw() {
 			petalSprite_[i]->Draw();
 		}
 	}
-	isGameOver_ = true;
 	if (isGameOver_) {
 		gameoverSprite_->Draw();
 	}
