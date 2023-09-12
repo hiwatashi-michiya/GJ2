@@ -1,6 +1,7 @@
 #include "GameScene.h"
 #include "TextureManager.h"
 #include <cassert>
+#include "Rand.h"
 
 #ifdef _DEBUG
 #include <ImGuiManager.h>
@@ -63,11 +64,48 @@ void GameScene::Initialize() {
 	moveMassTex_ = TextureManager::Load("ground/movemass.png");
 	frameTex_ = TextureManager::Load("UI/frame.png");
 	nextTex_ = TextureManager::Load("UI/nextUI.png");
+	clearTex_ = TextureManager::Load("UI/clear.png");
+	gameoverTex_ = TextureManager::Load("UI/gameover.png");
+	petalTex_ = TextureManager::Load("white1x1.png");
 
 	// SE
 	damageSE_ = audio_->LoadWave("SE/damage.wav");
 	damageHandle_ = damageSE_;
 
+	clearSprite_.reset(Sprite::Create(clearTex_, {0.0f, 0.0f}));
+	clearSprite_->SetSize({1280.0f, 720.0f});
+	clearSprite_->SetTextureRect(
+	    {
+	        0.0f,
+	        0.0f,
+	    },
+	    {1280.0f, 720.0f});
+	clearSprite_->SetPosition({0.0f, 0.0f});
+
+	gameoverSprite_.reset(Sprite::Create(gameoverTex_, {0.0f, 0.0f}));
+	gameoverSprite_->SetSize({1280.0f, 720.0f});
+	gameoverSprite_->SetTextureRect(
+	    {
+	        0.0f,
+	        0.0f,
+	    },
+	    {1280.0f, 720.0f});
+	gameoverSprite_->SetPosition({0.0f, 0.0f});
+
+	SetRandom();
+	for (uint32_t i = 0; i < 100; i++) {
+		petalSprite_[i].reset(Sprite::Create(petalTex_, {0.0f, 0.0f}));
+		petalSprite_[i]->SetSize({32.0f, 32.0f});
+		petalSprite_[i]->SetTextureRect(
+		    {
+		        0.0f,
+		        0.0f,
+		    },
+		    {32.0f, 32.0f});
+		petalSprite_[i]->SetPosition({640.0f, 0.0f});
+		randPos[i].x = float(rand() % 100);
+		randPos[i].y = float(rand() % 100 - 200);
+	}
 	playerTex_ = TextureManager::Load("pawn/pawn.png");
 	playerSprite_.reset(Sprite::Create(playerTex_, {0.0f, 0.0f}));
 	playerModel_.reset(Model::CreateFromOBJ("pawn", true));
@@ -297,7 +335,23 @@ void GameScene::Update() {
 				}
 			}
 		}
+		// ゲームクリア時の画面エフェクト
+		if (isGameClear_) {
+			SetRandom();
+			for (uint32_t i = 0; i < 50; i++) {
 
+				petalSprite_[i]->SetPosition(
+				    {petalSprite_[i]->GetPosition().x + randPos[i].x + gameSpeed_->GetGameSpeed(),
+				     petalSprite_[i]->GetPosition().y + randPos[i].y + gameSpeed_->GetGameSpeed()});
+
+				if (petalSprite_[i]->GetPosition().y < -50.0f ||
+				    petalSprite_[i]->GetPosition().y > 780.0f) {
+					petalSprite_[i]->SetPosition({640.0f, 0.0f});
+					randPos[i].x = float(rand() % 10 - 5);
+					randPos[i].y = float(rand() % 8 + 3);
+				}
+			}
+		}
 	}
 
 	option->Update();
@@ -405,6 +459,16 @@ void GameScene::Draw() {
 			enemy->DrawUI();
 		}
 
+	}
+
+	if (isGameClear_) {
+		clearSprite_->Draw();
+		for (uint32_t i = 0; i < 50; i++) {
+			petalSprite_[i]->Draw();
+		}
+	}
+	if (isGameOver_) {
+		gameoverSprite_->Draw();
 	}
 
 	option->Draw();
