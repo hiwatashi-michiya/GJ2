@@ -109,6 +109,7 @@ private:
 
 	//プレイヤーのワールドトランスフォーム
 	WorldTransform worldTransform_;
+	WorldTransform worldTransformGuard_;
 
 	//エフェクトのワールドトランスフォーム
 	WorldTransform worldTransformEffect_[8];
@@ -189,9 +190,11 @@ private:
 
 	//モデル
 	std::vector<Model*> models_;
+	std::unique_ptr<Model> guardModel_;
 
 	//画像
 	std::vector<uint32_t> textures_;
+	uint32_t guardTex_ = 0u;
 
 	//SE
 	std::vector<uint32_t> sounds_;

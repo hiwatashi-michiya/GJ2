@@ -17,6 +17,10 @@ void Player::Initialize(
 	SetTextures(textures);
 	SetSounds(sounds);
 
+	guardModel_.reset(Model::CreateFromOBJ("guard", true));
+
+	guardTex_ = TextureManager::Load("guard/guard.png");
+
 	currentTex_ = textures_[0];
 
 	findUITexture_ = TextureManager::Load("findUI.png");
@@ -98,6 +102,11 @@ void Player::Initialize(
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = Vector3(-25.0f, 2.0f, 5.0f);
 	worldTransform_.UpdateMatrix();
+	worldTransformGuard_.Initialize();
+	worldTransformGuard_.parent_ = &worldTransform_;
+	worldTransformGuard_.translation_.y = 3.0f;
+	worldTransformGuard_.scale_ *= 5.0f;
+	worldTransformGuard_.UpdateMatrix();
 
 	for (int i = 0; i < 8; i++) {
 		worldTransformEffect_[i].Initialize();
@@ -337,6 +346,10 @@ void Player::Update(const ViewProjection& viewProjection, Option* option) {
 	UpdateMoveCommandsNum();
 
 	SetCommandSprite(viewProjection);
+
+	worldTransform_.UpdateMatrix();
+	worldTransformGuard_.UpdateMatrix();
+
 }
 
 void Player::MoveTurn() {
@@ -375,6 +388,7 @@ void Player::MoveTurn() {
 	}
 
 	worldTransform_.UpdateMatrix();
+	worldTransformGuard_.UpdateMatrix();
 	for (int i = 0; i < 8; i++) {
 		worldTransformEffect_[i].UpdateMatrix();
 	}
@@ -659,6 +673,10 @@ void Player::Move(Command& command) {
 void Player::Draw(const ViewProjection& viewProjection) {
 
 	models_[0]->Draw(worldTransform_, viewProjection, currentTex_);
+
+	if (isGuard_) {
+		guardModel_->Draw(worldTransformGuard_, viewProjection, guardTex_);
+	}
 
 	/*if (currentMoveCommand_ == AttackCross || currentMoveCommand_ == AttackCircle) {
 

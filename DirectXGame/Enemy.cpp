@@ -17,6 +17,10 @@ void Enemy::Initialize(
 	SetTextures(textures);
 	SetSounds(sounds);
 
+	guardModel_.reset(Model::CreateFromOBJ("guard", true));
+
+	guardTex_ = TextureManager::Load("guard/guard.png");
+
 	currentTex_ = textures_[0];
 
 	for (int i = 0; i < kMaxEnemyCommand; i++) {
@@ -52,6 +56,13 @@ void Enemy::Initialize(
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = Vector3(25.0f, 2.0f, -5.0f);
 	worldTransform_.UpdateMatrix();
+
+	worldTransformGuard_.Initialize();
+	worldTransformGuard_.parent_ = &worldTransform_;
+	worldTransformGuard_.translation_.y = 3.0f;
+	worldTransformGuard_.scale_ *= 5.0f;
+	worldTransformGuard_.UpdateMatrix();
+
 	SetSelectCommands();
 	SetGrid(0, 0);
 	collisionManager_->SetCollision(GetGridX(), GetGridZ());
@@ -189,6 +200,9 @@ void Enemy::Update(const ViewProjection& viewProjection, Option* option) {
 
 	}
 
+	worldTransform_.UpdateMatrix();
+	worldTransformGuard_.UpdateMatrix();
+
 }
 
 void Enemy::MoveTurn(const ViewProjection& viewProjection) {
@@ -228,6 +242,7 @@ void Enemy::MoveTurn(const ViewProjection& viewProjection) {
 	}
 
 	worldTransform_.UpdateMatrix();
+	worldTransformGuard_.UpdateMatrix();
 
 	SetCommandSprite(viewProjection);
 
@@ -427,6 +442,11 @@ void Enemy::Draw(const ViewProjection& viewProjection) {
 	}
 	else {
 		models_[0]->Draw(worldTransform_, viewProjection, currentTex_);
+
+		if (isGuard_) {
+			guardModel_->Draw(worldTransformGuard_, viewProjection, guardTex_);
+		}
+
 	}
 }
 
@@ -534,12 +554,34 @@ void Enemy::SetEnemyMovePattern() {
 		case E_Move:
 
 			// 左右移動決定
-			command = Command(rand() % 2);
-			moveCommands_.push_back(command);
+			if (GetGridX() == 5) {
+
+				command = Command(MoveLeft);
+				moveCommands_.push_back(command);
+
+			}
+			else if (GetGridX() == 0) {
+				command = Command(MoveRight);
+				moveCommands_.push_back(command);
+			}
+			else {
+				command = Command(rand() % 2);
+				moveCommands_.push_back(command);
+			}
 
 			// 上下移動決定
-			command = Command(rand() % 2 + 2);
-			moveCommands_.push_back(command);
+			if (GetGridZ() == 5) {
+				command = Command(MoveUp);
+				moveCommands_.push_back(command);
+			}
+			else if (GetGridZ() == 0) {
+				command = Command(MoveDown);
+				moveCommands_.push_back(command);
+			}
+			else {
+				command = Command(rand() % 2 + 2);
+				moveCommands_.push_back(command);
+			}
 
 			// 残りの移動決定
 			command = Command(rand() % 5);

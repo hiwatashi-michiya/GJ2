@@ -129,8 +129,9 @@ private:
 
 	int inputCoolTimer_ = 0;
 
-	// プレイヤーのワールドトランスフォーム
+	// ワールドトランスフォーム
 	WorldTransform worldTransform_;
+	WorldTransform worldTransformGuard_;
 
 	// 速度
 	Vector3 velocity_;
@@ -207,9 +208,11 @@ private:
 
 	// モデル
 	std::vector<Model*> models_;
+	std::unique_ptr<Model> guardModel_;
 
 	// 画像
 	std::vector<uint32_t> textures_;
+	uint32_t guardTex_ = 0u;
 
 	// SE
 	std::vector<uint32_t> sounds_;
