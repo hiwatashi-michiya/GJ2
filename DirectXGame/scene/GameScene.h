@@ -66,6 +66,8 @@ public: // メンバ関数
 	/// </summary>
 	void Reset();
 
+	void shuffle(float array);
+
 private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
@@ -163,4 +165,5 @@ private: // メンバ変数
 	bool isGameOver_ = false;
 
 	Vector2 randPos[100] = {0.0f, 0.0f};
+	bool isPetalDead[100];
 };
