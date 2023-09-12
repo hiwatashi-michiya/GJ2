@@ -10,6 +10,7 @@ enum EffectType {
 	Up,
 	Crash,
 	Move,
+	Dust,
 
 };
 
@@ -53,6 +54,6 @@ private:
 
 	EffectType effectType_ = Up;
 
-	uint32_t effectTex_[2];
+	uint32_t effectTex_[3];
 
 };

@@ -14,6 +14,7 @@
 #include "Option.h"
 #include <Audio.h>
 #include "GameSpeed.h"
+#include "Effect.h"
 
 //コマンドの最大表示数
 const int kMaxCommand = 3;
