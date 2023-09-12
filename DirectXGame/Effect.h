@@ -8,8 +8,9 @@ const int kMaxParticles = 10;
 
 enum EffectType {
 	Up,
-	Crash
-	
+	Crash,
+	Move,
+
 };
 
 class Effect {

@@ -81,6 +81,15 @@ public:
 
 	void Reset();
 
+	Vector3 GetPosition() { return worldTransform_.translation_; }
+
+	void SetWorldPosition(Vector3 position) {
+		worldTransform_.translation_ = position;
+		worldTransform_.UpdateMatrix();
+	}
+
+	bool GetIsStart() { return isStart_; }
+
 private:
 
 	//入力
@@ -200,4 +209,10 @@ private:
 	uint32_t findUITexture_;
 
 	float moveAngle_;
+
+	//スタート演出
+	bool isStart_ = false;
+
+	int startCount_ = 60;
+
 };

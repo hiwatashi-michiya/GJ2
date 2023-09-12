@@ -45,7 +45,7 @@ void Effect::Update() {
 
 				velocities_[i].y -= 0.3f;
 
-				worldTransforms_[i].scale_ -= Vector3(0.01f, 0.01f, 0.01f);
+				worldTransforms_[i].scale_ -= Vector3(0.03f, 0.03f, 0.03f);
 				worldTransforms_[i].translation_ += velocities_[i];
 
 				if (worldTransforms_[i].translation_.y <= 0.0f) {
@@ -123,7 +123,7 @@ void Effect::SetEffect() {
 				velocities_[i] *= 0.5f;
 			}
 
-			worldTransforms_[i].scale_ = Vector3(0.5f, 0.5f, 0.5f);
+			worldTransforms_[i].scale_ = Vector3(1.0f, 1.0f, 1.0f);
 
 			worldTransforms_[i].UpdateMatrix();
 		}

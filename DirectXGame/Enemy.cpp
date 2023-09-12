@@ -78,7 +78,32 @@ void Enemy::Update(const ViewProjection& viewProjection, Option* option) {
 
 #endif // _DEBUG
 
-	if (isEffect_ == false) {
+	if (isStart_ == false) {
+
+		if (startCount_ <= 0) {
+			worldTransform_.translation_.y = 2.0f;
+			velocity_ = {0.0f, 0.0f, 0.0f};
+			isStart_ = true;
+		}
+
+		if (startCount_ == 60) {
+			velocity_ = {0.0f, -2.0f, 0.0f};
+		}
+
+		velocity_ -= {0.0f, 0.2f, 0.0f};
+
+		worldTransform_.translation_ += velocity_;
+
+		if (worldTransform_.translation_.y <= 2.0f) {
+			worldTransform_.translation_.y = 2.0f;
+			velocity_ = {0.0f, 3.0f * float(startCount_ / 60.0f), 0.0f};
+		}
+
+		startCount_--;
+
+		worldTransform_.UpdateMatrix();
+	}
+	else if (isEffect_ == false) {
 
 		if (isHit_ == false) {
 
@@ -449,7 +474,7 @@ void Enemy::UpdateMoveCommandsNum() {
 	currentNumSprite_->SetPosition({selectNum_ * 64.0f + 610.0f, 80.0f});
 }
 
-void Enemy::SetPosition(int x, int z) {
+void Enemy::SetGridPosition(int x, int z) {
 
 	collisionManager_->RemoveCollision(GetGridX(), GetGridZ());
 

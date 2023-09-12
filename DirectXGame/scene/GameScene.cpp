@@ -123,13 +123,13 @@ void GameScene::Initialize() {
 	Enemy* newEnemy = new Enemy();
 	newEnemy->Initialize(enemyModels, enemyTextures, enemySounds);
 	newEnemy->SetPlayer(player_.get());
-	newEnemy->SetPosition(3, 3);
+	newEnemy->SetGridPosition(3, 3);
 	enemies_.push_back(newEnemy);
 
 	Enemy* newEnemy2 = new Enemy();
 	newEnemy2->Initialize(enemyModels, enemyTextures, enemySounds);
 	newEnemy2->SetPlayer(player_.get());
-	newEnemy2->SetPosition(5, 5);
+	newEnemy2->SetGridPosition(5, 5);
 	enemies_.push_back(newEnemy2);
 
 	// オプション 初期化
@@ -191,7 +191,8 @@ void GameScene::Update() {
 			// 実際に遷移する
 			transition_->ChangeScene();
 		}
-	} else {
+	}
+	else {
 
 		enemies_.remove_if([](Enemy* enemy) {
 			if (enemy->GetIsDead()) {
@@ -378,10 +379,18 @@ void GameScene::Draw() {
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
 
-	player_->DrawUI();
+	if (player_->GetIsStart()) {
+
+		player_->DrawUI();
+
+	}
 
 	for (Enemy* enemy : enemies_) {
-		enemy->DrawUI();
+
+		if (enemy->GetIsStart()) {
+			enemy->DrawUI();
+		}
+
 	}
 
 	option->Draw();
@@ -449,13 +458,24 @@ void GameScene::Reset() {
 	Enemy* newEnemy = new Enemy();
 	newEnemy->Initialize(enemyModels, enemyTextures, enemySounds);
 	newEnemy->SetPlayer(player_.get());
-	newEnemy->SetPosition(3, 3);
+	newEnemy->SetGridPosition(3, 3);
 	enemies_.push_back(newEnemy);
 
 	Enemy* newEnemy2 = new Enemy();
 	newEnemy2->Initialize(enemyModels, enemyTextures, enemySounds);
 	newEnemy2->SetPlayer(player_.get());
-	newEnemy2->SetPosition(5, 5);
+	newEnemy2->SetGridPosition(5, 5);
 	enemies_.push_back(newEnemy2);
+
+	//演出上の初期位置
+	Vector3 height{0.0f, 100.0f, 0.0f};
+
+	player_->SetWorldPosition(Add(player_->GetPosition(), height));
+	
+	for (Enemy* enemy : enemies_) {
+
+		enemy->SetWorldPosition(Add(enemy->GetPosition(), height));
+
+	}
 
 }

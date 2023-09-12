@@ -134,174 +134,207 @@ void Player::Update(const ViewProjection& viewProjection, Option* option) {
 
 #endif // _DEBUG
 
-	if (isHit_ == false) {
+	if (isStart_ == false) {
 
-		if (collisionManager_->IsHitAttack(GetGridX(), GetGridZ(), EnemyAttack)) {
-
-			// ガード状態なら半減し、その後ガードを解除する
-			if (isGuard_) {
-				life_ -= 5;
-				isGuard_ = false;
-			} else {
-				life_ -= 10;
-			}
-
-			audio_->PlayWave(sounds_[0], false, option->m_seVol);
-			isHit_ = true;
-
-		} else if (collisionManager_->IsHitAttack(GetGridX(), GetGridZ(), EnemySpecialAttack)) {
-
-			// ガード状態なら半減し、その後ガードを解除する
-			if (isGuard_) {
-				life_ -= 10;
-				isGuard_ = false;
-			} else {
-				life_ -= 20;
-			}
-
-			audio_->PlayWave(sounds_[0], false, option->m_seVol);
-			isHit_ = true;
+		if (startCount_ <= 0) {
+			worldTransform_.translation_.y = 2.0f;
+			velocity_ = {0.0f, 0.0f, 0.0f};
+			isStart_ = true;
 		}
 
+		if (startCount_ == 60) {
+			velocity_ = {0.0f, -2.0f, 0.0f};
+		}
+
+		velocity_ -= {0.0f, 0.2f, 0.0f};
+
+		worldTransform_.translation_ += velocity_;
+
+		if (worldTransform_.translation_.y <= 2.0f) {
+			worldTransform_.translation_.y = 2.0f;
+			velocity_ = {0.0f, 3.0f * float(startCount_ / 60.0f), 0.0f};
+		}
+
+		startCount_--;
+
+		worldTransform_.UpdateMatrix();
+
 	}
-	// アタックが終了したらヒットフラグを降ろす
-	else if (isHit_ == true && collisionManager_->IsHitAttack(GetGridX(), GetGridZ(), 0)) {
+	else {
 
-		isHit_ = false;
-	}
+		if (isHit_ == false) {
 
-	// 体力が0以下で死亡
-	if (life_ <= 0) {
-		collisionManager_->RemoveCollision(GetGridX(), GetGridZ());
-		isDead_ = true;
-	}
+			if (collisionManager_->IsHitAttack(GetGridX(), GetGridZ(), EnemyAttack)) {
 
-	// ポインターを行動カードと接触してる状態でXボタンを押すと効果を表示
-	for (int i = 0; i < kMaxSelectNum; i++) {
-		Vector2 pos = selectCommandNumSprite_[i]->GetPosition();
-		Vector2 size = selectCommandNumSprite_[i]->GetSize();
+				// ガード状態なら半減し、その後ガードを解除する
+				if (isGuard_) {
+					life_ -= 5;
+					isGuard_ = false;
+				} else {
+					life_ -= 10;
+				}
 
-		if ((pos.x) <= (option->GetCursorPos().x + option->GetCursorRad().x) &&
-		    (pos.x + size.x) >= (option->GetCursorPos().x - option->GetCursorRad().x) &&
-		    (pos.y) <= (option->GetCursorPos().y + option->GetCursorRad().y) &&
-		    (pos.y + size.y) >= (option->GetCursorPos().y - option->GetCursorRad().y) &&
-		    option->GetActionLongPush(UI_SELECT)) {
-			if (findUI_[i]->GetSize().x)
-				isFindUI_[i] = true;
+				audio_->PlayWave(sounds_[0], false, option->m_seVol);
+				isHit_ = true;
+
+			} else if (collisionManager_->IsHitAttack(GetGridX(), GetGridZ(), EnemySpecialAttack)) {
+
+				// ガード状態なら半減し、その後ガードを解除する
+				if (isGuard_) {
+					life_ -= 10;
+					isGuard_ = false;
+				} else {
+					life_ -= 20;
+				}
+
+				audio_->PlayWave(sounds_[0], false, option->m_seVol);
+				isHit_ = true;
+			}
+
+		}
+		// アタックが終了したらヒットフラグを降ろす
+		else if (isHit_ == true && collisionManager_->IsHitAttack(GetGridX(), GetGridZ(), 0)) {
+
+			isHit_ = false;
+		}
+
+		// 体力が0以下で死亡
+		if (life_ <= 0) {
+			life_ = 0;
+			collisionManager_->RemoveCollision(GetGridX(), GetGridZ());
+			isDead_ = true;
+		}
+
+		// ポインターを行動カードと接触してる状態でXボタンを押すと効果を表示
+		for (int i = 0; i < kMaxSelectNum; i++) {
+			Vector2 pos = selectCommandNumSprite_[i]->GetPosition();
+			Vector2 size = selectCommandNumSprite_[i]->GetSize();
+
+			if ((pos.x) <= (option->GetCursorPos().x + option->GetCursorRad().x) &&
+			    (pos.x + size.x) >= (option->GetCursorPos().x - option->GetCursorRad().x) &&
+			    (pos.y) <= (option->GetCursorPos().y + option->GetCursorRad().y) &&
+			    (pos.y + size.y) >= (option->GetCursorPos().y - option->GetCursorRad().y) &&
+			    option->GetActionLongPush(UI_SELECT)) {
+				if (findUI_[i]->GetSize().x)
+					isFindUI_[i] = true;
+			} else {
+				isFindUI_[i] = false;
+			}
+		}
+
+		// XINPUT_STATE joyState;
+
+		if (inputCoolTimer_ > 0) {
+			inputCoolTimer_--;
+		}
+
+		// 行動選択
+		if (isSelect_) {
+
+			if ((input_->TriggerKey(DIK_UP) || option->GetActionTrigger(U_SELECT)) &&
+			    inputCoolTimer_ == 0) {
+
+				if (selectNum_ > 0) {
+					selectNum_--;
+
+					// 移動時にSEを鳴らす
+					if (audio_->IsPlaying(selectSE_)) {
+						audio_->StopWave(selectSE_);
+					}
+					audio_->PlayWave(selectSE_, false, 0.4f * option->m_seVol);
+				}
+
+				inputCoolTimer_ = kInputCoolTime;
+
+			}
+
+			else if (
+			    (input_->TriggerKey(DIK_DOWN) || option->GetActionTrigger(D_SELECT)) &&
+			    inputCoolTimer_ == 0) {
+
+				if (selectNum_ < selectCommands_.size() - 1) {
+					selectNum_++;
+
+					// 移動時にSEを鳴らす
+					if (audio_->IsPlaying(selectSE_)) {
+						audio_->StopWave(selectSE_);
+					}
+					audio_->PlayWave(selectSE_, false, 0.4f * option->m_seVol);
+				}
+
+				inputCoolTimer_ = kInputCoolTime;
+			}
+
+			// スペシャルカウントが溜まっていたら特殊攻撃可能にする
+			if (specialCount_ >= kMaxSpecialCount && option->GetActionTrigger(SPECIAL)) {
+
+				// コマンドリセット
+				selectCommands_.clear();
+
+				for (int i = 0; i < kMaxSelectNum; i++) {
+
+					selectCommands_.push_back(S_PlayerAttack);
+				}
+
+				specialCount_ = 0;
+
+			} else if (
+			    (input_->TriggerKey(DIK_RETURN) || option->GetActionTrigger(ACT)) &&
+			    inputCoolTimer_ == 0 && moveCommands_.size() < kMaxCommand) {
+
+				SetMoveCommand(selectNum_);
+				PopSelectCommand(selectNum_);
+
+				inputCoolTimer_ = kInputCoolTime;
+
+				// 行動選択時にSEを鳴らす
+				if (audio_->IsPlaying(clickSE_)) {
+					audio_->StopWave(clickSE_);
+				}
+				audio_->PlayWave(clickSE_, false, 1.0f * option->m_seVol);
+
+			} else if (
+			    (input_->TriggerKey(DIK_RETURN) || option->GetActionTrigger(ACT)) &&
+			    inputCoolTimer_ == 0) {
+				isSelect_ = false;
+				isPlayerTurn_ = true;
+				inputCoolTimer_ = kInputCoolTime;
+
+				// 行動選択時にSEを鳴らす
+				if (audio_->IsPlaying(clickSE_)) {
+					audio_->StopWave(clickSE_);
+				}
+				audio_->PlayWave(clickSE_, false, 1.0f * option->m_seVol);
+			}
+
+			if ((input_->TriggerKey(DIK_BACKSPACE) || option->GetActionTrigger(CANCEL)) &&
+			    inputCoolTimer_ == 0 && moveCommands_.size() != 0) {
+				PushSelectCommand(moveCommands_.back());
+				PopBackMoveCommand();
+				inputCoolTimer_ = kInputCoolTime;
+
+				// 行動キャンセル時にSEを鳴らす
+				if (audio_->IsPlaying(cancelSE_)) {
+					audio_->StopWave(cancelSE_);
+				}
+				audio_->PlayWave(cancelSE_, false, 1.0f * option->m_seVol);
+			}
+
+			if (selectNum_ >= selectCommands_.size()) {
+				selectNum_ = int(selectCommands_.size() - 1);
+			}
+
 		} else {
-			isFindUI_[i] = false;
-		}
-	}
-
-	// XINPUT_STATE joyState;
-
-	if (inputCoolTimer_ > 0) {
-		inputCoolTimer_--;
-	}
-
-	// 行動選択
-	if (isSelect_) {
-
-		if ((input_->TriggerKey(DIK_UP) || option->GetActionTrigger(U_SELECT)) &&
-		    inputCoolTimer_ == 0) {
-
-			if (selectNum_ > 0) {
-				selectNum_--;
-
-				// 移動時にSEを鳴らす
-				if (audio_->IsPlaying(selectSE_)) {
-					audio_->StopWave(selectSE_);
-				}
-				audio_->PlayWave(selectSE_, false, 0.4f * option->m_seVol);
-			}
-
-			inputCoolTimer_ = kInputCoolTime;
-
 		}
 
-		else if (
-		    (input_->TriggerKey(DIK_DOWN) || option->GetActionTrigger(D_SELECT)) &&
-		    inputCoolTimer_ == 0) {
-
-			if (selectNum_ < selectCommands_.size() - 1) {
-				selectNum_++;
-
-				// 移動時にSEを鳴らす
-				if (audio_->IsPlaying(selectSE_)) {
-					audio_->StopWave(selectSE_);
-				}
-				audio_->PlayWave(selectSE_, false, 0.4f * option->m_seVol);
-			}
-
-			inputCoolTimer_ = kInputCoolTime;
-		}
-
-		// スペシャルカウントが溜まっていたら特殊攻撃可能にする
-		if (specialCount_ >= kMaxSpecialCount && option->GetActionTrigger(SPECIAL)) {
-
-			// コマンドリセット
-			selectCommands_.clear();
-
-			for (int i = 0; i < kMaxSelectNum; i++) {
-
-				selectCommands_.push_back(S_PlayerAttack);
-			}
-
-			specialCount_ = 0;
-
-		} else if (
-		    (input_->TriggerKey(DIK_RETURN) || option->GetActionTrigger(ACT)) &&
-		    inputCoolTimer_ == 0 && moveCommands_.size() < kMaxCommand) {
-
-			SetMoveCommand(selectNum_);
-			PopSelectCommand(selectNum_);
-
-			inputCoolTimer_ = kInputCoolTime;
-
-			// 行動選択時にSEを鳴らす
-			if (audio_->IsPlaying(clickSE_)) {
-				audio_->StopWave(clickSE_);
-			}
-			audio_->PlayWave(clickSE_, false, 1.0f * option->m_seVol);
 		
-		} else if (
-		    (input_->TriggerKey(DIK_RETURN) || option->GetActionTrigger(ACT)) &&
-		    inputCoolTimer_ == 0) {
-			isSelect_ = false;
-			isPlayerTurn_ = true;
-			inputCoolTimer_ = kInputCoolTime;
-
-			// 行動選択時にSEを鳴らす
-			if (audio_->IsPlaying(clickSE_)) {
-				audio_->StopWave(clickSE_);
-			}
-			audio_->PlayWave(clickSE_, false, 1.0f * option->m_seVol);
-		}
-
-		if ((input_->TriggerKey(DIK_BACKSPACE) || option->GetActionTrigger(CANCEL)) &&
-		    inputCoolTimer_ == 0 && moveCommands_.size() != 0) {
-			PushSelectCommand(moveCommands_.back());
-			PopBackMoveCommand();
-			inputCoolTimer_ = kInputCoolTime;
-
-			// 行動キャンセル時にSEを鳴らす
-			if (audio_->IsPlaying(cancelSE_)) {
-				audio_->StopWave(cancelSE_);
-			}
-			audio_->PlayWave(cancelSE_, false, 1.0f * option->m_seVol);
-		}
-
-		if (selectNum_ >= selectCommands_.size()) {
-			selectNum_ = int(selectCommands_.size() - 1);
-		}
-
-	} else {
 
 	}
 
 	UpdateMoveCommandsNum();
 
 	SetCommandSprite(viewProjection);
+	
 }
 
 void Player::MoveTurn() {
@@ -756,6 +789,8 @@ void Player::Reset() {
 
 	isHit_ = false;
 	isDead_ = false;
+	isStart_ = false;
+	startCount_ = 60;
 	life_ = kMaxLife;
 
 	moveAngle_ = 0.0f;

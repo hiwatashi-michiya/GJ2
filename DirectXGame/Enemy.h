@@ -86,7 +86,7 @@ public:
 
 	bool GetIsEnemyTurn() const { return isEnemyTurn_; }
 
-	void SetPosition(int x, int z);
+	void SetGridPosition(int x, int z);
 
 	void SetPlayer(Player* player) { player_ = player; }
 
@@ -97,6 +97,15 @@ public:
 	void SetIsSelect(bool flag) { isSelect_ = flag; }
 
 	void Reset();
+
+	Vector3 GetPosition() { return worldTransform_.translation_; }
+
+	void SetWorldPosition(Vector3 position) { 
+		worldTransform_.translation_ = position;
+		worldTransform_.UpdateMatrix();
+	}
+
+	bool GetIsStart() { return isStart_; }
 
 private:
 	// 入力
@@ -207,4 +216,10 @@ private:
 
 	// 現在セットしている画像
 	uint32_t currentTex_ = 0u;
+
+	// スタート演出
+	bool isStart_ = false;
+
+	int startCount_ = 60;
+
 };
