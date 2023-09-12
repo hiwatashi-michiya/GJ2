@@ -19,7 +19,7 @@
 const int kMaxCommand = 3;
 
 // 選択できる個数
-const int kMaxSelectNum = 6;
+const int kMaxSelectNum = 8;
 
 
 class Player : public MoveCommand, public Collider {

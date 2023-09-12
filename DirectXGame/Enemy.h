@@ -20,7 +20,7 @@
 const int kMaxEnemyCommand = 3;
 
 // 選択できる個数
-const int kMaxEnemySelectNum = 6;
+const int kMaxEnemySelectNum = 8;
 
 enum MovePattern {
 	//基本行動

@@ -61,7 +61,7 @@ void Player::Initialize(
 		        0.0f,
 		    },
 		    {1024.0f, 1024.0f});
-		selectCommandNumSprite_[i]->SetPosition({10.0f, i * 64.0f + 222.0f});
+		selectCommandNumSprite_[i]->SetPosition({10.0f, i * 64.0f + 158.0f});
 	}
 
 	for (int i = 0; i < kMaxSelectNum; i++) {

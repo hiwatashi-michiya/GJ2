@@ -83,13 +83,16 @@ void MoveCommand::SetSelectCommands() {
 
 	nextSelectCommands_.clear();
 
-	// 移動パターンを三種類設定
-	for (int32_t i = 0; i < 3; i++) {
+	// 移動パターンを五種類設定
+	for (int32_t i = 0; i < 5; i++) {
 
 		Command command;
-
-		command = Command(rand() % 4);
-
+		if (i < 4) {
+			command = Command(i);
+		}
+		else {
+			command = Command(rand() % 5);
+		}
 		nextSelectCommands_.push_back(command);
 	}
 
