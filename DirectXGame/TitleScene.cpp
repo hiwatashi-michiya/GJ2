@@ -53,7 +53,7 @@ void TitleScene::Initialize() {
 	crossEffectModel_.reset(Model::CreateFromOBJ("crosseffect", true));
 
 	// モデル
-	pawnModel_.reset(Model::CreateFromOBJ("pawnTest", true));
+	pawnModel_.reset(Model::CreateFromOBJ("pawn", true));
 	kingModel_.reset(Model::CreateFromOBJ("king", true));
 
 	// 画像

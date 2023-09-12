@@ -116,6 +116,9 @@ private: // メンバ変数
 
 	// 画像
 	std::unique_ptr<Sprite> playerSprite_;
+	std::unique_ptr<Sprite> clearSprite_;
+	std::unique_ptr<Sprite> gameoverSprite_;
+	std::unique_ptr<Sprite> petalSprite_[100];
 
 	uint32_t playerTex_ = 0u;
 	uint32_t enemyTex_ = 0u;
@@ -134,6 +137,9 @@ private: // メンバ変数
 	uint32_t enemyAttackMassTex_ = 0u;
 	uint32_t frameTex_ = 0u;
 	uint32_t nextTex_ = 0u;
+	uint32_t clearTex_ = 0u;
+	uint32_t gameoverTex_ = 0u;
+	uint32_t petalTex_ = 0u;
 
 	// BGM
 	uint32_t gameBGM_ = 0u;
@@ -156,4 +162,5 @@ private: // メンバ変数
 
 	bool isGameOver_ = false;
 
+	Vector2 randPos[100] = {0.0f, 0.0f};
 };
