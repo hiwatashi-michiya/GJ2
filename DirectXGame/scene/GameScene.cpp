@@ -63,6 +63,7 @@ void GameScene::Initialize() {
 	playerAttackMassTex_ = TextureManager::Load("ground/playerattackmass.png");
 	enemyAttackMassTex_ = TextureManager::Load("ground/enemyattackmass.png");
 	moveMassTex_ = TextureManager::Load("ground/movemass.png");
+	enemyMoveMassTex_ = TextureManager::Load("ground/enemymovemass.png");
 	frameTex_ = TextureManager::Load("UI/frame.png");
 	nextTex_ = TextureManager::Load("UI/nextUI.png");
 	clearTex_ = TextureManager::Load("UI/clear.png");
@@ -132,7 +133,7 @@ void GameScene::Initialize() {
 	                                    numberTex_, alphaDarkTex_, frameTex_};
 	std::vector<uint32_t> enemySounds{damageSE_, damageHandle_};
 
-	// 攻撃マスのワールドトランスフォーム初期化
+	// マスのワールドトランスフォーム初期化
 	for (int z = 0; z < kMaxGrid; z++) {
 
 		for (int x = 0; x < kMaxGrid; x++) {
@@ -142,11 +143,11 @@ void GameScene::Initialize() {
 			effectMass_[z][x].SetStartPosition(
 			    Vector3(-25.0f + x * 10.0f, 1.0f, 25.0f + z * -10.0f));
 
-			worldTransformAttackMass_[z][x].Initialize();
-			worldTransformAttackMass_[z][x].scale_ *= 5.0f;
-			worldTransformAttackMass_[z][x].translation_ =
+			worldTransformMass_[z][x].Initialize();
+			worldTransformMass_[z][x].scale_ *= 5.0f;
+			worldTransformMass_[z][x].translation_ =
 			    Vector3(-25.0f + x * 10.0f, 1.0f, 25.0f + z * -10.0f);
-			worldTransformAttackMass_[z][x].UpdateMatrix();
+			worldTransformMass_[z][x].UpdateMatrix();
 		}
 	}
 
@@ -412,6 +413,8 @@ void GameScene::Draw() {
 	skydome_->Draw(viewProjection_);
 	ground_->Draw(viewProjection_);
 
+	PredictionActDraw();
+
 	for (int z = 0; z < kMaxGrid; z++) {
 
 		for (int x = 0; x < kMaxGrid; x++) {
@@ -420,14 +423,14 @@ void GameScene::Draw() {
 			    collisionManager_->GetAttackMass(x, z) == PlayerSpecialAttack) {
 
 				groundModel_->Draw(
-				    worldTransformAttackMass_[z][x], viewProjection_, playerAttackMassTex_);
+				    worldTransformMass_[z][x], viewProjection_, playerAttackMassTex_);
 			}
 
 			if (collisionManager_->GetAttackMass(x, z) == EnemyAttack ||
 			    collisionManager_->GetAttackMass(x, z) == EnemySpecialAttack) {
 
 				groundModel_->Draw(
-				    worldTransformAttackMass_[z][x], viewProjection_, enemyAttackMassTex_);
+				    worldTransformMass_[z][x], viewProjection_, enemyAttackMassTex_);
 			}
 
 			if (collisionManager_->GetAttackMass(x, z) != 0) {
@@ -635,4 +638,401 @@ void GameScene::shuffle(float array) {
 	tmp = int(array);
 	array = array;
 	array = float(tmp);
+}
+
+void GameScene::PredictionActDraw() {
+
+	if (player_->GetIsSelect()) {
+
+		int tmpGridX = player_->GetGridX();
+		int tmpGridZ = player_->GetGridZ();
+
+		for (Command command : player_->moveCommands_) {
+
+			switch (command) {
+			case MoveLeft:
+
+				if (tmpGridX - 1 >= 0) {
+					tmpGridX -= 1;
+					groundModel_->Draw(
+					    worldTransformMass_[tmpGridZ][tmpGridX], viewProjection_, moveMassTex_);
+				}
+
+				break;
+			case MoveRight:
+
+				if (tmpGridX + 1 < 6) {
+					tmpGridX += 1;
+					groundModel_->Draw(
+					    worldTransformMass_[tmpGridZ][tmpGridX], viewProjection_, moveMassTex_);
+				}
+
+				break;
+			case MoveUp:
+
+				if (tmpGridZ - 1 >= 0) {
+					tmpGridZ -= 1;
+					groundModel_->Draw(
+					    worldTransformMass_[tmpGridZ][tmpGridX], viewProjection_, moveMassTex_);
+				}
+
+				break;
+			case MoveDown:
+
+				if (tmpGridZ + 1 < 6) {
+					tmpGridZ += 1;
+					groundModel_->Draw(
+					    worldTransformMass_[tmpGridZ][tmpGridX], viewProjection_, moveMassTex_);
+				}
+
+				break;
+			case Stop:
+				break;
+			case AttackCross:
+
+				for (int i = 1; i < 3; i++) {
+
+					if (tmpGridZ - i >= 0) {
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ - i][tmpGridX], viewProjection_, playerAttackMassTex_);
+					}
+
+					if (tmpGridZ + i < 6) {
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ + i][tmpGridX], viewProjection_, playerAttackMassTex_);
+					}
+
+					if (tmpGridX - i >= 0) {
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ][tmpGridX - i], viewProjection_, playerAttackMassTex_);
+					}
+
+					if (tmpGridX + i < 6) {
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ][tmpGridX + i], viewProjection_, playerAttackMassTex_);
+					}
+				}
+
+				break;
+			case AttackCircle:
+
+				if (tmpGridZ - 1 >= 0) {
+
+					groundModel_->Draw(
+					    worldTransformMass_[tmpGridZ - 1][tmpGridX], viewProjection_,
+					    playerAttackMassTex_);
+
+					if (tmpGridX - 1 >= 0) {
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ - 1][tmpGridX - 1], viewProjection_,
+						    playerAttackMassTex_);
+					}
+
+					if (tmpGridX + 1 < 6) {
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ - 1][tmpGridX + 1], viewProjection_,
+						    playerAttackMassTex_);
+					}
+				}
+
+				if (tmpGridZ + 1 < 6) {
+
+					groundModel_->Draw(
+					    worldTransformMass_[tmpGridZ + 1][tmpGridX], viewProjection_,
+					    playerAttackMassTex_);
+
+					if (tmpGridX - 1 >= 0) {
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ + 1][tmpGridX - 1], viewProjection_,
+						    playerAttackMassTex_);
+					}
+
+					if (tmpGridX + 1 < 6) {
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ + 1][tmpGridX + 1], viewProjection_,
+						    playerAttackMassTex_);
+					}
+				}
+
+				if (tmpGridX - 1 >= 0) {
+					groundModel_->Draw(
+					    worldTransformMass_[tmpGridZ][tmpGridX - 1], viewProjection_,
+					    playerAttackMassTex_);
+				}
+
+				if (tmpGridX + 1 < 6) {
+					groundModel_->Draw(
+					    worldTransformMass_[tmpGridZ][tmpGridX + 1], viewProjection_,
+					    playerAttackMassTex_);
+				}
+
+				break;
+			case Guard:
+				break;
+			case S_PlayerAttack:
+
+				for (int i = 1; i < 3; i++) {
+
+					if (tmpGridZ - i >= 0) {
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ - i][tmpGridX], viewProjection_,
+						    playerAttackMassTex_);
+					}
+
+					if (tmpGridZ + i < 6) {
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ + i][tmpGridX], viewProjection_,
+						    playerAttackMassTex_);
+					}
+
+					if (tmpGridX - i >= 0) {
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ][tmpGridX - i], viewProjection_,
+						    playerAttackMassTex_);
+					}
+
+					if (tmpGridX + i < 6) {
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ][tmpGridX + i], viewProjection_,
+						    playerAttackMassTex_);
+					}
+				}
+
+				if (tmpGridZ - 1 >= 0) {
+
+					if (tmpGridX - 1 >= 0) {
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ - 1][tmpGridX - 1], viewProjection_,
+						    playerAttackMassTex_);
+					}
+
+					if (tmpGridX + 1 < 6) {
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ - 1][tmpGridX + 1], viewProjection_,
+						    playerAttackMassTex_);
+					}
+				}
+
+				if (tmpGridZ + 1 < 6) {
+
+					if (tmpGridX - 1 >= 0) {
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ + 1][tmpGridX - 1], viewProjection_,
+						    playerAttackMassTex_);
+					}
+
+					if (tmpGridX + 1 < 6) {
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ + 1][tmpGridX + 1], viewProjection_,
+						    playerAttackMassTex_);
+					}
+				}
+
+				break;
+			default:
+				break;
+			}
+		}
+
+		for (Enemy* enemy : enemies_) {
+
+			tmpGridX = enemy->GetGridX();
+			tmpGridZ = enemy->GetGridZ();
+
+			for (Command command : enemy->moveCommands_) {
+
+				switch (command) {
+				case MoveLeft:
+
+					if (tmpGridX - 1 >= 0) {
+						tmpGridX -= 1;
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ][tmpGridX], viewProjection_, enemyMoveMassTex_);
+					}
+
+					break;
+				case MoveRight:
+
+					if (tmpGridX + 1 < 6) {
+						tmpGridX += 1;
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ][tmpGridX], viewProjection_, enemyMoveMassTex_);
+					}
+
+					break;
+				case MoveUp:
+
+					if (tmpGridZ - 1 >= 0) {
+						tmpGridZ -= 1;
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ][tmpGridX], viewProjection_, enemyMoveMassTex_);
+					}
+
+					break;
+				case MoveDown:
+
+					if (tmpGridZ + 1 < 6) {
+						tmpGridZ += 1;
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ][tmpGridX], viewProjection_, enemyMoveMassTex_);
+					}
+
+					break;
+				case Stop:
+					break;
+				case AttackCross:
+
+					for (int i = 1; i < 3; i++) {
+
+						if (tmpGridZ - i >= 0) {
+							groundModel_->Draw(
+							    worldTransformMass_[tmpGridZ - i][tmpGridX], viewProjection_,
+							    enemyAttackMassTex_);
+						}
+
+						if (tmpGridZ + i < 6) {
+							groundModel_->Draw(
+							    worldTransformMass_[tmpGridZ + i][tmpGridX], viewProjection_,
+							    enemyAttackMassTex_);
+						}
+
+						if (tmpGridX - i >= 0) {
+							groundModel_->Draw(
+							    worldTransformMass_[tmpGridZ][tmpGridX - i], viewProjection_,
+							    enemyAttackMassTex_);
+						}
+
+						if (tmpGridX + i < 6) {
+							groundModel_->Draw(
+							    worldTransformMass_[tmpGridZ][tmpGridX + i], viewProjection_,
+							    enemyAttackMassTex_);
+						}
+					}
+
+					break;
+				case AttackCircle:
+
+					if (tmpGridZ - 1 >= 0) {
+
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ - 1][tmpGridX], viewProjection_,
+						    enemyAttackMassTex_);
+
+						if (tmpGridX - 1 >= 0) {
+							groundModel_->Draw(
+							    worldTransformMass_[tmpGridZ - 1][tmpGridX - 1], viewProjection_,
+							    enemyAttackMassTex_);
+						}
+
+						if (tmpGridX + 1 < 6) {
+							groundModel_->Draw(
+							    worldTransformMass_[tmpGridZ - 1][tmpGridX + 1], viewProjection_,
+							    enemyAttackMassTex_);
+						}
+					}
+
+					if (tmpGridZ + 1 < 6) {
+
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ + 1][tmpGridX], viewProjection_,
+						    enemyAttackMassTex_);
+
+						if (tmpGridX - 1 >= 0) {
+							groundModel_->Draw(
+							    worldTransformMass_[tmpGridZ + 1][tmpGridX - 1], viewProjection_,
+							    enemyAttackMassTex_);
+						}
+
+						if (tmpGridX + 1 < 6) {
+							groundModel_->Draw(
+							    worldTransformMass_[tmpGridZ + 1][tmpGridX + 1], viewProjection_,
+							    enemyAttackMassTex_);
+						}
+					}
+
+					if (tmpGridX - 1 >= 0) {
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ][tmpGridX - 1], viewProjection_,
+						    enemyAttackMassTex_);
+					}
+
+					if (tmpGridX + 1 < 6) {
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ][tmpGridX + 1], viewProjection_,
+						    enemyAttackMassTex_);
+					}
+
+					break;
+				case Guard:
+					break;
+				case S_EnemyAttack:
+
+						for (int i = 1; i < 3; i++) {
+
+						if (tmpGridZ - i >= 0) {
+							groundModel_->Draw(
+							    worldTransformMass_[tmpGridZ - i][tmpGridX], viewProjection_,
+							    enemyAttackMassTex_);
+						}
+
+						if (tmpGridZ + i < 6) {
+							groundModel_->Draw(
+							    worldTransformMass_[tmpGridZ + i][tmpGridX], viewProjection_,
+							    enemyAttackMassTex_);
+						}
+
+						if (tmpGridX - i >= 0) {
+							groundModel_->Draw(
+							    worldTransformMass_[tmpGridZ][tmpGridX - i], viewProjection_,
+							    enemyAttackMassTex_);
+						}
+
+						if (tmpGridX + i < 6) {
+							groundModel_->Draw(
+							    worldTransformMass_[tmpGridZ][tmpGridX + i], viewProjection_,
+							    enemyAttackMassTex_);
+						}
+					}
+
+					if (tmpGridZ - 1 >= 0) {
+
+						if (tmpGridX - 1 >= 0) {
+							groundModel_->Draw(
+							    worldTransformMass_[tmpGridZ - 1][tmpGridX - 1], viewProjection_,
+							    enemyAttackMassTex_);
+						}
+
+						if (tmpGridX + 1 < 6) {
+							groundModel_->Draw(
+							    worldTransformMass_[tmpGridZ - 1][tmpGridX + 1], viewProjection_,
+							    enemyAttackMassTex_);
+						}
+					}
+
+					if (tmpGridZ + 1 < 6) {
+
+						if (tmpGridX - 1 >= 0) {
+							groundModel_->Draw(
+							    worldTransformMass_[tmpGridZ + 1][tmpGridX - 1], viewProjection_,
+							    enemyAttackMassTex_);
+						}
+
+						if (tmpGridX + 1 < 6) {
+							groundModel_->Draw(
+							    worldTransformMass_[tmpGridZ + 1][tmpGridX + 1], viewProjection_,
+							    enemyAttackMassTex_);
+						}
+					}
+
+					break;
+				default:
+					break;
+
+				}
+			}
+
+		}
+
+	}
+
 }

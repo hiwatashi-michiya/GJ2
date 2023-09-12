@@ -84,8 +84,8 @@ private: // メンバ変数
 	/// ゲームシーン用
 	/// </summary>
 
-	//攻撃マスのワールドトランスフォーム
-	WorldTransform worldTransformAttackMass_[kMaxGrid][kMaxGrid];
+	//マスのワールドトランスフォーム
+	WorldTransform worldTransformMass_[kMaxGrid][kMaxGrid];
 	//エフェクト表示
 	Effect effectMass_[kMaxGrid][kMaxGrid];
 
@@ -102,6 +102,9 @@ private: // メンバ変数
 
 	//全ての敵が死んだかどうか確認するフラグ
 	bool CheckAllEnemyIsDead();
+
+	//プレイヤーの行動自前描画
+	void PredictionActDraw();
 
 	// 天球
 	std::unique_ptr<Skydome> skydome_ = nullptr;
@@ -140,6 +143,7 @@ private: // メンバ変数
 	uint32_t playerAttackMassTex_ = 0u;
 	uint32_t enemyAttackMassTex_ = 0u;
 	uint32_t moveMassTex_ = 0u;
+	uint32_t enemyMoveMassTex_ = 0u;
 	uint32_t frameTex_ = 0u;
 	uint32_t nextTex_ = 0u;
 	uint32_t clearTex_ = 0u;
