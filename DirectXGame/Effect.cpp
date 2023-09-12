@@ -11,7 +11,7 @@ void Effect::Initialize() {
 
 	effectTex_[0] = TextureManager::Load("particlecube/effect.png");
 	effectTex_[1] = TextureManager::Load("particlecube/effect_black.png");
-
+	effectTex_[1] = TextureManager::Load("particlecube/dust.png");
 }
 
 void Effect::Update() {
@@ -39,6 +39,7 @@ void Effect::Update() {
 			}
 
 			break;
+
 		case Crash:
 
 			for (int i = 0; i < kMaxParticles; i++) {
@@ -56,10 +57,26 @@ void Effect::Update() {
 			}
 
 			break;
+
+		case Dust:
+
+			for (int i = 0; i < kMaxParticles; i++) {
+
+				velocities_[i].y -= 0.3f;
+
+				worldTransforms_[i].scale_ -= Vector3(0.03f, 0.03f, 0.03f);
+				worldTransforms_[i].translation_ += velocities_[i];
+
+				if (worldTransforms_[i].translation_.y <= 0.0f) {
+					velocities_[i].y = 1.0f * float(lifeTimer_ / 10);
+				}
+
+				worldTransforms_[i].UpdateMatrix();
+			}
+
+			break;
 		}
-
 	}
-
 }
 
 void Effect::Draw(const ViewProjection& viewProjection) {
@@ -70,12 +87,8 @@ void Effect::Draw(const ViewProjection& viewProjection) {
 
 			effectModel_->Draw(worldTransforms_[i], viewProjection, effectTex_[i % 2]);
 		}
-
 	}
-
 }
-
-
 
 void Effect::SetEffect() {
 
@@ -96,7 +109,6 @@ void Effect::SetEffect() {
 			worldTransforms_[i].scale_ = Vector3(0.5f, 0.5f, 0.5f);
 
 			worldTransforms_[i].UpdateMatrix();
-
 		}
 
 		break;
@@ -129,10 +141,36 @@ void Effect::SetEffect() {
 		}
 
 		break;
-	
+	case Dust:
+
+		for (int i = 0; i < kMaxParticles; i++) {
+
+			worldTransforms_[i].translation_ = startPosition_[i];
+
+			if (i % 2 == 0) {
+
+				velocities_[i].x = cosf(i * 3.14f / 5.0f);
+				velocities_[i].y = 3.0f + float((rand() % 10) / 10.0f);
+				velocities_[i].z = sinf(i * 3.14f / 5.0f);
+
+				velocities_[i] *= 0.5f;
+
+			} else {
+
+				velocities_[i].x = cosf(i * 3.14f / 5.0f);
+				velocities_[i].y = 2.0f + float((rand() % 10) / 10.0f);
+				velocities_[i].z = sinf(i * 3.14f / 5.0f);
+
+				velocities_[i] *= 0.5f;
+			}
+
+			worldTransforms_[i].scale_ = Vector3(1.0f, 1.0f, 1.0f);
+
+			worldTransforms_[i].UpdateMatrix();
+		}
+
+		break;
 	}
-
-
 }
 
 void Effect::Reset(int32_t lifeTime) {

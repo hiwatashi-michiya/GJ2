@@ -158,15 +158,13 @@ void Player::Update(const ViewProjection& viewProjection, Option* option) {
 			if (startCount_ >= 10) {
 				audio_->PlayWave(fallSE_);
 			}
-
 		}
 
 		startCount_--;
 
 		worldTransform_.UpdateMatrix();
 
-	}
-	else {
+	} else {
 
 		if (isHit_ == false) {
 
@@ -274,7 +272,7 @@ void Player::Update(const ViewProjection& viewProjection, Option* option) {
 			// スペシャルカウントが溜まっていたら特殊攻撃可能にする
 			if (specialCount_ >= kMaxSpecialCount && option->GetActionTrigger(SPECIAL)) {
 
-				//攻撃、ガードコマンドリセット
+				// 攻撃、ガードコマンドリセット
 				for (int i = 0; i < kMaxCommand; i++) {
 					selectCommands_.pop_back();
 				}
@@ -334,22 +332,18 @@ void Player::Update(const ViewProjection& viewProjection, Option* option) {
 
 		} else {
 		}
-
-		
-
 	}
 
 	UpdateMoveCommandsNum();
 
 	SetCommandSprite(viewProjection);
-	
 }
 
 void Player::MoveTurn() {
 
 	if (!isSelect_) {
 
-		//行動後に間を置く
+		// 行動後に間を置く
 		if (interval_ > 0) {
 			interval_--;
 		}
@@ -594,7 +588,7 @@ void Player::Move(Command& command) {
 	case Guard:
 
 		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed()) {
-			
+
 			if (specialCount_ < kMaxSpecialCount) {
 				specialCount_++;
 			}
@@ -614,7 +608,7 @@ void Player::Move(Command& command) {
 		}
 
 		for (int i = 0; i < 5; i++) {
-			const float length = 10.0f;
+			const float length = 4.0f;
 			float radius = moveAngle_ * 3.14f / 180.0f;
 
 			velocity_.x = cosf(i * 10.0f + radius) * length;
@@ -647,7 +641,13 @@ void Player::Move(Command& command) {
 	if (--MoveTimer_ <= 0) {
 		moveAngle_ = 0.0f;
 		velocity_ = {0.0f, 0.0f, 0.0f};
-		currentTex_ = textures_[0];
+
+		if (isGuard_) {
+			currentTex_ = textures_[9];
+		} else {
+			currentTex_ = textures_[0];
+		}
+
 		currentMoveCommand_ = Stop;
 		collisionManager_->ResetAttack();
 		interval_ = kMaxInterval;
@@ -662,9 +662,9 @@ void Player::Draw(const ViewProjection& viewProjection) {
 
 	/*if (currentMoveCommand_ == AttackCross || currentMoveCommand_ == AttackCircle) {
 
-		for (int i = 0; i < 8; i++) {
-			models_[1]->Draw(worldTransformEffect_[i], viewProjection, textures_[5]);
-		}
+	    for (int i = 0; i < 8; i++) {
+	        models_[1]->Draw(worldTransformEffect_[i], viewProjection, textures_[5]);
+	    }
 	}*/
 
 	if (currentMoveCommand_ == Guard) {
@@ -812,5 +812,4 @@ void Player::Reset() {
 	SetSelectCommands();
 	SetGrid(0, 2);
 	collisionManager_->SetCollision(GetGridX(), GetGridZ());
-
 }
