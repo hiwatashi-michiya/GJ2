@@ -1,7 +1,8 @@
 #include "GameScene.h"
+#include "Rand.h"
 #include "TextureManager.h"
 #include <cassert>
-#include "Rand.h"
+#include <stdlib.h>
 
 #ifdef _DEBUG
 #include <ImGuiManager.h>
@@ -94,6 +95,11 @@ void GameScene::Initialize() {
 
 	SetRandom();
 	for (uint32_t i = 0; i < 100; i++) {
+		randPos[i].x = float(rand() % 14 - 7);
+		randPos[i].y = float(rand() % 8 + 3);
+	}
+
+	for (uint32_t i = 0; i < 100; i++) {
 		petalSprite_[i].reset(Sprite::Create(petalTex_, {0.0f, 0.0f}));
 		petalSprite_[i]->SetSize({32.0f, 32.0f});
 		petalSprite_[i]->SetTextureRect(
@@ -103,8 +109,7 @@ void GameScene::Initialize() {
 		    },
 		    {32.0f, 32.0f});
 		petalSprite_[i]->SetPosition({640.0f, 0.0f});
-		randPos[i].x = float(rand() % 100);
-		randPos[i].y = float(rand() % 100 - 200);
+		isPetalDead[i] = false;
 	}
 	playerTex_ = TextureManager::Load("pawn/pawn.png");
 	playerSprite_.reset(Sprite::Create(playerTex_, {0.0f, 0.0f}));
@@ -236,8 +241,7 @@ void GameScene::Update() {
 			// 実際に遷移する
 			transition_->ChangeScene();
 		}
-	}
-	else {
+	} else {
 
 		enemies_.remove_if([](Enemy* enemy) {
 			if (enemy->GetIsDead()) {
@@ -286,7 +290,7 @@ void GameScene::Update() {
 			enemy->Update(viewProjection_, option);
 		}
 
-			// エフェクト配置
+		// エフェクト配置
 		for (int z = 0; z < kMaxGrid; z++) {
 
 			for (int x = 0; x < kMaxGrid; x++) {
@@ -299,8 +303,7 @@ void GameScene::Update() {
 
 		if (player_->GetIsPlayerTurn()) {
 			player_->MoveTurn();
-		} 
-		else if (CheckAllEnemyTurn()) {
+		} else if (CheckAllEnemyTurn()) {
 
 			for (Enemy* enemy : enemies_) {
 
@@ -323,7 +326,7 @@ void GameScene::Update() {
 			}
 		}
 
-			// エフェクト配置
+		// エフェクト配置
 		for (int z = 0; z < kMaxGrid; z++) {
 
 			for (int x = 0; x < kMaxGrid; x++) {
@@ -335,20 +338,27 @@ void GameScene::Update() {
 				}
 			}
 		}
+
+		/*if ((input_->TriggerKey(DIK_SPACE))) {
+			isGameClear_ = true;
+		}*/
+
 		// ゲームクリア時の画面エフェクト
 		if (isGameClear_) {
 			SetRandom();
-			for (uint32_t i = 0; i < 50; i++) {
+			for (uint32_t i = 0; i < 100; i++) {
 
 				petalSprite_[i]->SetPosition(
 				    {petalSprite_[i]->GetPosition().x + randPos[i].x + gameSpeed_->GetGameSpeed(),
 				     petalSprite_[i]->GetPosition().y + randPos[i].y + gameSpeed_->GetGameSpeed()});
 
 				if (petalSprite_[i]->GetPosition().y < -50.0f ||
-				    petalSprite_[i]->GetPosition().y > 780.0f) {
+				    petalSprite_[i]->GetPosition().y > 720.0f) {
+					isPetalDead[i] = false;
 					petalSprite_[i]->SetPosition({640.0f, 0.0f});
-					randPos[i].x = float(rand() % 10 - 5);
+					shuffle(randPos[i].x);
 					randPos[i].y = float(rand() % 8 + 3);
+					isPetalDead[i] = true;
 				}
 			}
 		}
@@ -423,7 +433,6 @@ void GameScene::Draw() {
 			if (collisionManager_->GetAttackMass(x, z) != 0) {
 				effectMass_[z][x].Draw(viewProjection_);
 			}
-
 		}
 	}
 
@@ -450,7 +459,6 @@ void GameScene::Draw() {
 	if (player_->GetIsStart()) {
 
 		player_->DrawUI();
-
 	}
 
 	for (Enemy* enemy : enemies_) {
@@ -458,13 +466,14 @@ void GameScene::Draw() {
 		if (enemy->GetIsStart()) {
 			enemy->DrawUI();
 		}
-
 	}
 
 	if (isGameClear_) {
 		clearSprite_->Draw();
-		for (uint32_t i = 0; i < 50; i++) {
-			petalSprite_[i]->Draw();
+		for (uint32_t i = 0; i < 100; i++) {
+			if (isPetalDead[i]) {
+				petalSprite_[i]->Draw();
+			}
 		}
 	}
 	if (isGameOver_) {
@@ -587,7 +596,7 @@ void GameScene::Reset() {
 
 	}
 
-	//演出上の初期位置
+	// 演出上の初期位置
 	Vector3 height{0.0f, 100.0f, 0.0f};
 
 	player_->SetWorldPosition(Add(player_->GetPosition(), height));
@@ -595,7 +604,35 @@ void GameScene::Reset() {
 	for (Enemy* enemy : enemies_) {
 
 		enemy->SetWorldPosition(Add(enemy->GetPosition(), height));
-
 	}
 
+	for (uint32_t i = 0; i < 100; i++) {
+		isPetalDead[i] = false;
+		petalSprite_[i]->SetPosition({640.0f, 0.0f});
+	}
+}
+
+void GameScene::shuffle(float array) {
+	// int i, j;
+	int tmp;
+	///* シャッフル対象の末尾を設定 */
+	// i = size - 1;
+
+	// while (i > 0) {
+	//	/* シャッフル対象(0〜i)から位置をランダム決定 */
+	//	j = rand() % (i + 1);
+
+	//	/* ランダムに決めた位置と
+	//	   シャッフル対象の末尾の位置のデータを交換 */
+	//	tmp = int(array);
+	//	array = array;
+	//	//array[i].y = float(rand() % 8 + 3);
+	//	array = float(tmp);
+
+	//	/* シャッフル対象の範囲を狭める */
+	//	i--;
+	//}
+	tmp = int(array);
+	array = array;
+	array = float(tmp);
 }

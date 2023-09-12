@@ -66,6 +66,8 @@ public: // メンバ関数
 	/// </summary>
 	void Reset();
 
+	void shuffle(float array);
+
 	bool GetIsReset() { return isReset_; }
 
 private: // メンバ変数
@@ -170,4 +172,5 @@ private: // メンバ変数
 	bool isReset_ = false;
 
 	Vector2 randPos[100] = {0.0f, 0.0f};
+	bool isPetalDead[100];
 };
