@@ -63,13 +63,13 @@ void GameScene::Initialize() {
 	enemyAttackMassTex_ = TextureManager::Load("ground/enemyattackmass.png");
 	frameTex_ = TextureManager::Load("UI/frame.png");
 	nextTex_ = TextureManager::Load("UI/nextUI.png");
+	clearTex_ = TextureManager::Load("UI/clear.png");
+	gameoverTex_ = TextureManager::Load("UI/gameover.png");
+	petalTex_ = TextureManager::Load("white1x1.png");
 
 	// SE
 	damageSE_ = audio_->LoadWave("SE/damage.wav");
 	damageHandle_ = damageSE_;
-	clearTex_ = TextureManager::Load("UI/clear.png");
-	// gameoverTex_ = TextureManager::Load("UI/gameover.png");
-	petalTex_ = TextureManager::Load("white1x1.png");
 
 	clearSprite_.reset(Sprite::Create(clearTex_, {0.0f, 0.0f}));
 	clearSprite_->SetSize({1280.0f, 720.0f});
@@ -80,6 +80,16 @@ void GameScene::Initialize() {
 	    },
 	    {1280.0f, 720.0f});
 	clearSprite_->SetPosition({0.0f, 0.0f});
+
+	gameoverSprite_.reset(Sprite::Create(gameoverTex_, {0.0f, 0.0f}));
+	gameoverSprite_->SetSize({1280.0f, 720.0f});
+	gameoverSprite_->SetTextureRect(
+	    {
+	        0.0f,
+	        0.0f,
+	    },
+	    {1280.0f, 720.0f});
+	gameoverSprite_->SetPosition({0.0f, 0.0f});
 
 	SetRandom();
 	for (uint32_t i = 0; i < 100; i++) {
@@ -442,6 +452,10 @@ void GameScene::Draw() {
 		for (uint32_t i = 0; i < 50; i++) {
 			petalSprite_[i]->Draw();
 		}
+	}
+	isGameOver_ = true;
+	if (isGameOver_) {
+		gameoverSprite_->Draw();
 	}
 
 	option->Draw();
