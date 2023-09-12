@@ -68,6 +68,8 @@ public: // メンバ関数
 
 	void shuffle(float array);
 
+	bool GetIsReset() { return isReset_; }
+
 private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
@@ -137,6 +139,7 @@ private: // メンバ変数
 	uint32_t numPlateTex_ = 0u;
 	uint32_t playerAttackMassTex_ = 0u;
 	uint32_t enemyAttackMassTex_ = 0u;
+	uint32_t moveMassTex_ = 0u;
 	uint32_t frameTex_ = 0u;
 	uint32_t nextTex_ = 0u;
 	uint32_t clearTex_ = 0u;
@@ -163,6 +166,10 @@ private: // メンバ変数
 	bool isGameClear_ = false;
 
 	bool isGameOver_ = false;
+
+	int stageCount_ = 0;
+
+	bool isReset_ = false;
 
 	Vector2 randPos[100] = {0.0f, 0.0f};
 	bool isPetalDead[100];

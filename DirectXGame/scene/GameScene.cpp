@@ -62,6 +62,7 @@ void GameScene::Initialize() {
 	numPlateTex_ = TextureManager::Load("UI/numberPlateBlue.png");
 	playerAttackMassTex_ = TextureManager::Load("ground/playerattackmass.png");
 	enemyAttackMassTex_ = TextureManager::Load("ground/enemyattackmass.png");
+	moveMassTex_ = TextureManager::Load("ground/movemass.png");
 	frameTex_ = TextureManager::Load("UI/frame.png");
 	nextTex_ = TextureManager::Load("UI/nextUI.png");
 	clearTex_ = TextureManager::Load("UI/clear.png");
@@ -219,15 +220,21 @@ void GameScene::Update() {
 	if (transition_->GetIsChangeScene()) {
 
 		// ゲームシーンにフェードインする時、またはゲームシーンからフェードアウトする時更新
+		
 		if ((transition_->GetFadeIn() && transition_->GetNextScene() == TITLE) ||
+		    (transition_->GetFadeIn() && transition_->GetNextScene() == RESET) ||
 		    (transition_->GetFadeOut() && transition_->GetNextScene() == GAME)) {
 			transition_->Update();
 		}
 		// ゲームシーンからのフェードアウト終了でシーン遷移を止める
-		else if (transition_->GetFadeIn() && transition_->GetNextScene() == GAME) {
+		else if (transition_->GetFadeIn() && transition_->GetNextScene() == GAME && stageCount_ == 0) {
 			transition_->SetIsChangeScene(false);
 			transition_->Reset();
 			gameHandale_ = audio_->PlayWave(gameBGM_, true, option->m_bgmVol);
+		} 
+		else if (transition_->GetFadeIn() && transition_->GetNextScene() == GAME) {
+			transition_->SetIsChangeScene(false);
+			transition_->Reset();
 		}
 		// ゲームシーンへのフェードインが完了したら
 		else {
@@ -264,11 +271,18 @@ void GameScene::Update() {
 
 				transition_->SetIsChangeScene(true);
 				// 遷移先のシーンをゲームにする
-				transition_->SetNextScene(TITLE);
-
-				if (audio_->IsPlaying(gameHandale_)) {
-					audio_->StopWave(gameHandale_);
+				if (isGameClear_ && stageCount_ < 2) {
+					transition_->SetNextScene(RESET);
+					stageCount_++;
 				}
+				else {
+					transition_->SetNextScene(TITLE);
+					stageCount_ = 0;
+					if (audio_->IsPlaying(gameHandale_)) {
+						audio_->StopWave(gameHandale_);
+					}
+				}
+
 			}
 		}
 
@@ -515,6 +529,16 @@ void GameScene::Reset() {
 	isGameClear_ = false;
 	isGameOver_ = false;
 
+	for (int z = 0; z < kMaxGrid; z++) {
+
+		for (int x = 0; x < kMaxGrid; x++) {
+
+			collisionManager_->RemoveCollision(x, z);
+
+		}
+
+	}
+
 	player_->Reset();
 
 	enemies_.remove_if([](Enemy* enemy) {
@@ -528,17 +552,49 @@ void GameScene::Reset() {
 	                                    numberTex_, alphaDarkTex_, frameTex_};
 	std::vector<uint32_t> enemySounds{damageSE_, damageHandle_};
 
-	Enemy* newEnemy = new Enemy();
-	newEnemy->Initialize(enemyModels, enemyTextures, enemySounds);
-	newEnemy->SetPlayer(player_.get());
-	newEnemy->SetGridPosition(3, 3);
-	enemies_.push_back(newEnemy);
+	Enemy* newEnemy;
+	Enemy* newEnemy2;
 
-	Enemy* newEnemy2 = new Enemy();
-	newEnemy2->Initialize(enemyModels, enemyTextures, enemySounds);
-	newEnemy2->SetPlayer(player_.get());
-	newEnemy2->SetGridPosition(5, 5);
-	enemies_.push_back(newEnemy2);
+	switch (stageCount_) {
+	default:
+	case 0:
+
+		newEnemy = new Enemy();
+		newEnemy->Initialize(enemyModels, enemyTextures, enemySounds);
+		newEnemy->SetPlayer(player_.get());
+		newEnemy->SetGridPosition(1, 1);
+		enemies_.push_back(newEnemy);
+
+		
+
+		break;
+	case 1:
+
+		newEnemy2 = new Enemy();
+		newEnemy2->Initialize(enemyModels, enemyTextures, enemySounds);
+		newEnemy2->SetPlayer(player_.get());
+		newEnemy2->SetGridPosition(2, 4);
+		enemies_.push_back(newEnemy2);
+
+		break;
+	case 2:
+
+		newEnemy = new Enemy();
+		newEnemy->Initialize(enemyModels, enemyTextures, enemySounds);
+		newEnemy->SetPlayer(player_.get());
+		newEnemy->SetGridPosition(3, 3);
+		enemies_.push_back(newEnemy);
+
+		newEnemy2 = new Enemy();
+		newEnemy2->Initialize(enemyModels, enemyTextures, enemySounds);
+		newEnemy2->SetPlayer(player_.get());
+		newEnemy2->SetGridPosition(5, 5);
+		enemies_.push_back(newEnemy2);
+
+		break;
+		
+
+	}
 
 	// 演出上の初期位置
 	Vector3 height{0.0f, 100.0f, 0.0f};
