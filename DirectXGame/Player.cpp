@@ -274,10 +274,12 @@ void Player::Update(const ViewProjection& viewProjection, Option* option) {
 			// スペシャルカウントが溜まっていたら特殊攻撃可能にする
 			if (specialCount_ >= kMaxSpecialCount && option->GetActionTrigger(SPECIAL)) {
 
-				// コマンドリセット
-				selectCommands_.clear();
+				//攻撃、ガードコマンドリセット
+				for (int i = 0; i < kMaxCommand; i++) {
+					selectCommands_.pop_back();
+				}
 
-				for (int i = 0; i < kMaxSelectNum; i++) {
+				for (int i = 0; i < kMaxCommand; i++) {
 
 					selectCommands_.push_back(S_PlayerAttack);
 				}
@@ -631,21 +633,7 @@ void Player::Move(Command& command) {
 		break;
 	case S_PlayerAttack:
 
-		// 一回目
-		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed() && moveCommands_.size() == 2) {
-
-			collisionManager_->SetAttackCross(GetGridX(), GetGridZ(), PlayerAttack);
-		}
-
-		// 二回目
-		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed() && moveCommands_.size() == 1) {
-
-			collisionManager_->SetAttackCircle(GetGridX(), GetGridZ(), PlayerAttack);
-		}
-
-		// 三回目
-		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed() && moveCommands_.size() == 0) {
-
+		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed()) {
 			collisionManager_->SetAttackCross(GetGridX(), GetGridZ(), PlayerSpecialAttack);
 			collisionManager_->SetAttackCircle(GetGridX(), GetGridZ(), PlayerSpecialAttack);
 		}
@@ -696,10 +684,12 @@ void Player::DrawUI() {
 	for (int i = 0; i < selectCommands_.size(); i++) {
 
 		// 選択中のコマンドの色を変更する
-		if (i == selectNum_) {
+		if (i == selectNum_ && moveCommands_.size() < kMaxCommand && isSelect_) {
 			selectCommandNumSprite_[i]->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+			selectCommandNumSprite_[i]->SetPosition({20.0f, i * 64.0f + 158.0f});
 		} else {
 			selectCommandNumSprite_[i]->SetColor({1.0f, 1.0f, 1.0f, 0.3f});
+			selectCommandNumSprite_[i]->SetPosition({10.0f, i * 64.0f + 158.0f});
 		}
 		selectCommandNumSprite_[i]->Draw();
 	}
