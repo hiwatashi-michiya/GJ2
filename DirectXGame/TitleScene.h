@@ -64,6 +64,7 @@ private: // メンバ変数
 	// 画面遷移アニメーション
 	TransitionEffect* transition_ = nullptr;
 
+	WorldTransform worldTransform_[2];
 	ViewProjection viewProjection_;
 
 	// 天球
@@ -77,6 +78,10 @@ private: // メンバ変数
 	std::unique_ptr<Model> skydomeModel_ = nullptr;
 	// 地面モデル
 	std::unique_ptr<Model> groundModel_ = nullptr;
+	
+	// モデル
+	std::unique_ptr<Model> pawnModel_;
+	std::unique_ptr<Model> kingModel_;
 
 	// 画像
 	uint32_t redTex_ = 0u;
@@ -86,12 +91,17 @@ private: // メンバ変数
 	uint32_t blackTex_ = 0u;
 	uint32_t numberTex_ = 0u;
 	uint32_t titleTex_ = 0u;
+	uint32_t titleBackTex_ = 0u;
+	uint32_t titleFrontTex_ = 0u;
+
 
 	//SE
 	uint32_t debugSE_ = 0u;
 
 	// スプライト
 	std::unique_ptr<Sprite> titleSprite_;
+	std::unique_ptr<Sprite> titleBackSprite_;
+	std::unique_ptr<Sprite> titleFrontSprite_;
 
 	// オプション
 	Option* option = Option::GetInstance();

@@ -691,9 +691,9 @@ void Player::DrawUI() {
 
 		// 選択中のコマンドの色を変更する
 		if (i == selectNum_) {
-			selectCommandNumSprite_[i]->SetColor({1.0f, 1.0f, 1.0f, 0.5f});
-		} else {
 			selectCommandNumSprite_[i]->SetColor({1.0f, 1.0f, 1.0f, 1.0f});
+		} else {
+			selectCommandNumSprite_[i]->SetColor({1.0f, 1.0f, 1.0f, 0.3f});
 		}
 		selectCommandNumSprite_[i]->Draw();
 	}
