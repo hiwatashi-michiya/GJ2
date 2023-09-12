@@ -18,6 +18,7 @@ Option::Option() {
 
 	m_bgmVol = 0.5f;
 	m_seVol = 0.5f;
+	isMenuOverlay_ = false;
 
 	this->Initialize();
 }
@@ -26,15 +27,20 @@ Option::~Option() {}
 
 void Option::Initialize() 
 {
-
-	cursorTextureHandle = TextureManager::Load("cursorImage.png");
-	assert(cursorTextureHandle);
+	menuTextureHandal_ = TextureManager::Load("cursorImage.png");
+	assert(menuTextureHandal_);
+	cursorTextureHandle_ = TextureManager::Load("cursorImage.png");
+	assert(cursorTextureHandle_);
 	
-	m_cursorSprite = Sprite::Create(
-	    cursorTextureHandle, {m_cursorPos.x, m_cursorPos.y}, 
-		{1.0f, 1.0f, 0.0f, 1.0f},{0.5f, 0.5f});
-	m_cursorSprite->SetSize({32.0f, 32.0f});
+	m_menuSprite = Sprite::Create(
+	    menuTextureHandal_, {0, 0}, 
+		{1.0f, 1.0f, 1.0f, 1.0f},{0.5f, 0.5f});
+	m_menuSprite->SetSize({32.0f, 32.0f});
 
+	m_cursorSprite_ = Sprite::Create(
+	    cursorTextureHandle_, {m_cursorPos.x, m_cursorPos.y}, {1.0f, 1.0f, 0.0f, 1.0f},
+	    {0.5f, 0.5f});
+	m_cursorSprite_->SetSize({32.0f, 32.0f});
 
 }
 
@@ -47,7 +53,7 @@ void Option::Update() {
 	CursorUpdate();
 
 	// ビューポート
-	m_cursorSprite->SetPosition({m_cursorPos.x, m_cursorPos.y});
+	m_cursorSprite_->SetPosition({m_cursorPos.x, m_cursorPos.y});
 
 
 	/*ImGui::Begin("Action");
@@ -68,7 +74,12 @@ void Option::Update() {
 
 void Option::Draw() 
 {
-	m_cursorSprite->Draw();
+	if (isMenuOverlay_) {
+		m_menuSprite->Draw();
+	}
+
+	m_cursorSprite_->Draw();
+
 }
 
 bool Option::GetActionTrigger(ActCode act) {
@@ -1668,7 +1679,7 @@ void Option::CursorUpdate() {
 		m_cursorPos.y = 710;
 	}
 
-	m_cursorSprite->SetPosition({m_cursorPos.x, m_cursorPos.y});
+	m_cursorSprite_->SetPosition({m_cursorPos.x, m_cursorPos.y});
 
 
 }

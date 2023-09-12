@@ -24,6 +24,16 @@ void TitleScene::Initialize() {
 	collisionManager_ = CollisionManager::GetInstance();
 	transition_ = TransitionEffect::GetInstance();
 
+	// ワールドトランスフォームの初期化
+	for (int i = 0; i < 2; i++) {
+		worldTransform_[i].Initialize();
+	}
+	worldTransform_[0].rotation_ = {45.0f, 0.0f, 0.0f};
+	worldTransform_[0].translation_ = {40.0f, 0.0f, 0.0f};
+
+	worldTransform_[1].rotation_ = {0.0f, 0.0f, 0.0f};
+	worldTransform_[1].translation_ = {-40.0f, 0.0f, 0.0f};
+
 	// ビュープロジェクション初期化
 	viewProjection_.Initialize();
 	viewProjection_.farZ = 2000.0f;
@@ -42,6 +52,11 @@ void TitleScene::Initialize() {
 	ground_->Initialize(groundModel_.get());
 	crossEffectModel_.reset(Model::CreateFromOBJ("crosseffect", true));
 
+	// モデル
+	pawnModel_.reset(Model::CreateFromOBJ("pawnTest", true));
+	kingModel_.reset(Model::CreateFromOBJ("king", true));
+
+	// 画像
 	redTex_ = TextureManager::Load("player/red.png");
 	greenTex_ = TextureManager::Load("player/green.png");
 	blueTex_ = TextureManager::Load("player/blue.png");
@@ -49,6 +64,9 @@ void TitleScene::Initialize() {
 	whiteTex_ = TextureManager::Load("player/player.png");
 	blackTex_ = TextureManager::Load("enemy/enemy.png");
 	titleTex_ = TextureManager::Load("UI/title.png");
+	titleBackTex_ = TextureManager::Load("UI/titleBack.png");
+	titleFrontTex_ = TextureManager::Load("UI/titleFront.png");
+
 
 	debugSE_ = audio_->LoadWave("SE/debugmode.wav");
 
@@ -62,6 +80,26 @@ void TitleScene::Initialize() {
 	    {1280.0f, 720.0f});
 	titleSprite_->SetPosition({0.0f, 0.0f});
 
+	titleBackSprite_.reset(Sprite::Create(titleBackTex_, {0.0f, 0.0f}));
+	titleBackSprite_->SetSize({1280.0f, 720.0f});
+	titleBackSprite_->SetTextureRect(
+	    {
+	        0.0f,
+	        0.0f,
+	    },
+	    {2560.0f, 1440.0f});
+	titleBackSprite_->SetPosition({0.0f, 0.0f});
+
+	titleFrontSprite_.reset(Sprite::Create(titleFrontTex_, {0.0f, 0.0f}));
+	titleFrontSprite_->SetSize({1280.0f, 720.0f});
+	titleFrontSprite_->SetTextureRect(
+	    {
+	        0.0f,
+	        0.0f,
+	    },
+	    {2560.0f, 1440.0f});
+	titleFrontSprite_->SetPosition({0.0f, 0.0f});
+
 	// オプション 初期化
 	option->Initialize();
 }
@@ -72,6 +110,8 @@ void TitleScene::Initialize() {
 void TitleScene::Update() {
 
 	// XINPUT_STATE joyState;
+
+	
 
 	// シーンチェンジ中の処理
 	if (transition_->GetIsChangeScene()) {
@@ -107,6 +147,14 @@ void TitleScene::Update() {
 		}
 	}
 
+	// モデルの回転
+	worldTransform_[0].rotation_ += {0.0f, 0.05f, 0.0f};
+	worldTransform_[1].rotation_ += {0.0f, -0.08f, 0.0f};
+
+	// ワールドトランスフォーム更新
+	for (int i = 0; i < 2; i++) {
+		worldTransform_[i].UpdateMatrix();
+	}
 	// ビュープロジェクション更新
 	viewProjection_.UpdateMatrix();
 }
@@ -126,6 +174,8 @@ void TitleScene::Draw() {
 	/// ここに背景スプライトの描画処理を追加できる
 	/// </summary>
 
+	titleBackSprite_->Draw();
+
 	// スプライト描画後処理
 	Sprite::PostDraw();
 	// 深度バッファクリア
@@ -140,8 +190,11 @@ void TitleScene::Draw() {
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
 
-	skydome_->Draw(viewProjection_);
-	ground_->Draw(viewProjection_);
+	//skydome_->Draw(viewProjection_);
+	//ground_->Draw(viewProjection_);
+
+	pawnModel_->Draw(worldTransform_[0], viewProjection_);
+	kingModel_->Draw(worldTransform_[1], viewProjection_);
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
@@ -158,7 +211,8 @@ void TitleScene::Draw() {
 	option->Draw();
 
 	// タイトルの表示
-	titleSprite_->Draw();
+	//titleSprite_->Draw();
+	titleFrontSprite_->Draw();
 
 	// 画面遷移の描画
 	transition_->Draw();
