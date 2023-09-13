@@ -70,7 +70,8 @@ void GameScene::Initialize() {
 	enemyMoveMassTex_ = TextureManager::Load("ground/enemymovemass.png");
 	frameTex_ = TextureManager::Load("UI/frame.png");
 	nextTex_ = TextureManager::Load("UI/nextUI.png");
-	clearTex_ = TextureManager::Load("UI/clear.png");
+	gameClearTex_ = TextureManager::Load("UI/clear.png");
+	stageClearTex_ = TextureManager::Load("UI/stageClear.png");
 	gameoverTex_ = TextureManager::Load("UI/gameover.png");
 	petalTex_ = TextureManager::Load("UI/petal.png");
 	ctrKeyTex_ = TextureManager::Load("UI/ctrKey.png");
@@ -100,7 +101,6 @@ void GameScene::Initialize() {
 	    },
 	    {720.0f, 1280.0f});
 	ctrSprite_->SetPosition({1040.0f, 0.00f});
-	
 
 	ctrGameSprite_ = ctrKeyGameSprite_.get();
 	ctrGameSprite_->SetSize({240.0f, 240.0f});
@@ -139,15 +139,25 @@ void GameScene::Initialize() {
 	optionCloseSE_ = audio_->LoadWave("SE/optionclose.wav");
 	guardSE_ = audio_->LoadWave("SE/guard.wav");
 
-	clearSprite_.reset(Sprite::Create(clearTex_, {0.0f, 0.0f}));
-	clearSprite_->SetSize({1280.0f, 720.0f});
-	clearSprite_->SetTextureRect(
+	gameClearSprite_.reset(Sprite::Create(gameClearTex_, {0.0f, 0.0f}));
+	gameClearSprite_->SetSize({1280.0f, 720.0f});
+	gameClearSprite_->SetTextureRect(
 	    {
 	        0.0f,
 	        0.0f,
 	    },
 	    {1280.0f, 720.0f});
-	clearSprite_->SetPosition({0.0f, 0.0f});
+	gameClearSprite_->SetPosition({0.0f, 0.0f});
+
+	stageClearSprite_.reset(Sprite::Create(stageClearTex_, {0.0f, 0.0f}));
+	stageClearSprite_->SetSize({1280.0f, 720.0f});
+	stageClearSprite_->SetTextureRect(
+	    {
+	        0.0f,
+	        0.0f,
+	    },
+	    {1280.0f, 720.0f});
+	stageClearSprite_->SetPosition({0.0f, 0.0f});
 
 	gameoverSprite_.reset(Sprite::Create(gameoverTex_, {0.0f, 0.0f}));
 	gameoverSprite_->SetSize({1280.0f, 720.0f});
@@ -266,6 +276,8 @@ void GameScene::Initialize() {
 	// BGM
 	gameBGM_ = audio_->LoadWave("BGM/Battle1.wav");
 	bossBGM_ = audio_->LoadWave("BGM/Battle2.wav");
+
+	isGameClear_ = false;
 }
 
 void GameScene::Update() {
@@ -318,8 +330,7 @@ void GameScene::Update() {
 		    {720.0f, 1024.0f});
 		ctrGameSprite_->SetPosition({1090.0f, 450.0f});
 
-	} 
-	else {
+	} else {
 		ctrSprite_ = ctrKeySprite_.get();
 		ctrSprite_->SetSize({300.0f, 628.0f});
 		ctrSprite_->SetTextureRect(
@@ -353,7 +364,7 @@ void GameScene::Update() {
 		    transition_->GetFadeIn() && transition_->GetNextScene() == GAME && stageCount_ == 0) {
 			transition_->SetIsChangeScene(false);
 			transition_->Reset();
-		
+
 		} else if (transition_->GetFadeIn() && transition_->GetNextScene() == GAME) {
 			transition_->SetIsChangeScene(false);
 			transition_->Reset();
@@ -375,16 +386,14 @@ void GameScene::Update() {
 		}
 	} else {
 
-		
-		if (!audio_->IsPlaying(gameHandale_)){
+		if (!audio_->IsPlaying(gameHandale_)) {
 			if (stageCount_ < 2) {
 
 				gameHandale_ = audio_->PlayWave(gameBGM_, true, option->m_bgmVol * 0.8f);
 
 			} else if (stageCount_ == 2) {
-			
-				gameHandale_ = audio_->PlayWave(bossBGM_, true, option->m_bgmVol * 0.8f);
 
+				gameHandale_ = audio_->PlayWave(bossBGM_, true, option->m_bgmVol * 0.8f);
 			}
 		}
 
@@ -416,10 +425,13 @@ void GameScene::Update() {
 				return false;
 			});
 
-			if (isGameClear_ == false && isGameOver_ == false) {
+			if (isStageClear_ == false && isGameOver_ == false) {
 
 				if (CheckAllEnemyIsDead() && player_->GetIsPlayerTurn() == false) {
-					isGameClear_ = true;
+					isStageClear_ = true;
+					if (stageCount_ == 2) {
+						isGameClear_ = true;
+					}
 				} else if (player_->GetIsDead() && CheckAllEnemyTurn() == false) {
 					isGameOver_ = true;
 				}
@@ -432,10 +444,10 @@ void GameScene::Update() {
 				if ((input_->TriggerKey(DIK_RETURN) || option->GetActionTrigger(ACT))) {
 
 					audio_->PlayWave(guardSE_, false, option->m_seVol * 1.2f);
-					
+
 					transition_->SetIsChangeScene(true);
 					// 遷移先のシーンをゲームにする
-					if (isGameClear_ && stageCount_ < 2) {
+					if (isStageClear_ && stageCount_ < 2) {
 						transition_->SetNextScene(RESET);
 						stageCount_++;
 
@@ -524,7 +536,7 @@ void GameScene::Update() {
 		}
 
 		// ゲームクリア時の画面エフェクト
-		if (isGameClear_) {
+		if (isStageClear_) {
 			SetRandom();
 			for (uint32_t i = 0; i < 100; i++) {
 
@@ -543,6 +555,9 @@ void GameScene::Update() {
 				}
 			}
 		}
+		/*if (input_->PushKey(DIK_SPACE)) {
+			isStageClear_ = true;
+		}*/
 	}
 
 	option->Update();
@@ -654,8 +669,11 @@ void GameScene::Draw() {
 
 	optionSprite_->Draw();
 
-	if (isGameClear_) {
-		clearSprite_->Draw();
+	if (isStageClear_) {
+		stageClearSprite_->Draw();
+		if (isGameClear_){
+			gameClearSprite_->Draw();
+		}
 		for (uint32_t i = 0; i < 100; i++) {
 			if (isPetalDead[i]) {
 				petalSprite_[i]->Draw();
@@ -719,6 +737,7 @@ bool GameScene::CheckAllEnemyIsDead() {
 
 void GameScene::Reset() {
 
+	isStageClear_ = false;
 	isGameClear_ = false;
 	isGameOver_ = false;
 
@@ -1470,9 +1489,7 @@ void GameScene::PredictionActDraw() {
 					default:
 						break;
 					}
-
 				}
-				
 			}
 		}
 	}

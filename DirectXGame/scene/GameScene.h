@@ -128,7 +128,8 @@ private: // メンバ変数
 
 	// 画像
 	std::unique_ptr<Sprite> playerSprite_;
-	std::unique_ptr<Sprite> clearSprite_;
+	std::unique_ptr<Sprite> gameClearSprite_;
+	std::unique_ptr<Sprite> stageClearSprite_;
 	std::unique_ptr<Sprite> gameoverSprite_;
 	std::unique_ptr<Sprite> petalSprite_[100];
 
@@ -160,7 +161,8 @@ private: // メンバ変数
 	uint32_t playerSpecialAttackTex_ = 0u;
 	uint32_t enemySpecialAttackTex_ = 0u;
 	uint32_t optionTex_ = 0u;
-	uint32_t clearTex_ = 0u;
+	uint32_t gameClearTex_ = 0u;
+	uint32_t stageClearTex_ = 0u;
 	uint32_t gameoverTex_ = 0u;
 	uint32_t petalTex_ = 0u;
 	uint32_t AnextTex_ = 0u;
@@ -199,6 +201,7 @@ private: // メンバ変数
 
 	bool isChangeGameScene_ = false;
 
+	bool isStageClear_ = false;
 	bool isGameClear_ = false;
 
 	bool isGameOver_ = false;
