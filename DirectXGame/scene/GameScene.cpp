@@ -683,31 +683,30 @@ void GameScene::Reset() {
 		newEnemy = new Enemy();
 		newEnemy->Initialize(enemyModels, enemyTextures, enemySounds);
 		newEnemy->SetPlayer(player_.get());
-		newEnemy->SetGridPosition(1, 1);
-		newEnemy->SetLife(30);
+		newEnemy->SetGridPosition(4, 4);
+		newEnemy->SetLife(50);
+		enemies_.push_back(newEnemy);
+
+		player_->SetGridPosition(1, 1);
+
+		break;
+	case 1:
+
+		newEnemy = new Enemy();
+		newEnemy->Initialize(enemyModels, enemyTextures, enemySounds);
+		newEnemy->SetPlayer(player_.get());
+		newEnemy->SetGridPosition(4, 4);
+		newEnemy->SetLife(50);
 		enemies_.push_back(newEnemy);
 
 		newEnemy2 = new Enemy();
 		newEnemy2->Initialize(enemyModels, enemyTextures, enemySounds);
 		newEnemy2->SetPlayer(player_.get());
-		newEnemy2->SetGridPosition(2, 2);
+		newEnemy2->SetGridPosition(4, 2);
+		newEnemy2->SetLife(50);
 		enemies_.push_back(newEnemy2);
 
-		newEnemy3 = new Enemy();
-		newEnemy3->Initialize(enemyModels, enemyTextures, enemySounds);
-		newEnemy3->SetPlayer(player_.get());
-		newEnemy3->SetGridPosition(3, 3);
-		newEnemy3->SetLife(40);
-		enemies_.push_back(newEnemy3);
-
-		break;
-	case 1:
-
-		newEnemy2 = new Enemy();
-		newEnemy2->Initialize(enemyModels, enemyTextures, enemySounds);
-		newEnemy2->SetPlayer(player_.get());
-		newEnemy2->SetGridPosition(2, 4);
-		enemies_.push_back(newEnemy2);
+		player_->SetGridPosition(1, 3);
 
 		break;
 	case 2:
@@ -715,14 +714,26 @@ void GameScene::Reset() {
 		newEnemy = new Enemy();
 		newEnemy->Initialize(enemyModels, enemyTextures, enemySounds);
 		newEnemy->SetPlayer(player_.get());
-		newEnemy->SetGridPosition(3, 3);
+		newEnemy->SetGridPosition(4, 4);
+		newEnemy->SetLife(50);
 		enemies_.push_back(newEnemy);
 
 		newEnemy2 = new Enemy();
 		newEnemy2->Initialize(enemyModels, enemyTextures, enemySounds);
 		newEnemy2->SetPlayer(player_.get());
-		newEnemy2->SetGridPosition(5, 5);
+		newEnemy2->SetGridPosition(1, 1);
+		newEnemy2->SetLife(50);
 		enemies_.push_back(newEnemy2);
+
+		newEnemy3 = new Enemy();
+		newEnemy3->Initialize(enemyModels, enemyTextures, enemySounds);
+		newEnemy3->SetPlayer(player_.get());
+		newEnemy3->SetGridPosition(4, 1);
+		newEnemy3->SetLife(100);
+		newEnemy3->SetBossFlag();
+		enemies_.push_back(newEnemy3);
+
+		player_->SetGridPosition(1, 4);
 
 		break;
 	}
@@ -969,7 +980,7 @@ void GameScene::PredictionActDraw() {
 		}
 
 		// 現在選択しているコマンドの行動プレビュー表示
-		if (player_->moveCommands_.size() < kMaxCommand) {
+		if (player_->GetIsStart() && player_->moveCommands_.size() < kMaxCommand) {
 
 			Command selectCommand = player_->GetSelectCommand(player_->GetSelectNum());
 

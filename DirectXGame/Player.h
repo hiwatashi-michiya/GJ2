@@ -80,6 +80,8 @@ public:
 
 	void SetIsSelect(bool flag) { isSelect_ = flag; }
 
+	void SetGridPosition(int x, int z);
+
 	void Reset();
 
 	Vector3 GetPosition() { return worldTransform_.translation_; }

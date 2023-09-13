@@ -118,6 +118,11 @@ public:
 
 	bool GetIsStart() { return isStart_; }
 
+	void SetBossFlag() { 
+		isBoss_ = true;
+		currentTex_ = bossTex_;
+	}
+
 private:
 	// 入力
 	Input* input_ = nullptr;
@@ -229,6 +234,10 @@ private:
 	// 画像
 	std::vector<uint32_t> textures_;
 	uint32_t guardTex_ = 0u;
+	uint32_t bossTex_ = 0u;
+
+	//ボスかどうか
+	bool isBoss_ = false;
 
 	// SE
 	std::vector<uint32_t> sounds_;
