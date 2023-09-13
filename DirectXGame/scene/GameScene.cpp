@@ -97,6 +97,8 @@ void GameScene::Initialize() {
 	damageHandle_ = damageSE_;
 	moveSE_ = audio_->LoadWave("SE/move.wav");
 	moveHandle_ = moveSE_;
+	optionOpenSE_ = audio_->LoadWave("SE/optionopen.wav");
+	optionCloseSE_ = audio_->LoadWave("SE/optionclose.wav");
 
 	clearSprite_.reset(Sprite::Create(clearTex_, {0.0f, 0.0f}));
 	clearSprite_->SetSize({1280.0f, 720.0f});
@@ -309,6 +311,7 @@ void GameScene::Update() {
 
 			if (option->GetActionTrigger(MENU) || input_->TriggerKey(DIK_Q)) {
 				option->isMenuOverlay_ = false;
+				audio_->PlayWave(optionCloseSE_, false, option->m_seVol * 0.8f);
 			}
 				
 
@@ -318,6 +321,7 @@ void GameScene::Update() {
 
 			if (option->GetActionTrigger(MENU) || input_->TriggerKey(DIK_Q)) {
 				option->isMenuOverlay_ = true;
+				audio_->PlayWave(optionOpenSE_, false, option->m_seVol * 0.8f);
 			}
 
 			enemies_.remove_if([](Enemy* enemy) {

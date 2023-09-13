@@ -175,6 +175,8 @@ private: // メンバ変数
 	uint32_t damageHandle_ = 0u;
 	uint32_t moveSE_ = 0u;
 	uint32_t moveHandle_ = 0u;
+	uint32_t optionOpenSE_ = 0u;
+	uint32_t optionCloseSE_ = 0u;
 
 	// オプション
 	Option* option = Option::GetInstance();
