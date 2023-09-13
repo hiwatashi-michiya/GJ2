@@ -165,6 +165,7 @@ void Player::Initialize(
 	fallSE_ = audio_->LoadWave("SE/fall.wav");
 	specialSE = audio_->LoadWave("SE/special.wav");
 	specialMissSE_ = audio_->LoadWave("SE/specialmiss.wav");
+	pSpecialSE_ = audio_->LoadWave("SE/pSpecial.wav");
 
 	isEffect_ = false;
 	isMoveEffect_ = false;
@@ -816,6 +817,7 @@ void Player::Move(Command& command) {
 	case S_PlayerAttack:
 
 		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed()) {
+			audio_->PlayWave(pSpecialSE_, false, option_->m_seVol * 1.5f);
 			collisionManager_->SetAttackCross(GetGridX(), GetGridZ(), PlayerSpecialAttack);
 			collisionManager_->SetAttackCircle(GetGridX(), GetGridZ(), PlayerSpecialAttack);
 		}
