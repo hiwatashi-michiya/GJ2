@@ -79,6 +79,7 @@ void GameScene::Initialize() {
 	enemyAttackTex_ = TextureManager::Load("attack/enemyattack.png");
 	playerSpecialAttackTex_ = TextureManager::Load("attack/playerspecialattack.png");
 	enemySpecialAttackTex_ = TextureManager::Load("attack/enemyspecialattack.png");
+	optionTex_ = TextureManager::Load("UI/option.png");
 
 	// スプライト
 	ctrSprite_ = Sprite::Create(ctrKeyTex_, {0.0f, 0.0f});
@@ -116,6 +117,15 @@ void GameScene::Initialize() {
 	    },
 	    {1280.0f, 720.0f});
 	gameoverSprite_->SetPosition({0.0f, 0.0f});
+
+	optionSprite_.reset(Sprite::Create(optionTex_, {1040.0f, 0.0f}));
+	optionSprite_->SetSize({240.0f, 100.0f});
+	optionSprite_->SetTextureRect(
+	    {
+	        0.0f,
+	        0.0f,
+	    },
+	    {2560.0f, 1440.0f});
 
 	SetRandom();
 	for (uint32_t i = 0; i < 100; i++) {
@@ -561,6 +571,8 @@ void GameScene::Draw() {
 	if (isGameOver_) {
 		gameoverSprite_->Draw();
 	}
+
+	optionSprite_->Draw();
 
 	option->Draw();
 
