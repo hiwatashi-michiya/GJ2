@@ -137,6 +137,7 @@ void Player::Initialize(
 	fallSE_ = audio_->LoadWave("SE/fall.wav");
 
 	isEffect_ = false;
+	isMoveEffect_ = false;
 	moveEffect_.Initialize();
 	moveEffect_.Reset(60 / gameSpeed_->GetGameSpeed());
 	moveEffect_.SetStartPosition(worldTransform_.translation_);
@@ -414,7 +415,7 @@ void Player::Update(const ViewProjection& viewProjection) {
 			isFall_ = false;
 		}
 
-		if (isEffect_) {
+		if (isMoveEffect_) {
 			moveEffect_.Update();
 		}
 	}
@@ -516,8 +517,8 @@ void Player::Move(Command& command) {
 			SetGrid(tmpX, tmpZ);
 
 			// エフェクト配置
-			if (isEffect_ != 1) {
-				isEffect_ = true;
+			if (isMoveEffect_ != 1) {
+				isMoveEffect_ = true;
 				moveEffect_.SetEffect();
 			}
 		}
@@ -555,8 +556,8 @@ void Player::Move(Command& command) {
 			SetGrid(tmpX, tmpZ);
 
 			// エフェクト配置
-			if (isEffect_ != 1) {
-				isEffect_ = true;
+			if (isMoveEffect_ != 1) {
+				isMoveEffect_ = true;
 				moveEffect_.SetEffect();
 			}
 		}
@@ -597,8 +598,8 @@ void Player::Move(Command& command) {
 			SetGrid(tmpX, tmpZ);
 
 			// エフェクト配置
-			if (isEffect_ != 1) {
-				isEffect_ = true;
+			if (isMoveEffect_ != 1) {
+				isMoveEffect_ = true;
 				moveEffect_.SetEffect();
 			}
 		}
@@ -636,8 +637,8 @@ void Player::Move(Command& command) {
 			SetGrid(tmpX, tmpZ);
 
 			// エフェクト配置
-			if (isEffect_ != 1) {
-				isEffect_ = true;
+			if (isMoveEffect_ != 1) {
+				isMoveEffect_ = true;
 				moveEffect_.SetEffect();
 			}
 		}
@@ -787,8 +788,8 @@ void Player::Move(Command& command) {
 		interval_ = kMaxInterval;
 
 		// エフェクト配置
-		if (isEffect_) {
-			isEffect_ = false;
+		if (isMoveEffect_) {
+			isMoveEffect_ = false;
 			moveEffect_.Reset(60 / gameSpeed_->GetGameSpeed());
 			moveEffect_.SetStartPosition(worldTransform_.translation_);
 			moveEffect_.SetEffectType(Dust);
@@ -835,7 +836,7 @@ void Player::Draw(const ViewProjection& viewProjection) {
 		}
 	}
 
-	if (isEffect_) {
+	if (isMoveEffect_) {
 		moveEffect_.Draw(viewProjection);
 	}
 }
