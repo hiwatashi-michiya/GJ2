@@ -37,7 +37,7 @@ public:
 	/// <summary>
 	/// 更新
 	/// </summary>
-	void Update(const ViewProjection& viewProjection,Option* option);
+	void Update(const ViewProjection& viewProjection);
 
 	/// <summary>
 	/// 描画
@@ -232,6 +232,9 @@ private:
 	uint32_t findUITexture_;
 
 	float moveAngle_;
+
+	// オプション
+	Option* option_ = Option::GetInstance();
 
 	//スタート演出
 	bool isStart_ = false;

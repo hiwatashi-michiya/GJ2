@@ -9,6 +9,7 @@
 #include "TitleScene.h"
 #include "TransitionEffect.h"
 #include "WinApp.h"
+#include "Option.h"
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
@@ -164,6 +165,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// 各種解放
 	SafeDelete(titleScene);
 	SafeDelete(gameScene);
+
 	audio->Finalize();
 	// ImGui解放
 	imguiManager->Finalize();

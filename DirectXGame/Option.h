@@ -25,9 +25,13 @@ class Option final{
 private: 
 	
 	Option();
-	~Option();
+	
 
 public:
+
+	~Option();
+
+	enum TYPE { A, B };
 
 	// コピーや代入演算子を無効化
 	Option(const Option& option) = delete;
@@ -50,7 +54,12 @@ public:
 
 	bool GetMenuOverlay() { return isMenuOverlay_; };
 
+	void SetControllType(TYPE type);
+
 private:
+
+	// 入力
+	Input* input_ = nullptr;
 
 	// カーソル
 	WorldTransform m_cursorWorldTransform;
@@ -58,16 +67,25 @@ private:
 	Vector3 m_cursorVel = {6, 6, 0};
 	
 	// スプライト
-	Sprite* m_cursorSprite_ = nullptr;
-	Sprite* m_menuSprite = nullptr;
+	std::unique_ptr<Sprite> m_cursorSprite_ = nullptr;
+	std::unique_ptr<Sprite> m_menuSprite = nullptr;
+	std::unique_ptr<Sprite> m_leftSelectUI[2];
+	std::unique_ptr<Sprite> m_rightSelectUI[2];
+	std::unique_ptr<Sprite> m_volUI[2];
+
 	// 画像
 	uint32_t cursorTextureHandle_ = 0u;
 	uint32_t menuTextureHandal_ = 0u;
+	uint32_t leftUITex_ = 0u;
+	uint32_t rightUITex_ = 0u;
+	uint32_t numberUITex_ = 0u;
 
-
-	bool isMenuOverlay_;
+	bool leftSelect;
+	bool upSelect;
 
 public:
+
+	bool isMenuOverlay_;
 
 	// BGM
 	float m_bgmVol;

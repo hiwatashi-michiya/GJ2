@@ -27,20 +27,43 @@ Option::~Option() {}
 
 void Option::Initialize() 
 {
-	menuTextureHandal_ = TextureManager::Load("cursorImage.png");
-	assert(menuTextureHandal_);
-	cursorTextureHandle_ = TextureManager::Load("cursorImage.png");
-	assert(cursorTextureHandle_);
-	
-	m_menuSprite = Sprite::Create(
-	    menuTextureHandal_, {0, 0}, 
-		{1.0f, 1.0f, 1.0f, 1.0f},{0.5f, 0.5f});
-	m_menuSprite->SetSize({32.0f, 32.0f});
+	input_ = Input::GetInstance();
 
-	m_cursorSprite_ = Sprite::Create(
+	// 画像
+	menuTextureHandal_ = TextureManager::Load("UI/optionOverLay.png");
+	cursorTextureHandle_ = TextureManager::Load("cursorImage.png");
+	numberUITex_ = TextureManager::Load("UI/numberplateYelow.png");
+	leftUITex_ = TextureManager::Load("UI/LEFT.png");
+	rightUITex_ = TextureManager::Load("UI/RIGHT.png");
+
+	m_menuSprite.reset(Sprite::Create(
+	    menuTextureHandal_, {0, 0}, 
+		{1.0f, 1.0f, 1.0f, 1.0f},{0.0f, 0.0f}));
+	m_menuSprite->SetTextureRect({0.0f, 0.0f}, {2560.0f, 1440.0f});
+	m_menuSprite->SetSize({1280.0f, 720.0f});
+
+	m_cursorSprite_.reset(Sprite::Create(
 	    cursorTextureHandle_, {m_cursorPos.x, m_cursorPos.y}, {1.0f, 1.0f, 0.0f, 1.0f},
-	    {0.5f, 0.5f});
+	    {0.5f, 0.5f}));
 	m_cursorSprite_->SetSize({32.0f, 32.0f});
+
+	for (int i = 0; i < 2; i++) {
+
+		m_leftSelectUI[i].reset(Sprite::Create(leftUITex_, {100.0f, (i + 1) * 300.0f-110.0f}));
+		m_leftSelectUI[i]->Sprite::SetSize({128, 128});
+		m_leftSelectUI[i]->Sprite::SetTextureRect({0, 0}, {1024.0f, 1024.0f});
+
+		m_rightSelectUI[i].reset(Sprite::Create(rightUITex_, {420.0f, (i + 1) * 300.0f - 110.0f}));
+		m_rightSelectUI[i]->Sprite::SetSize({128, 128});
+		m_rightSelectUI[i]->Sprite::SetTextureRect({0, 0}, {1024.0f, 1024.0f});
+
+		m_volUI[i].reset(Sprite::Create(numberUITex_, {260.0f, (i + 1) * 300.0f - 110.0f}));
+		m_volUI[i]->Sprite::SetSize({128, 128});
+		m_volUI[i]->Sprite::SetTextureRect({0, 0}, {1024.0f, 1024.0f});
+	}
+
+	leftSelect = true;
+	upSelect = true;
 
 }
 
@@ -50,7 +73,142 @@ void Option::Update() {
 	Gamepad::Input();
 
 	// カーソルの更新処理
-	CursorUpdate();
+	//CursorUpdate();
+
+	if (isMenuOverlay_) {
+	
+		// 左上 ＜BGM Down＞
+		if (leftSelect && upSelect) {
+		
+			// 上方向への入力
+			if (input_->TriggerKey(DIK_W) || GetActionTrigger(U_SELECT)) {
+
+			}
+
+			// 下方向への入力
+			if (input_->TriggerKey(DIK_S) || GetActionTrigger(D_SELECT)) {
+				upSelect = false;
+			}
+
+			// 左方向への入力
+			if (input_->TriggerKey(DIK_A) || GetActionTrigger(L_SELECT)) {
+			
+			}
+
+			// 右方向への入力
+			if (input_->TriggerKey(DIK_D) || GetActionTrigger(R_SELECT)) {
+				leftSelect = false;
+			}
+
+			// 決定の入力
+			if (input_->TriggerKey(DIK_RETURN) || GetActionTrigger(ACT)) {
+			
+				if (m_bgmVol > 0.0f) {
+					m_bgmVol -= 0.1f;
+				}
+
+			}
+
+		}
+
+		// 右上 ＜BGM Up＞
+		if (!leftSelect && upSelect) {
+
+			// 上方向への入力
+			if (input_->TriggerKey(DIK_W) || GetActionTrigger(U_SELECT)) {
+			}
+
+			// 下方向への入力
+			if (input_->TriggerKey(DIK_S) || GetActionTrigger(D_SELECT)) {
+				upSelect = false;
+			}
+
+			// 左方向への入力
+			if (input_->TriggerKey(DIK_A) || GetActionTrigger(L_SELECT)) {
+				leftSelect = true;
+			}
+
+			// 右方向への入力
+			if (input_->TriggerKey(DIK_D) || GetActionTrigger(R_SELECT)) {
+			}
+
+			// 決定の入力
+			if (input_->TriggerKey(DIK_RETURN) || GetActionTrigger(ACT)) {
+
+				if (m_bgmVol < 1.0f) {
+					m_bgmVol += 0.1f;
+				}
+
+			}
+
+		}
+
+		// 左下 ＜SE Down＞
+		if (leftSelect && !upSelect) {
+
+			// 上方向への入力
+			if (input_->TriggerKey(DIK_W) || GetActionTrigger(U_SELECT)) {
+				upSelect = true;
+			}
+
+			// 下方向への入力
+			if (input_->TriggerKey(DIK_S) || GetActionTrigger(D_SELECT)) {
+
+			}
+
+			// 左方向への入力
+			if (input_->TriggerKey(DIK_A) || GetActionTrigger(L_SELECT)) {
+			}
+
+			// 右方向への入力
+			if (input_->TriggerKey(DIK_D) || GetActionTrigger(R_SELECT)) {
+				leftSelect = true;
+			}
+
+			// 決定の入力
+			if (input_->TriggerKey(DIK_RETURN) || GetActionTrigger(ACT)) {
+
+				if (m_seVol > 0.0f) {
+					m_seVol -= 0.1f;
+				}
+
+			}
+
+		}
+
+		// 右下 ＜SE Up＞
+		if (!leftSelect && !upSelect){
+
+			// 上方向への入力
+			if (input_->TriggerKey(DIK_W) || GetActionTrigger(U_SELECT)) {
+				upSelect = true;
+			}
+
+			// 下方向への入力
+			if (input_->TriggerKey(DIK_S) || GetActionTrigger(D_SELECT)) {
+			}
+
+			// 左方向への入力
+			if (input_->TriggerKey(DIK_A) || GetActionTrigger(L_SELECT)) {
+				leftSelect = true;
+			}
+
+			// 右方向への入力
+			if (input_->TriggerKey(DIK_D) || GetActionTrigger(R_SELECT)) {
+			}
+
+			// 決定の入力
+			if (input_->TriggerKey(DIK_RETURN) || GetActionTrigger(ACT)) {
+
+				if (m_seVol < 1.0f) {
+					m_seVol += 0.1f;
+				}
+
+			}
+
+		}
+
+	}
 
 	// ビューポート
 	m_cursorSprite_->SetPosition({m_cursorPos.x, m_cursorPos.y});
@@ -76,9 +234,131 @@ void Option::Draw()
 {
 	if (isMenuOverlay_) {
 		m_menuSprite->Draw();
+
+		// 左上 ＜BGM Down＞
+		if (leftSelect && upSelect) {
+			
+			m_leftSelectUI[0]->SetColor({
+			    1.0f,
+			    1.0f,
+			    1.0f,
+			    1.0f,
+			});
+			m_leftSelectUI[1]->SetColor({
+			    0.5f,
+			    0.5f,
+			    0.5f,
+			    0.5f,
+			});
+			m_rightSelectUI[0]->SetColor({
+			    0.5f,
+			    0.5f,
+			    0.5f,
+			    0.5f,
+			});
+			m_rightSelectUI[1]->SetColor({
+			    0.5f,
+			    0.5f,
+			    0.5f,
+			    0.5f,
+			});
+
+		}
+
+		// 右上 ＜BGM Up＞
+		if (!leftSelect && upSelect) {
+			m_leftSelectUI[0]->SetColor({
+			    0.5f,
+			    0.5f,
+			    0.5f,
+			    0.5f,
+			});
+			m_leftSelectUI[1]->SetColor({
+			    0.5f,
+			    0.5f,
+			    0.5f,
+			    0.5f,
+			});
+			m_rightSelectUI[0]->SetColor({
+			    1.0f,
+			    1.0f,
+			    1.0f,
+			    1.0f,
+			});
+			m_rightSelectUI[1]->SetColor({
+			    0.5f,
+			    0.5f,
+			    0.5f,
+			    0.5f,
+			});
+		}
+
+		// 左下 ＜SE Down＞
+		if (leftSelect && !upSelect) {
+			m_leftSelectUI[0]->SetColor({
+			    0.5f,
+			    0.5f,
+			    0.5f,
+			    0.5f,
+			});
+			m_leftSelectUI[1]->SetColor({
+			    1.0f,
+			    1.0f,
+			    1.0f,
+			    1.0f,
+			});
+			m_rightSelectUI[0]->SetColor({
+			    0.5f,
+			    0.5f,
+			    0.5f,
+			    0.5f,
+			});
+			m_rightSelectUI[1]->SetColor({
+			    0.5f,
+			    0.5f,
+			    0.5f,
+			    0.5f,
+			});
+		}
+
+		// 右下 ＜SE Up＞
+		if (!leftSelect && !upSelect) {
+			m_leftSelectUI[0]->SetColor({
+			    0.5f,
+			    0.5f,
+			    0.5f,
+			    0.5f,
+			});
+			m_leftSelectUI[1]->SetColor({
+			    0.5f,
+			    0.5f,
+			    0.5f,
+			    0.5f,
+			});
+			m_rightSelectUI[0]->SetColor({
+			    0.5f,
+			    0.5f,
+			    0.5f,
+			    0.5f,
+			});
+			m_rightSelectUI[1]->SetColor({
+			    1.0f,
+			    1.0f,
+			    1.0f,
+			    1.0f,
+			});
+		}
+
+		for (int i = 0; i < 2; i++) {
+
+			m_leftSelectUI[i]->Draw();
+			m_rightSelectUI[i]->Draw();
+			m_volUI[i]->Draw();
+
+		}
 	}
 
-	m_cursorSprite_->Draw();
+	//m_cursorSprite_->Draw();
 
 }
 
@@ -1687,3 +1967,25 @@ void Option::CursorUpdate() {
 Vector2 Option::GetCursorPos() { return Vector2(m_cursorPos.x,m_cursorPos.y); }
 
 Vector2 Option::GetCursorRad() { return Vector2{16, 16}; }
+
+void Option::SetControllType(TYPE type) {
+
+	switch (type) {
+	case Option::A:
+
+		m_InputButton[ActCode::ACT] = (int)Gamepad::Button::A;
+		m_InputButton[ActCode::CANCEL] = (int)Gamepad::Button::B;
+
+		break;
+	case Option::B:
+
+		m_InputButton[ActCode::ACT] = (int)Gamepad::Button::B;
+		m_InputButton[ActCode::CANCEL] = (int)Gamepad::Button::A;
+
+		break;
+	default:
+
+		break;
+	}
+
+}

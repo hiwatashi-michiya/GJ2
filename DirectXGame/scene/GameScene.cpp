@@ -73,10 +73,25 @@ void GameScene::Initialize() {
 	clearTex_ = TextureManager::Load("UI/clear.png");
 	gameoverTex_ = TextureManager::Load("UI/gameover.png");
 	petalTex_ = TextureManager::Load("UI/petal.png");
+	ctrKeyTex_ = TextureManager::Load("UI/ctrKey.png");
+	ctrPadTex_ = TextureManager::Load("UI/ctrPad.png");
+
+	// スプライト
+	ctrSprite_ = Sprite::Create(ctrKeyTex_, {0.0f, 0.0f});
+	ctrSprite_->SetSize({240.0f, 720.0f});
+	ctrSprite_->SetTextureRect(
+	    {
+	        0.0f,
+	        0.0f,
+	    },
+	    {720.0f, 1280.0f});
+	ctrSprite_->SetPosition({1040.0f, 0.00f});
 
 	// SE
 	damageSE_ = audio_->LoadWave("SE/damage.wav");
 	damageHandle_ = damageSE_;
+	moveSE_ = audio_->LoadWave("SE/move.wav");
+	moveHandle_ = moveSE_;
 
 	clearSprite_.reset(Sprite::Create(clearTex_, {0.0f, 0.0f}));
 	clearSprite_->SetSize({1280.0f, 720.0f});
@@ -125,7 +140,7 @@ void GameScene::Initialize() {
 	std::vector<uint32_t> playerTextures{playerTex_, redTex_,      greenTex_,    blueTex_,
 	                                     numberTex_, alphaRedTex_, numPlateTex_, frameTex_,
 	                                     nextTex_,   alphaBlueTex_};
-	std::vector<uint32_t> playerSounds{damageSE_, damageHandle_};
+	std::vector<uint32_t> playerSounds{damageSE_, damageHandle_, moveSE_, moveHandle_};
 
 	player_ = std::make_unique<Player>();
 	player_->Initialize(playerModels, playerTextures, playerSounds);
@@ -135,7 +150,7 @@ void GameScene::Initialize() {
 	    enemyModel_.get(), crossEffectModel_.get(), guardEffectModel_.get()};
 	std::vector<uint32_t> enemyTextures{enemyTex_,  redTex_,       greenTex_, blueTex_,
 	                                    numberTex_, alphaDarkTex_, frameTex_};
-	std::vector<uint32_t> enemySounds{damageSE_, damageHandle_};
+	std::vector<uint32_t> enemySounds{damageSE_, damageHandle_, moveSE_, moveHandle_};
 
 	// マスのワールドトランスフォーム初期化
 	for (int z = 0; z < kMaxGrid; z++) {
@@ -158,7 +173,6 @@ void GameScene::Initialize() {
 			worldTransformArrowMass_[z][x].translation_ =
 			    Vector3(-25.0f + x * 10.0f, 1.5f, 25.0f + z * -10.0f);
 			worldTransformArrowMass_[z][x].UpdateMatrix();
-
 		}
 	}
 
@@ -200,7 +214,7 @@ void GameScene::Initialize() {
 
 void GameScene::Update() {
 
-	// XINPUT_STATE joyState;
+	XINPUT_STATE joyState;
 
 #ifdef _DEBUG
 
@@ -229,24 +243,45 @@ void GameScene::Update() {
 
 #endif // _DEBUG
 
+	if (input_->GetJoystickState(0, joyState)) {
+		ctrSprite_ = Sprite::Create(ctrPadTex_, {860.0f, 45.0f});
+		ctrSprite_->SetSize({300.0f, 628.0f});
+		ctrSprite_->SetTextureRect(
+		    {
+		        0.0f,
+		        0.0f,
+		    },
+		    {720.0f, 1280.0f});
+	} else {
+		ctrSprite_ = Sprite::Create(ctrKeyTex_, {860.0f, 45.0f});
+		ctrSprite_->SetSize({300.0f, 628.0f});
+		ctrSprite_->SetTextureRect(
+		    {
+		        0.0f,
+		        0.0f,
+		    },
+		    {720.0f, 1280.0f});
+	}
+
 	if (transition_->GetIsChangeScene()) {
 
 		// ゲームシーンにフェードインする時、またはゲームシーンからフェードアウトする時更新
-		
+
 		if ((transition_->GetFadeIn() && transition_->GetNextScene() == TITLE) ||
 		    (transition_->GetFadeIn() && transition_->GetNextScene() == RESET) ||
 		    (transition_->GetFadeOut() && transition_->GetNextScene() == GAME)) {
 			transition_->Update();
 		}
 		// ゲームシーンからのフェードアウト終了でシーン遷移を止める
-		else if (transition_->GetFadeIn() && transition_->GetNextScene() == GAME && stageCount_ == 0) {
+		else if (
+		    transition_->GetFadeIn() && transition_->GetNextScene() == GAME && stageCount_ == 0) {
 			transition_->SetIsChangeScene(false);
 			transition_->Reset();
 			gameHandale_ = audio_->PlayWave(gameBGM_, true, option->m_bgmVol);
-		} 
-		else if (transition_->GetFadeIn() && transition_->GetNextScene() == GAME) {
+		} else if (transition_->GetFadeIn() && transition_->GetNextScene() == GAME) {
 			transition_->SetIsChangeScene(false);
 			transition_->Reset();
+			gameHandale_ = audio_->PlayWave(gameBGM_, true, option->m_bgmVol * 0.8f);
 		}
 		// ゲームシーンへのフェードインが完了したら
 		else {
@@ -255,104 +290,115 @@ void GameScene::Update() {
 		}
 	} else {
 
-		enemies_.remove_if([](Enemy* enemy) {
-			if (enemy->GetIsDead()) {
+		// オプション画面時の処理
+		if (option->GetMenuOverlay()) {
 
-				delete enemy;
-
-				return true;
+			if (option->GetActionTrigger(MENU) || input_->TriggerKey(DIK_Q)) {
+				option->isMenuOverlay_ = false;
 			}
+				
 
-			return false;
-		});
-
-		if (isGameClear_ == false && isGameOver_ == false) {
-
-			if (CheckAllEnemyIsDead() && player_->GetIsPlayerTurn() == false) {
-				isGameClear_ = true;
-			} else if (player_->GetIsDead() && CheckAllEnemyTurn() == false) {
-				isGameOver_ = true;
-			}
-
-			player_->Update(viewProjection_, option);
+			audio_->SetVolume(gameHandale_, option->m_bgmVol * 0.8f * 0.5f);
 
 		} else {
 
-			// シーンチェンジ
-			if ((input_->TriggerKey(DIK_RETURN) || option->GetActionTrigger(ACT))) {
+			if (option->GetActionTrigger(MENU) || input_->TriggerKey(DIK_Q)) {
+				option->isMenuOverlay_ = true;
+			}
 
-				transition_->SetIsChangeScene(true);
-				// 遷移先のシーンをゲームにする
-				if (isGameClear_ && stageCount_ < 2) {
-					transition_->SetNextScene(RESET);
-					stageCount_++;
+			enemies_.remove_if([](Enemy* enemy) {
+				if (enemy->GetIsDead()) {
+
+					delete enemy;
+
+					return true;
 				}
-				else {
-					transition_->SetNextScene(TITLE);
-					stageCount_ = 0;
-					if (audio_->IsPlaying(gameHandale_)) {
-						audio_->StopWave(gameHandale_);
+
+				return false;
+			});
+
+			if (isGameClear_ == false && isGameOver_ == false) {
+
+				if (CheckAllEnemyIsDead() && player_->GetIsPlayerTurn() == false) {
+					isGameClear_ = true;
+				} else if (player_->GetIsDead() && CheckAllEnemyTurn() == false) {
+					isGameOver_ = true;
+				}
+
+				player_->Update(viewProjection_);
+
+			} else {
+
+				// シーンチェンジ
+				if ((input_->TriggerKey(DIK_RETURN) || option->GetActionTrigger(ACT))) {
+
+					transition_->SetIsChangeScene(true);
+					// 遷移先のシーンをゲームにする
+					if (isGameClear_ && stageCount_ < 2) {
+						transition_->SetNextScene(RESET);
+						stageCount_++;
+					} else {
+						transition_->SetNextScene(TITLE);
+						stageCount_ = 0;
+						if (audio_->IsPlaying(gameHandale_)) {
+							audio_->StopWave(gameHandale_);
+						}
 					}
 				}
-
 			}
-		}
-
-		for (Enemy* enemy : enemies_) {
-			enemy->Update(viewProjection_, option);
-		}
-
-		// エフェクト配置
-		for (int z = 0; z < kMaxGrid; z++) {
-
-			for (int x = 0; x < kMaxGrid; x++) {
-
-				if (effectMass_[z][x].IsDead() == false) {
-					effectMass_[z][x].Update();
-				}
-			}
-		}
-
-		if (player_->GetIsPlayerTurn()) {
-			player_->MoveTurn();
-		} else if (CheckAllEnemyTurn()) {
 
 			for (Enemy* enemy : enemies_) {
+				enemy->Update(viewProjection_, option);
+			}
 
-				if (enemy->GetIsEnemyTurn() && enemy->GetIsEffect() == false) {
-					enemy->MoveTurn(viewProjection_);
-					break;
+			// エフェクト配置
+			for (int z = 0; z < kMaxGrid; z++) {
+
+				for (int x = 0; x < kMaxGrid; x++) {
+
+					if (effectMass_[z][x].IsDead() == false) {
+						effectMass_[z][x].Update();
+					}
 				}
 			}
 
-		}
-		// 全員のターンが終了したらコマンドを打てるようにする
-		else {
-
-			if (player_->GetIsSelect() == false) {
-				player_->SetIsSelect(true);
+			if (player_->GetIsPlayerTurn()) {
+				player_->MoveTurn();
+			} else if (CheckAllEnemyTurn()) {
 
 				for (Enemy* enemy : enemies_) {
-					enemy->SetIsSelect(true);
+
+					if (enemy->GetIsEnemyTurn() && enemy->GetIsEffect() == false) {
+						enemy->MoveTurn(viewProjection_);
+						break;
+					}
 				}
 			}
-		}
 
-		// エフェクト配置
-		for (int z = 0; z < kMaxGrid; z++) {
+			// 全員のターンが終了したらコマンドを打てるようにする
+			else {
 
-			for (int x = 0; x < kMaxGrid; x++) {
+				if (player_->GetIsSelect() == false) {
+					player_->SetIsSelect(true);
 
-				if (collisionManager_->GetAttackMass(x, z) != 0 && effectMass_[z][x].IsDead()) {
-					effectMass_[z][x].Reset(60 / gameSpeed_->GetGameSpeed());
-					effectMass_[z][x].SetEffectType(Up);
-					effectMass_[z][x].SetEffect();
+					for (Enemy* enemy : enemies_) {
+						enemy->SetIsSelect(true);
+					}
 				}
 			}
-		}
+			// エフェクト配置
+			for (int z = 0; z < kMaxGrid; z++) {
 
-		if ((input_->TriggerKey(DIK_SPACE))) {
-			isGameClear_ = true;
+				for (int x = 0; x < kMaxGrid; x++) {
+
+					if (collisionManager_->GetAttackMass(x, z) != 0 && effectMass_[z][x].IsDead()) {
+						effectMass_[z][x].Reset(60 / gameSpeed_->GetGameSpeed());
+						effectMass_[z][x].SetEffectType(Up);
+						effectMass_[z][x].SetEffect();
+					}
+				}
+			}
+			audio_->SetVolume(gameHandale_, option->m_bgmVol * 0.8f);
 		}
 
 		// ゲームクリア時の画面エフェクト
@@ -393,6 +439,7 @@ void GameScene::Update() {
 	if (isStageTransition_) {
 	    transition_->Update();
 	}*/
+
 }
 
 void GameScene::Draw() {
@@ -441,8 +488,7 @@ void GameScene::Draw() {
 			if (collisionManager_->GetAttackMass(x, z) == EnemyAttack ||
 			    collisionManager_->GetAttackMass(x, z) == EnemySpecialAttack) {
 
-				groundModel_->Draw(
-				    worldTransformMass_[z][x], viewProjection_, enemyAttackMassTex_);
+				groundModel_->Draw(worldTransformMass_[z][x], viewProjection_, enemyAttackMassTex_);
 			}
 
 			if (collisionManager_->GetAttackMass(x, z) != 0) {
@@ -497,6 +543,11 @@ void GameScene::Draw() {
 
 	option->Draw();
 
+	// オプション画面時の処理
+	if (option->GetMenuOverlay()) {
+		ctrSprite_->Draw();
+	}
+
 	// 画面遷移の描画
 	transition_->Draw();
 
@@ -549,9 +600,7 @@ void GameScene::Reset() {
 		for (int x = 0; x < kMaxGrid; x++) {
 
 			collisionManager_->RemoveCollision(x, z);
-
 		}
-
 	}
 
 	player_->Reset();
@@ -620,8 +669,6 @@ void GameScene::Reset() {
 		enemies_.push_back(newEnemy2);
 
 		break;
-		
-
 	}
 
 	// 演出上の初期位置
@@ -653,7 +700,7 @@ void GameScene::PredictionActDraw() {
 		int tmpGridX = player_->GetGridX();
 		int tmpGridZ = player_->GetGridZ();
 
-		//仮の当たり判定
+		// 仮の当たり判定
 		int32_t tmpCollisionMass[kMaxGrid][kMaxGrid]{};
 
 		tmpCollisionMass[tmpGridZ][tmpGridX] = 1;
@@ -671,7 +718,8 @@ void GameScene::PredictionActDraw() {
 					tmpCollisionMass[tmpGridZ][tmpGridX] = 0;
 					tmpGridX -= 1;
 					arrowLeftModel_->Draw(
-					    worldTransformArrowMass_[tmpGridZ][tmpGridX], viewProjection_, moveMassTex_);
+					    worldTransformArrowMass_[tmpGridZ][tmpGridX], viewProjection_,
+					    moveMassTex_);
 					tmpCollisionMass[tmpGridZ][tmpGridX] = 1;
 				}
 
@@ -682,7 +730,8 @@ void GameScene::PredictionActDraw() {
 					tmpCollisionMass[tmpGridZ][tmpGridX] = 0;
 					tmpGridX += 1;
 					arrowRightModel_->Draw(
-					    worldTransformArrowMass_[tmpGridZ][tmpGridX], viewProjection_, moveMassTex_);
+					    worldTransformArrowMass_[tmpGridZ][tmpGridX], viewProjection_,
+					    moveMassTex_);
 					tmpCollisionMass[tmpGridZ][tmpGridX] = 1;
 				}
 
@@ -693,7 +742,8 @@ void GameScene::PredictionActDraw() {
 					tmpCollisionMass[tmpGridZ][tmpGridX] = 0;
 					tmpGridZ -= 1;
 					arrowUpModel_->Draw(
-					    worldTransformArrowMass_[tmpGridZ][tmpGridX], viewProjection_, moveMassTex_);
+					    worldTransformArrowMass_[tmpGridZ][tmpGridX], viewProjection_,
+					    moveMassTex_);
 					tmpCollisionMass[tmpGridZ][tmpGridX] = 1;
 				}
 
@@ -704,7 +754,8 @@ void GameScene::PredictionActDraw() {
 					tmpCollisionMass[tmpGridZ][tmpGridX] = 0;
 					tmpGridZ += 1;
 					arrowDownModel_->Draw(
-					    worldTransformArrowMass_[tmpGridZ][tmpGridX], viewProjection_, moveMassTex_);
+					    worldTransformArrowMass_[tmpGridZ][tmpGridX], viewProjection_,
+					    moveMassTex_);
 					tmpCollisionMass[tmpGridZ][tmpGridX] = 1;
 				}
 
@@ -717,22 +768,26 @@ void GameScene::PredictionActDraw() {
 
 					if (tmpGridZ - i >= 0) {
 						groundModel_->Draw(
-						    worldTransformMass_[tmpGridZ - i][tmpGridX], viewProjection_, playerAttackMassTex_);
+						    worldTransformMass_[tmpGridZ - i][tmpGridX], viewProjection_,
+						    playerAttackMassTex_);
 					}
 
 					if (tmpGridZ + i < 6) {
 						groundModel_->Draw(
-						    worldTransformMass_[tmpGridZ + i][tmpGridX], viewProjection_, playerAttackMassTex_);
+						    worldTransformMass_[tmpGridZ + i][tmpGridX], viewProjection_,
+						    playerAttackMassTex_);
 					}
 
 					if (tmpGridX - i >= 0) {
 						groundModel_->Draw(
-						    worldTransformMass_[tmpGridZ][tmpGridX - i], viewProjection_, playerAttackMassTex_);
+						    worldTransformMass_[tmpGridZ][tmpGridX - i], viewProjection_,
+						    playerAttackMassTex_);
 					}
 
 					if (tmpGridX + i < 6) {
 						groundModel_->Draw(
-						    worldTransformMass_[tmpGridZ][tmpGridX + i], viewProjection_, playerAttackMassTex_);
+						    worldTransformMass_[tmpGridZ][tmpGridX + i], viewProjection_,
+						    playerAttackMassTex_);
 					}
 				}
 
@@ -857,7 +912,7 @@ void GameScene::PredictionActDraw() {
 			}
 		}
 
-		//現在選択しているコマンドの行動プレビュー表示
+		// 現在選択しているコマンドの行動プレビュー表示
 		if (player_->moveCommands_.size() < kMaxCommand) {
 
 			Command selectCommand = player_->GetSelectCommand(player_->GetSelectNum());
@@ -1061,7 +1116,6 @@ void GameScene::PredictionActDraw() {
 			default:
 				break;
 			}
-
 		}
 
 		for (Enemy* enemy : enemies_) {
@@ -1074,44 +1128,52 @@ void GameScene::PredictionActDraw() {
 				switch (command) {
 				case MoveLeft:
 
-					if (tmpEnemyGridX - 1 >= 0 && tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX - 1] == 0) {
+					if (tmpEnemyGridX - 1 >= 0 &&
+					    tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX - 1] == 0) {
 						tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX] = 0;
 						tmpEnemyGridX -= 1;
 						arrowLeftModel_->Draw(
-						    worldTransformArrowMass_[tmpEnemyGridZ][tmpEnemyGridX], viewProjection_, enemyMoveMassTex_);
+						    worldTransformArrowMass_[tmpEnemyGridZ][tmpEnemyGridX], viewProjection_,
+						    enemyMoveMassTex_);
 						tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX] = 1;
 					}
 
 					break;
 				case MoveRight:
 
-					if (tmpEnemyGridX + 1 < 6 && tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX + 1] == 0) {
+					if (tmpEnemyGridX + 1 < 6 &&
+					    tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX + 1] == 0) {
 						tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX] = 0;
 						tmpEnemyGridX += 1;
 						arrowRightModel_->Draw(
-						    worldTransformArrowMass_[tmpEnemyGridZ][tmpEnemyGridX], viewProjection_, enemyMoveMassTex_);
+						    worldTransformArrowMass_[tmpEnemyGridZ][tmpEnemyGridX], viewProjection_,
+						    enemyMoveMassTex_);
 						tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX] = 1;
 					}
 
 					break;
 				case MoveUp:
 
-					if (tmpEnemyGridZ - 1 >= 0 && tmpCollisionMass[tmpEnemyGridZ - 1][tmpEnemyGridX] == 0) {
+					if (tmpEnemyGridZ - 1 >= 0 &&
+					    tmpCollisionMass[tmpEnemyGridZ - 1][tmpEnemyGridX] == 0) {
 						tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX] = 0;
 						tmpEnemyGridZ -= 1;
 						arrowUpModel_->Draw(
-						    worldTransformArrowMass_[tmpEnemyGridZ][tmpEnemyGridX], viewProjection_, enemyMoveMassTex_);
+						    worldTransformArrowMass_[tmpEnemyGridZ][tmpEnemyGridX], viewProjection_,
+						    enemyMoveMassTex_);
 						tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX] = 1;
 					}
 
 					break;
 				case MoveDown:
 
-					if (tmpEnemyGridZ + 1 < 6 && tmpCollisionMass[tmpEnemyGridZ + 1][tmpEnemyGridX] == 0) {
+					if (tmpEnemyGridZ + 1 < 6 &&
+					    tmpCollisionMass[tmpEnemyGridZ + 1][tmpEnemyGridX] == 0) {
 						tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX] = 0;
 						tmpEnemyGridZ += 1;
 						arrowDownModel_->Draw(
-						    worldTransformArrowMass_[tmpEnemyGridZ][tmpEnemyGridX], viewProjection_, enemyMoveMassTex_);
+						    worldTransformArrowMass_[tmpEnemyGridZ][tmpEnemyGridX], viewProjection_,
+						    enemyMoveMassTex_);
 						tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX] = 1;
 					}
 
@@ -1124,26 +1186,26 @@ void GameScene::PredictionActDraw() {
 
 						if (tmpEnemyGridZ - i >= 0) {
 							groundModel_->Draw(
-							    worldTransformMass_[tmpEnemyGridZ - i][tmpEnemyGridX], viewProjection_,
-							    enemyAttackMassTex_);
+							    worldTransformMass_[tmpEnemyGridZ - i][tmpEnemyGridX],
+							    viewProjection_, enemyAttackMassTex_);
 						}
 
 						if (tmpEnemyGridZ + i < 6) {
 							groundModel_->Draw(
-							    worldTransformMass_[tmpEnemyGridZ + i][tmpEnemyGridX], viewProjection_,
-							    enemyAttackMassTex_);
+							    worldTransformMass_[tmpEnemyGridZ + i][tmpEnemyGridX],
+							    viewProjection_, enemyAttackMassTex_);
 						}
 
 						if (tmpEnemyGridX - i >= 0) {
 							groundModel_->Draw(
-							    worldTransformMass_[tmpEnemyGridZ][tmpEnemyGridX - i], viewProjection_,
-							    enemyAttackMassTex_);
+							    worldTransformMass_[tmpEnemyGridZ][tmpEnemyGridX - i],
+							    viewProjection_, enemyAttackMassTex_);
 						}
 
 						if (tmpEnemyGridX + i < 6) {
 							groundModel_->Draw(
-							    worldTransformMass_[tmpEnemyGridZ][tmpEnemyGridX + i], viewProjection_,
-							    enemyAttackMassTex_);
+							    worldTransformMass_[tmpEnemyGridZ][tmpEnemyGridX + i],
+							    viewProjection_, enemyAttackMassTex_);
 						}
 					}
 
@@ -1158,14 +1220,14 @@ void GameScene::PredictionActDraw() {
 
 						if (tmpEnemyGridX - 1 >= 0) {
 							groundModel_->Draw(
-							    worldTransformMass_[tmpEnemyGridZ - 1][tmpEnemyGridX - 1], viewProjection_,
-							    enemyAttackMassTex_);
+							    worldTransformMass_[tmpEnemyGridZ - 1][tmpEnemyGridX - 1],
+							    viewProjection_, enemyAttackMassTex_);
 						}
 
 						if (tmpEnemyGridX + 1 < 6) {
 							groundModel_->Draw(
-							    worldTransformMass_[tmpEnemyGridZ - 1][tmpEnemyGridX + 1], viewProjection_,
-							    enemyAttackMassTex_);
+							    worldTransformMass_[tmpEnemyGridZ - 1][tmpEnemyGridX + 1],
+							    viewProjection_, enemyAttackMassTex_);
 						}
 					}
 
@@ -1177,14 +1239,14 @@ void GameScene::PredictionActDraw() {
 
 						if (tmpEnemyGridX - 1 >= 0) {
 							groundModel_->Draw(
-							    worldTransformMass_[tmpEnemyGridZ + 1][tmpEnemyGridX - 1], viewProjection_,
-							    enemyAttackMassTex_);
+							    worldTransformMass_[tmpEnemyGridZ + 1][tmpEnemyGridX - 1],
+							    viewProjection_, enemyAttackMassTex_);
 						}
 
 						if (tmpEnemyGridX + 1 < 6) {
 							groundModel_->Draw(
-							    worldTransformMass_[tmpEnemyGridZ + 1][tmpEnemyGridX + 1], viewProjection_,
-							    enemyAttackMassTex_);
+							    worldTransformMass_[tmpEnemyGridZ + 1][tmpEnemyGridX + 1],
+							    viewProjection_, enemyAttackMassTex_);
 						}
 					}
 
@@ -1205,30 +1267,30 @@ void GameScene::PredictionActDraw() {
 					break;
 				case S_EnemyAttack:
 
-						for (int i = 1; i < 3; i++) {
+					for (int i = 1; i < 3; i++) {
 
 						if (tmpEnemyGridZ - i >= 0) {
 							groundModel_->Draw(
-							    worldTransformMass_[tmpEnemyGridZ - i][tmpEnemyGridX], viewProjection_,
-							    enemyAttackMassTex_);
+							    worldTransformMass_[tmpEnemyGridZ - i][tmpEnemyGridX],
+							    viewProjection_, enemyAttackMassTex_);
 						}
 
 						if (tmpEnemyGridZ + i < 6) {
 							groundModel_->Draw(
-							    worldTransformMass_[tmpEnemyGridZ + i][tmpEnemyGridX], viewProjection_,
-							    enemyAttackMassTex_);
+							    worldTransformMass_[tmpEnemyGridZ + i][tmpEnemyGridX],
+							    viewProjection_, enemyAttackMassTex_);
 						}
 
 						if (tmpEnemyGridX - i >= 0) {
 							groundModel_->Draw(
-							    worldTransformMass_[tmpEnemyGridZ][tmpEnemyGridX - i], viewProjection_,
-							    enemyAttackMassTex_);
+							    worldTransformMass_[tmpEnemyGridZ][tmpEnemyGridX - i],
+							    viewProjection_, enemyAttackMassTex_);
 						}
 
 						if (tmpEnemyGridX + i < 6) {
 							groundModel_->Draw(
-							    worldTransformMass_[tmpEnemyGridZ][tmpEnemyGridX + i], viewProjection_,
-							    enemyAttackMassTex_);
+							    worldTransformMass_[tmpEnemyGridZ][tmpEnemyGridX + i],
+							    viewProjection_, enemyAttackMassTex_);
 						}
 					}
 
@@ -1236,14 +1298,14 @@ void GameScene::PredictionActDraw() {
 
 						if (tmpEnemyGridX - 1 >= 0) {
 							groundModel_->Draw(
-							    worldTransformMass_[tmpEnemyGridZ - 1][tmpEnemyGridX - 1], viewProjection_,
-							    enemyAttackMassTex_);
+							    worldTransformMass_[tmpEnemyGridZ - 1][tmpEnemyGridX - 1],
+							    viewProjection_, enemyAttackMassTex_);
 						}
 
 						if (tmpEnemyGridX + 1 < 6) {
 							groundModel_->Draw(
-							    worldTransformMass_[tmpEnemyGridZ - 1][tmpEnemyGridX + 1], viewProjection_,
-							    enemyAttackMassTex_);
+							    worldTransformMass_[tmpEnemyGridZ - 1][tmpEnemyGridX + 1],
+							    viewProjection_, enemyAttackMassTex_);
 						}
 					}
 
@@ -1251,26 +1313,22 @@ void GameScene::PredictionActDraw() {
 
 						if (tmpEnemyGridX - 1 >= 0) {
 							groundModel_->Draw(
-							    worldTransformMass_[tmpEnemyGridZ + 1][tmpEnemyGridX - 1], viewProjection_,
-							    enemyAttackMassTex_);
+							    worldTransformMass_[tmpEnemyGridZ + 1][tmpEnemyGridX - 1],
+							    viewProjection_, enemyAttackMassTex_);
 						}
 
 						if (tmpEnemyGridX + 1 < 6) {
 							groundModel_->Draw(
-							    worldTransformMass_[tmpEnemyGridZ + 1][tmpEnemyGridX + 1], viewProjection_,
-							    enemyAttackMassTex_);
+							    worldTransformMass_[tmpEnemyGridZ + 1][tmpEnemyGridX + 1],
+							    viewProjection_, enemyAttackMassTex_);
 						}
 					}
 
 					break;
 				default:
 					break;
-
 				}
 			}
-
 		}
-
 	}
-
 }
