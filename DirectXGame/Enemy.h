@@ -98,6 +98,17 @@ public:
 
 	void Reset();
 
+	void SetLife(int setLife) {
+
+		if (setLife <= 0) {
+			setLife = 100;
+		}
+
+		maxLife_ = setLife;
+		life_ = maxLife_;
+
+	}
+
 	Vector3 GetPosition() { return worldTransform_.translation_; }
 
 	void SetWorldPosition(Vector3 position) { 
@@ -137,9 +148,9 @@ private:
 	Vector3 velocity_;
 
 	// 体力
-	const int kMaxLife = 100;
+	int maxLife_ = 100;
 
-	int life_ = kMaxLife;
+	int life_ = maxLife_;
 
 	// 攻撃が当たったかどうか
 	bool isHit_ = false;

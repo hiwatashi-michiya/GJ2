@@ -45,6 +45,10 @@ void GameScene::Initialize() {
 	groundModel_.reset(Model::CreateFromOBJ("ground", true));
 	ground_ = std::make_unique<Ground>();
 	ground_->Initialize(groundModel_.get());
+	arrowLeftModel_.reset(Model::CreateFromOBJ("arrowleft", true));
+	arrowRightModel_.reset(Model::CreateFromOBJ("arrowright", true));
+	arrowUpModel_.reset(Model::CreateFromOBJ("arrowup", true));
+	arrowDownModel_.reset(Model::CreateFromOBJ("arrowdown", true));
 
 	crossEffectModel_.reset(Model::CreateFromOBJ("crosseffect", true));
 	guardEffectModel_.reset(Model::CreateFromOBJ("guardEffect", true));
@@ -148,6 +152,13 @@ void GameScene::Initialize() {
 			worldTransformMass_[z][x].translation_ =
 			    Vector3(-25.0f + x * 10.0f, 1.0f, 25.0f + z * -10.0f);
 			worldTransformMass_[z][x].UpdateMatrix();
+
+			worldTransformArrowMass_[z][x].Initialize();
+			worldTransformArrowMass_[z][x].scale_ *= 5.0f;
+			worldTransformArrowMass_[z][x].translation_ =
+			    Vector3(-25.0f + x * 10.0f, 1.5f, 25.0f + z * -10.0f);
+			worldTransformArrowMass_[z][x].UpdateMatrix();
+
 		}
 	}
 
@@ -558,6 +569,7 @@ void GameScene::Reset() {
 
 	Enemy* newEnemy;
 	Enemy* newEnemy2;
+	Enemy* newEnemy3;
 
 	switch (stageCount_) {
 	default:
@@ -567,9 +579,21 @@ void GameScene::Reset() {
 		newEnemy->Initialize(enemyModels, enemyTextures, enemySounds);
 		newEnemy->SetPlayer(player_.get());
 		newEnemy->SetGridPosition(1, 1);
+		newEnemy->SetLife(30);
 		enemies_.push_back(newEnemy);
 
-		
+		newEnemy2 = new Enemy();
+		newEnemy2->Initialize(enemyModels, enemyTextures, enemySounds);
+		newEnemy2->SetPlayer(player_.get());
+		newEnemy2->SetGridPosition(2, 2);
+		enemies_.push_back(newEnemy2);
+
+		newEnemy3 = new Enemy();
+		newEnemy3->Initialize(enemyModels, enemyTextures, enemySounds);
+		newEnemy3->SetPlayer(player_.get());
+		newEnemy3->SetGridPosition(3, 3);
+		newEnemy3->SetLife(40);
+		enemies_.push_back(newEnemy3);
 
 		break;
 	case 1:
@@ -629,42 +653,59 @@ void GameScene::PredictionActDraw() {
 		int tmpGridX = player_->GetGridX();
 		int tmpGridZ = player_->GetGridZ();
 
+		//仮の当たり判定
+		int32_t tmpCollisionMass[kMaxGrid][kMaxGrid]{};
+
+		tmpCollisionMass[tmpGridZ][tmpGridX] = 1;
+
+		for (Enemy* enemy : enemies_) {
+			tmpCollisionMass[enemy->GetGridZ()][enemy->GetGridX()] = 1;
+		}
+
 		for (Command command : player_->moveCommands_) {
 
 			switch (command) {
 			case MoveLeft:
 
-				if (tmpGridX - 1 >= 0) {
+				if (tmpGridX - 1 >= 0 && tmpCollisionMass[tmpGridZ][tmpGridX - 1] == 0) {
+					tmpCollisionMass[tmpGridZ][tmpGridX] = 0;
 					tmpGridX -= 1;
-					groundModel_->Draw(
-					    worldTransformMass_[tmpGridZ][tmpGridX], viewProjection_, moveMassTex_);
+					arrowLeftModel_->Draw(
+					    worldTransformArrowMass_[tmpGridZ][tmpGridX], viewProjection_, moveMassTex_);
+					tmpCollisionMass[tmpGridZ][tmpGridX] = 1;
 				}
 
 				break;
 			case MoveRight:
 
-				if (tmpGridX + 1 < 6) {
+				if (tmpGridX + 1 < 6 && tmpCollisionMass[tmpGridZ][tmpGridX + 1] == 0) {
+					tmpCollisionMass[tmpGridZ][tmpGridX] = 0;
 					tmpGridX += 1;
-					groundModel_->Draw(
-					    worldTransformMass_[tmpGridZ][tmpGridX], viewProjection_, moveMassTex_);
+					arrowRightModel_->Draw(
+					    worldTransformArrowMass_[tmpGridZ][tmpGridX], viewProjection_, moveMassTex_);
+					tmpCollisionMass[tmpGridZ][tmpGridX] = 1;
 				}
 
 				break;
 			case MoveUp:
 
-				if (tmpGridZ - 1 >= 0) {
+				if (tmpGridZ - 1 >= 0 && tmpCollisionMass[tmpGridZ - 1][tmpGridX] == 0) {
+					tmpCollisionMass[tmpGridZ][tmpGridX] = 0;
 					tmpGridZ -= 1;
-					groundModel_->Draw(
-					    worldTransformMass_[tmpGridZ][tmpGridX], viewProjection_, moveMassTex_);
+					arrowUpModel_->Draw(
+					    worldTransformArrowMass_[tmpGridZ][tmpGridX], viewProjection_, moveMassTex_);
+					tmpCollisionMass[tmpGridZ][tmpGridX] = 1;
 				}
 
 				break;
 			case MoveDown:
 
-				if (tmpGridZ + 1 < 6) {
+				if (tmpGridZ + 1 < 6 && tmpCollisionMass[tmpGridZ + 1][tmpGridX] == 0) {
+					tmpCollisionMass[tmpGridZ][tmpGridX] = 0;
 					tmpGridZ += 1;
-					groundModel_->Draw(
-					    worldTransformMass_[tmpGridZ][tmpGridX], viewProjection_, moveMassTex_);
+					arrowDownModel_->Draw(
+					    worldTransformArrowMass_[tmpGridZ][tmpGridX], viewProjection_, moveMassTex_);
+					tmpCollisionMass[tmpGridZ][tmpGridX] = 1;
 				}
 
 				break;
@@ -818,45 +859,53 @@ void GameScene::PredictionActDraw() {
 
 		for (Enemy* enemy : enemies_) {
 
-			tmpGridX = enemy->GetGridX();
-			tmpGridZ = enemy->GetGridZ();
+			int tmpEnemyGridX = enemy->GetGridX();
+			int tmpEnemyGridZ = enemy->GetGridZ();
 
 			for (Command command : enemy->moveCommands_) {
 
 				switch (command) {
 				case MoveLeft:
 
-					if (tmpGridX - 1 >= 0) {
-						tmpGridX -= 1;
-						groundModel_->Draw(
-						    worldTransformMass_[tmpGridZ][tmpGridX], viewProjection_, enemyMoveMassTex_);
+					if (tmpEnemyGridX - 1 >= 0 && tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX - 1] == 0) {
+						tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX] = 0;
+						tmpEnemyGridX -= 1;
+						arrowLeftModel_->Draw(
+						    worldTransformArrowMass_[tmpEnemyGridZ][tmpEnemyGridX], viewProjection_, enemyMoveMassTex_);
+						tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX] = 1;
 					}
 
 					break;
 				case MoveRight:
 
-					if (tmpGridX + 1 < 6) {
-						tmpGridX += 1;
-						groundModel_->Draw(
-						    worldTransformMass_[tmpGridZ][tmpGridX], viewProjection_, enemyMoveMassTex_);
+					if (tmpEnemyGridX + 1 < 6 && tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX + 1] == 0) {
+						tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX] = 0;
+						tmpEnemyGridX += 1;
+						arrowRightModel_->Draw(
+						    worldTransformArrowMass_[tmpEnemyGridZ][tmpEnemyGridX], viewProjection_, enemyMoveMassTex_);
+						tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX] = 1;
 					}
 
 					break;
 				case MoveUp:
 
-					if (tmpGridZ - 1 >= 0) {
-						tmpGridZ -= 1;
-						groundModel_->Draw(
-						    worldTransformMass_[tmpGridZ][tmpGridX], viewProjection_, enemyMoveMassTex_);
+					if (tmpEnemyGridZ - 1 >= 0 && tmpCollisionMass[tmpEnemyGridZ - 1][tmpEnemyGridX] == 0) {
+						tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX] = 0;
+						tmpEnemyGridZ -= 1;
+						arrowUpModel_->Draw(
+						    worldTransformArrowMass_[tmpEnemyGridZ][tmpEnemyGridX], viewProjection_, enemyMoveMassTex_);
+						tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX] = 1;
 					}
 
 					break;
 				case MoveDown:
 
-					if (tmpGridZ + 1 < 6) {
-						tmpGridZ += 1;
-						groundModel_->Draw(
-						    worldTransformMass_[tmpGridZ][tmpGridX], viewProjection_, enemyMoveMassTex_);
+					if (tmpEnemyGridZ + 1 < 6 && tmpCollisionMass[tmpEnemyGridZ + 1][tmpEnemyGridX] == 0) {
+						tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX] = 0;
+						tmpEnemyGridZ += 1;
+						arrowDownModel_->Draw(
+						    worldTransformArrowMass_[tmpEnemyGridZ][tmpEnemyGridX], viewProjection_, enemyMoveMassTex_);
+						tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX] = 1;
 					}
 
 					break;
@@ -866,27 +915,27 @@ void GameScene::PredictionActDraw() {
 
 					for (int i = 1; i < 3; i++) {
 
-						if (tmpGridZ - i >= 0) {
+						if (tmpEnemyGridZ - i >= 0) {
 							groundModel_->Draw(
-							    worldTransformMass_[tmpGridZ - i][tmpGridX], viewProjection_,
+							    worldTransformMass_[tmpEnemyGridZ - i][tmpEnemyGridX], viewProjection_,
 							    enemyAttackMassTex_);
 						}
 
-						if (tmpGridZ + i < 6) {
+						if (tmpEnemyGridZ + i < 6) {
 							groundModel_->Draw(
-							    worldTransformMass_[tmpGridZ + i][tmpGridX], viewProjection_,
+							    worldTransformMass_[tmpEnemyGridZ + i][tmpEnemyGridX], viewProjection_,
 							    enemyAttackMassTex_);
 						}
 
-						if (tmpGridX - i >= 0) {
+						if (tmpEnemyGridX - i >= 0) {
 							groundModel_->Draw(
-							    worldTransformMass_[tmpGridZ][tmpGridX - i], viewProjection_,
+							    worldTransformMass_[tmpEnemyGridZ][tmpEnemyGridX - i], viewProjection_,
 							    enemyAttackMassTex_);
 						}
 
-						if (tmpGridX + i < 6) {
+						if (tmpEnemyGridX + i < 6) {
 							groundModel_->Draw(
-							    worldTransformMass_[tmpGridZ][tmpGridX + i], viewProjection_,
+							    worldTransformMass_[tmpEnemyGridZ][tmpEnemyGridX + i], viewProjection_,
 							    enemyAttackMassTex_);
 						}
 					}
@@ -894,53 +943,53 @@ void GameScene::PredictionActDraw() {
 					break;
 				case AttackCircle:
 
-					if (tmpGridZ - 1 >= 0) {
+					if (tmpEnemyGridZ - 1 >= 0) {
 
 						groundModel_->Draw(
-						    worldTransformMass_[tmpGridZ - 1][tmpGridX], viewProjection_,
+						    worldTransformMass_[tmpEnemyGridZ - 1][tmpEnemyGridX], viewProjection_,
 						    enemyAttackMassTex_);
 
-						if (tmpGridX - 1 >= 0) {
+						if (tmpEnemyGridX - 1 >= 0) {
 							groundModel_->Draw(
-							    worldTransformMass_[tmpGridZ - 1][tmpGridX - 1], viewProjection_,
+							    worldTransformMass_[tmpEnemyGridZ - 1][tmpEnemyGridX - 1], viewProjection_,
 							    enemyAttackMassTex_);
 						}
 
-						if (tmpGridX + 1 < 6) {
+						if (tmpEnemyGridX + 1 < 6) {
 							groundModel_->Draw(
-							    worldTransformMass_[tmpGridZ - 1][tmpGridX + 1], viewProjection_,
+							    worldTransformMass_[tmpEnemyGridZ - 1][tmpEnemyGridX + 1], viewProjection_,
 							    enemyAttackMassTex_);
 						}
 					}
 
-					if (tmpGridZ + 1 < 6) {
+					if (tmpEnemyGridZ + 1 < 6) {
 
 						groundModel_->Draw(
-						    worldTransformMass_[tmpGridZ + 1][tmpGridX], viewProjection_,
+						    worldTransformMass_[tmpEnemyGridZ + 1][tmpEnemyGridX], viewProjection_,
 						    enemyAttackMassTex_);
 
-						if (tmpGridX - 1 >= 0) {
+						if (tmpEnemyGridX - 1 >= 0) {
 							groundModel_->Draw(
-							    worldTransformMass_[tmpGridZ + 1][tmpGridX - 1], viewProjection_,
+							    worldTransformMass_[tmpEnemyGridZ + 1][tmpEnemyGridX - 1], viewProjection_,
 							    enemyAttackMassTex_);
 						}
 
-						if (tmpGridX + 1 < 6) {
+						if (tmpEnemyGridX + 1 < 6) {
 							groundModel_->Draw(
-							    worldTransformMass_[tmpGridZ + 1][tmpGridX + 1], viewProjection_,
+							    worldTransformMass_[tmpEnemyGridZ + 1][tmpEnemyGridX + 1], viewProjection_,
 							    enemyAttackMassTex_);
 						}
 					}
 
-					if (tmpGridX - 1 >= 0) {
+					if (tmpEnemyGridX - 1 >= 0) {
 						groundModel_->Draw(
-						    worldTransformMass_[tmpGridZ][tmpGridX - 1], viewProjection_,
+						    worldTransformMass_[tmpEnemyGridZ][tmpEnemyGridX - 1], viewProjection_,
 						    enemyAttackMassTex_);
 					}
 
-					if (tmpGridX + 1 < 6) {
+					if (tmpEnemyGridX + 1 < 6) {
 						groundModel_->Draw(
-						    worldTransformMass_[tmpGridZ][tmpGridX + 1], viewProjection_,
+						    worldTransformMass_[tmpEnemyGridZ][tmpEnemyGridX + 1], viewProjection_,
 						    enemyAttackMassTex_);
 					}
 
@@ -951,57 +1000,57 @@ void GameScene::PredictionActDraw() {
 
 						for (int i = 1; i < 3; i++) {
 
-						if (tmpGridZ - i >= 0) {
+						if (tmpEnemyGridZ - i >= 0) {
 							groundModel_->Draw(
-							    worldTransformMass_[tmpGridZ - i][tmpGridX], viewProjection_,
+							    worldTransformMass_[tmpEnemyGridZ - i][tmpEnemyGridX], viewProjection_,
 							    enemyAttackMassTex_);
 						}
 
-						if (tmpGridZ + i < 6) {
+						if (tmpEnemyGridZ + i < 6) {
 							groundModel_->Draw(
-							    worldTransformMass_[tmpGridZ + i][tmpGridX], viewProjection_,
+							    worldTransformMass_[tmpEnemyGridZ + i][tmpEnemyGridX], viewProjection_,
 							    enemyAttackMassTex_);
 						}
 
-						if (tmpGridX - i >= 0) {
+						if (tmpEnemyGridX - i >= 0) {
 							groundModel_->Draw(
-							    worldTransformMass_[tmpGridZ][tmpGridX - i], viewProjection_,
+							    worldTransformMass_[tmpEnemyGridZ][tmpEnemyGridX - i], viewProjection_,
 							    enemyAttackMassTex_);
 						}
 
-						if (tmpGridX + i < 6) {
+						if (tmpEnemyGridX + i < 6) {
 							groundModel_->Draw(
-							    worldTransformMass_[tmpGridZ][tmpGridX + i], viewProjection_,
-							    enemyAttackMassTex_);
-						}
-					}
-
-					if (tmpGridZ - 1 >= 0) {
-
-						if (tmpGridX - 1 >= 0) {
-							groundModel_->Draw(
-							    worldTransformMass_[tmpGridZ - 1][tmpGridX - 1], viewProjection_,
-							    enemyAttackMassTex_);
-						}
-
-						if (tmpGridX + 1 < 6) {
-							groundModel_->Draw(
-							    worldTransformMass_[tmpGridZ - 1][tmpGridX + 1], viewProjection_,
+							    worldTransformMass_[tmpEnemyGridZ][tmpEnemyGridX + i], viewProjection_,
 							    enemyAttackMassTex_);
 						}
 					}
 
-					if (tmpGridZ + 1 < 6) {
+					if (tmpEnemyGridZ - 1 >= 0) {
 
-						if (tmpGridX - 1 >= 0) {
+						if (tmpEnemyGridX - 1 >= 0) {
 							groundModel_->Draw(
-							    worldTransformMass_[tmpGridZ + 1][tmpGridX - 1], viewProjection_,
+							    worldTransformMass_[tmpEnemyGridZ - 1][tmpEnemyGridX - 1], viewProjection_,
 							    enemyAttackMassTex_);
 						}
 
-						if (tmpGridX + 1 < 6) {
+						if (tmpEnemyGridX + 1 < 6) {
 							groundModel_->Draw(
-							    worldTransformMass_[tmpGridZ + 1][tmpGridX + 1], viewProjection_,
+							    worldTransformMass_[tmpEnemyGridZ - 1][tmpEnemyGridX + 1], viewProjection_,
+							    enemyAttackMassTex_);
+						}
+					}
+
+					if (tmpEnemyGridZ + 1 < 6) {
+
+						if (tmpEnemyGridX - 1 >= 0) {
+							groundModel_->Draw(
+							    worldTransformMass_[tmpEnemyGridZ + 1][tmpEnemyGridX - 1], viewProjection_,
+							    enemyAttackMassTex_);
+						}
+
+						if (tmpEnemyGridX + 1 < 6) {
+							groundModel_->Draw(
+							    worldTransformMass_[tmpEnemyGridZ + 1][tmpEnemyGridX + 1], viewProjection_,
 							    enemyAttackMassTex_);
 						}
 					}

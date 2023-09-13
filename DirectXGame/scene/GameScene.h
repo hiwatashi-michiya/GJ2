@@ -86,6 +86,7 @@ private: // メンバ変数
 
 	//マスのワールドトランスフォーム
 	WorldTransform worldTransformMass_[kMaxGrid][kMaxGrid];
+	WorldTransform worldTransformArrowMass_[kMaxGrid][kMaxGrid];
 	//エフェクト表示
 	Effect effectMass_[kMaxGrid][kMaxGrid];
 
@@ -120,6 +121,10 @@ private: // メンバ変数
 	std::unique_ptr<Model> skydomeModel_ = nullptr;
 	// 地面モデル
 	std::unique_ptr<Model> groundModel_ = nullptr;
+	std::unique_ptr<Model> arrowLeftModel_ = nullptr;
+	std::unique_ptr<Model> arrowRightModel_ = nullptr;
+	std::unique_ptr<Model> arrowUpModel_ = nullptr;
+	std::unique_ptr<Model> arrowDownModel_ = nullptr;
 
 	// 画像
 	std::unique_ptr<Sprite> playerSprite_;

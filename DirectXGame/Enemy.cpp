@@ -155,7 +155,7 @@ void Enemy::Update(const ViewProjection& viewProjection, Option* option) {
 		}
 
 		// 体力半分以下で行動変化
-		if (life_ <= (kMaxLife / 2) && isFormChange_ == false) {
+		if (life_ <= (maxLife_ / 2) && isFormChange_ == false) {
 			// 半分以下で確定行動
 			movePattern_ = E_Special;
 			isFormChange_ = true;
