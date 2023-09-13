@@ -23,6 +23,14 @@ void Enemy::Initialize(
 
 	currentTex_ = textures_[0];
 
+	hpFrameSprite_.reset(Sprite::Create(textures_[2], {-100.0f, 0.0f}));
+	hpFrameSprite_->SetTextureRect(
+	    {
+	        0.0f,
+	        0.0f,
+	    },
+	    {32.0f, 32.0f});
+
 	for (int i = 0; i < kMaxEnemyCommand; i++) {
 		commandNumSprite_[i].reset(Sprite::Create(textures_[4], {0.0f, 0.0f}));
 		commandNumSprite_[i]->SetSize({32.0f, 32.0f});
@@ -486,6 +494,8 @@ void Enemy::DrawUI() {
 		commandNumSprite_[i]->Draw();
 	}
 
+	hpFrameSprite_->Draw();
+
 	/*for (int i = 0; i < selectCommands_.size(); i++) {
 		selectCommandNumSprite_[i]->Draw();
 	}
@@ -566,6 +576,9 @@ void Enemy::SetCommandSprite(const ViewProjection& viewProjection) {
 
 		}
 		
+		hpFrameSprite_->SetSize({(128.0f * (float(life_) /maxLife_)), 16.0f});
+		hpFrameSprite_->SetPosition(Vector2(positionReticle.x - 16.0f, positionReticle.y - 32.0f));
+
 	}
 
 }

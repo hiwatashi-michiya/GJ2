@@ -217,6 +217,8 @@ private:
 
 	std::unique_ptr<Sprite> currentNumSprite_;
 
+	std::unique_ptr<Sprite> hpFrameSprite_;
+
 	//スプライトの位置をセット
 	void SetCommandSprite(const ViewProjection& viewProjection);
 

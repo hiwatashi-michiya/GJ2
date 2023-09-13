@@ -33,7 +33,7 @@ void Player::Initialize(
 	        0.0f,
 	        0.0f,
 	    },
-	    {1024.0f, 1024.0f});
+	    {32.0f, 32.0f});
 
 	nextUISprite_.reset(Sprite::Create(textures_[8], {0.0f, 0.0f}));
 	nextUISprite_->SetSize({128.0f, 64.0f});
