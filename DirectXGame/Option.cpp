@@ -36,32 +36,32 @@ void Option::Initialize() {
 	rightUITex_ = TextureManager::Load("UI/RIGHT.png");
 
 	m_menuSprite.reset(
-	    Sprite::Create(menuTextureHandal_, {0, 0}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}));
-	m_menuSprite->SetTextureRect({0.0f, 0.0f}, {2560.0f, 1440.0f});
-	m_menuSprite->SetSize({1280.0f, 720.0f});
+		Sprite::Create(menuTextureHandal_, { 0, 0 }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f }));
+	m_menuSprite->SetTextureRect({ 0.0f, 0.0f }, { 2560.0f, 1440.0f });
+	m_menuSprite->SetSize({ 1280.0f, 720.0f });
 
 	m_cursorSprite_.reset(Sprite::Create(
-	    cursorTextureHandle_, {m_cursorPos.x, m_cursorPos.y}, {1.0f, 1.0f, 0.0f, 1.0f},
-	    {0.5f, 0.5f}));
-	m_cursorSprite_->SetSize({32.0f, 32.0f});
+		cursorTextureHandle_, { m_cursorPos.x, m_cursorPos.y }, { 1.0f, 1.0f, 0.0f, 1.0f },
+		{ 0.5f, 0.5f }));
+	m_cursorSprite_->SetSize({ 32.0f, 32.0f });
 
 	for (int i = 0; i < 2; i++) {
 
-		m_leftSelectUI[i].reset(Sprite::Create(leftUITex_, {100.0f, (i + 1) * 300.0f - 110.0f}));
-		m_leftSelectUI[i]->Sprite::SetSize({128, 128});
-		m_leftSelectUI[i]->Sprite::SetTextureRect({0, 0}, {1024.0f, 1024.0f});
+		m_leftSelectUI[i].reset(Sprite::Create(leftUITex_, { 100.0f, (i + 1) * 300.0f - 110.0f }));
+		m_leftSelectUI[i]->Sprite::SetSize({ 128, 128 });
+		m_leftSelectUI[i]->Sprite::SetTextureRect({ 0, 0 }, { 1024.0f, 1024.0f });
 
-		m_rightSelectUI[i].reset(Sprite::Create(rightUITex_, {420.0f, (i + 1) * 300.0f - 110.0f}));
-		m_rightSelectUI[i]->Sprite::SetSize({128, 128});
-		m_rightSelectUI[i]->Sprite::SetTextureRect({0, 0}, {1024.0f, 1024.0f});
+		m_rightSelectUI[i].reset(Sprite::Create(rightUITex_, { 420.0f, (i + 1) * 300.0f - 110.0f }));
+		m_rightSelectUI[i]->Sprite::SetSize({ 128, 128 });
+		m_rightSelectUI[i]->Sprite::SetTextureRect({ 0, 0 }, { 1024.0f, 1024.0f });
 
-		m_volUI[i].reset(Sprite::Create(numberUITex_, {260.0f, (i + 1) * 300.0f - 110.0f}));
-		m_volUI[i]->Sprite::SetSize({128, 128});
+		m_volUI[i].reset(Sprite::Create(numberUITex_, { 260.0f, (i + 1) * 300.0f - 110.0f }));
+		m_volUI[i]->Sprite::SetSize({ 128, 128 });
 	}
 	m_volUI[0]->Sprite::SetTextureRect(
-	    {m_bgmVol * 10240.0f - 1024.0f, 0.0f}, {m_bgmVol * 10240.0f + 1024.0f, 1024.0f});
+		{ m_bgmVol * 10240.0f, 0.0f }, { 1024.0f, 1024.0f });
 	m_volUI[1]->Sprite::SetTextureRect(
-	    {m_seVol * 10240.0f - 1024.0f, 0.0f}, {m_seVol * 10240.0f + 1024.0f, 1024.0f});
+		{ m_seVol * 10240.0f, 0.0f }, { 1024.0f, 1024.0f });
 
 	leftSelect = true;
 	upSelect = true;
@@ -103,6 +103,9 @@ void Option::Update() {
 
 				if (m_bgmVol > 0.0f) {
 					m_bgmVol -= 0.1f;
+					if (0.0f > m_bgmVol) {
+						m_bgmVol = 0.0f;
+					}
 				}
 			}
 		}
@@ -131,7 +134,7 @@ void Option::Update() {
 			// 決定の入力
 			if (input_->TriggerKey(DIK_RETURN) || GetActionTrigger(ACT)) {
 
-				if (m_bgmVol < 0.9f) {
+				if (m_bgmVol < 1.0f) {
 					m_bgmVol += 0.1f;
 				}
 			}
@@ -191,11 +194,12 @@ void Option::Update() {
 			// 決定の入力
 			if (input_->TriggerKey(DIK_RETURN) || GetActionTrigger(ACT)) {
 
-				if (m_seVol < 0.9f) {
+				if (m_seVol < 1.0f) {
 					m_seVol += 0.1f;
 				}
 			}
 		}
+
 	}
 
 	m_volUI[0]->Sprite::SetTextureRect(
