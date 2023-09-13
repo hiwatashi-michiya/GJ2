@@ -94,6 +94,8 @@ private: // メンバ変数
 	uint32_t titleBackTex_ = 0u;
 	uint32_t titleFrontTex_ = 0u;
 
+	// BGM 
+	uint32_t titleBGM_ = 0u;
 
 	//SE
 	uint32_t debugSE_ = 0u;
@@ -105,7 +107,7 @@ private: // メンバ変数
 
 	// オプション
 	Option* option = Option::GetInstance();
-
+	uint32_t titleHandle_ = 0u;
 	bool isChangeGameScene_ = false;
 
 };

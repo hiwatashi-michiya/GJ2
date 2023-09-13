@@ -37,7 +37,7 @@ public:
 	/// <summary>
 	/// 更新
 	/// </summary>
-	void Update(const ViewProjection& viewProjection,Option* option);
+	void Update(const ViewProjection& viewProjection);
 
 	/// <summary>
 	/// 描画
@@ -91,6 +91,8 @@ public:
 
 	bool GetIsStart() { return isStart_; }
 
+	int GetSelectNum() { return selectNum_; }
+
 	Command GetCurrentMoveCommands() { return currentMoveCommand_; }
 
 private:
@@ -116,6 +118,10 @@ private:
 
 	//エフェクトのワールドトランスフォーム
 	WorldTransform worldTransformEffect_[8];
+
+	//エフェクト
+	Effect guardEffect_;
+	Effect crashEffect_;
 
 	//速度
 	Vector3 velocity_;
@@ -165,7 +171,7 @@ private:
 	bool isAttack_ = false;
 
 	//ガードしたかどうか
-	bool isGuard_ = false;
+	int guardCount_ = 0;
 
 	//特殊攻撃発動までのカウント
 	const int kMaxSpecialCount = 10;
@@ -179,6 +185,9 @@ private:
 	const int kMaxInterval = 10;
 
 	int interval_ = 0;
+
+	//エフェクト中かどうか
+	bool isEffect_ = false;
 
 	//スプライト
 	std::unique_ptr<Sprite> commandNumSprite_[kMaxCommand];
@@ -215,6 +224,13 @@ private:
 	uint32_t selectSE_ = 0u;
 	uint32_t cancelSE_ = 0u;
 	uint32_t fallSE_ = 0u;
+	uint32_t guardSE_ = 0u;
+	uint32_t circleAttackSE_ = 0u;
+
+	// 非音声再生かどうか判断するやつ
+	uint32_t guardHandle = 0u;
+	uint32_t crossHandle = 0u;
+	uint32_t circleHandle = 0u;
 
 	//現在セットしている画像
 	uint32_t currentTex_ = 0u;
@@ -225,6 +241,9 @@ private:
 	uint32_t findUITexture_;
 
 	float moveAngle_;
+
+	// オプション
+	Option* option_ = Option::GetInstance();
 
 	//スタート演出
 	bool isStart_ = false;

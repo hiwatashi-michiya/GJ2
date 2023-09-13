@@ -23,6 +23,14 @@ void Enemy::Initialize(
 
 	currentTex_ = textures_[0];
 
+	hpFrameSprite_.reset(Sprite::Create(textures_[2], {-100.0f, 0.0f}));
+	hpFrameSprite_->SetTextureRect(
+	    {
+	        0.0f,
+	        0.0f,
+	    },
+	    {32.0f, 32.0f});
+
 	for (int i = 0; i < kMaxEnemyCommand; i++) {
 		commandNumSprite_[i].reset(Sprite::Create(textures_[4], {0.0f, 0.0f}));
 		commandNumSprite_[i]->SetSize({32.0f, 32.0f});
@@ -71,6 +79,16 @@ void Enemy::Initialize(
 
 	effect_.Initialize();
 	effect_.SetEffectType(Crash);
+	effect_.SetTexture(0, textures_[0]);
+	effect_.SetTexture(1, textures_[0]);
+	effect_.SetTexture(2, textures_[0]);
+
+	guardEffect_.Initialize();
+	guardEffect_.SetEffectType(Crash);
+	guardEffect_.SetStartPosition(worldTransform_.translation_);
+	guardEffect_.SetTexture(0, guardTex_);
+	guardEffect_.SetTexture(1, guardTex_);
+	guardEffect_.SetTexture(2, guardTex_);
 
 }
 
@@ -122,9 +140,16 @@ void Enemy::Update(const ViewProjection& viewProjection, Option* option) {
 			if (collisionManager_->IsHitAttack(GetGridX(), GetGridZ(), PlayerAttack)) {
 
 				// ガード状態なら半減し、その後ガードを解除する
-				if (isGuard_) {
+				if (guardCount_ > 0) {
 					life_ -= 5;
-					isGuard_ = false;
+					guardCount_ -= 1;
+
+					if (guardCount_ == 0) {
+						guardEffect_.Reset(60 / gameSpeed_->GetGameSpeed());
+						guardEffect_.SetStartPosition(worldTransform_.translation_);
+						guardEffect_.SetEffect();
+					}
+
 				} else {
 					life_ -= 10;
 				}
@@ -136,9 +161,16 @@ void Enemy::Update(const ViewProjection& viewProjection, Option* option) {
 			               GetGridX(), GetGridZ(), PlayerSpecialAttack)) {
 
 				// ガード状態なら半減し、その後ガードを解除する
-				if (isGuard_) {
+				if (guardCount_ > 0) {
 					life_ -= 10;
-					isGuard_ = false;
+					guardCount_ -= 1;
+
+					if (guardCount_ == 0) {
+						guardEffect_.Reset(60 / gameSpeed_->GetGameSpeed());
+						guardEffect_.SetStartPosition(worldTransform_.translation_);
+						guardEffect_.SetEffect();
+					}
+
 				} else {
 					life_ -= 20;
 				}
@@ -163,6 +195,7 @@ void Enemy::Update(const ViewProjection& viewProjection, Option* option) {
 
 		// 体力が0以下で死亡。エフェクト開始
 		if (life_ <= 0) {
+			life_ = 0;
 			collisionManager_->RemoveCollision(GetGridX(), GetGridZ());
 			effect_.Reset(60 / gameSpeed_->GetGameSpeed());
 			effect_.SetStartPosition(worldTransform_.translation_);
@@ -198,6 +231,10 @@ void Enemy::Update(const ViewProjection& viewProjection, Option* option) {
 			isDead_ = true;
 		}
 
+	}
+
+	if (guardEffect_.IsDead() == false) {
+		guardEffect_.Update();
 	}
 
 	worldTransform_.UpdateMatrix();
@@ -360,8 +397,6 @@ void Enemy::Move(Command& command) {
 
 		velocity_ = {0.0f, 0.0f, 0.0f};
 
-		currentTex_ = textures_[3];
-
 		break;
 
 	case AttackCross:
@@ -371,8 +406,6 @@ void Enemy::Move(Command& command) {
 			collisionManager_->SetAttackCross(GetGridX(), GetGridZ(), EnemyAttack);
 
 		}
-
-		currentTex_ = textures_[0];
 
 		break;
 	case AttackCircle:
@@ -385,16 +418,12 @@ void Enemy::Move(Command& command) {
 
 		velocity_ = {0.0f, 0.0f, 0.0f};
 
-		currentTex_ = textures_[1];
-
 		break;
 	case Guard:
 
 		velocity_ = {0.0f, 0.0f, 0.0f};
 
-		isGuard_ = true;
-
-		currentTex_ = textures_[2];
+		guardCount_ = 2;
 
 		break;
 	case S_EnemyAttack:
@@ -428,7 +457,6 @@ void Enemy::Move(Command& command) {
 
 	if (--MoveTimer_ <= 0) {
 		velocity_.y = 0.0f;
-		currentTex_ = textures_[0];
 		collisionManager_->ResetAttack();
 		interval_ = kMaxInterval;
 		isMove_ = false;
@@ -443,11 +471,16 @@ void Enemy::Draw(const ViewProjection& viewProjection) {
 	else {
 		models_[0]->Draw(worldTransform_, viewProjection, currentTex_);
 
-		if (isGuard_) {
+		if (guardCount_ > 0) {
 			guardModel_->Draw(worldTransformGuard_, viewProjection, guardTex_);
 		}
 
 	}
+
+	if (guardEffect_.IsDead() == false) {
+		guardEffect_.Draw(viewProjection);
+	}
+
 }
 
 void Enemy::DrawUI() {
@@ -455,6 +488,8 @@ void Enemy::DrawUI() {
 	for (int i = 0; i < GetmoveCommands().size(); i++) {
 		commandNumSprite_[i]->Draw();
 	}
+
+	hpFrameSprite_->Draw();
 
 	/*for (int i = 0; i < selectCommands_.size(); i++) {
 		selectCommandNumSprite_[i]->Draw();
@@ -536,6 +571,9 @@ void Enemy::SetCommandSprite(const ViewProjection& viewProjection) {
 
 		}
 		
+		hpFrameSprite_->SetSize({(128.0f * (float(life_) /maxLife_)), 16.0f});
+		hpFrameSprite_->SetPosition(Vector2(positionReticle.x - 16.0f, positionReticle.y - 32.0f));
+
 	}
 
 }

@@ -33,7 +33,7 @@ void Player::Initialize(
 	        0.0f,
 	        0.0f,
 	    },
-	    {1024.0f, 1024.0f});
+	    {32.0f, 32.0f});
 
 	nextUISprite_.reset(Sprite::Create(textures_[8], {0.0f, 0.0f}));
 	nextUISprite_->SetSize({128.0f, 64.0f});
@@ -142,9 +142,26 @@ void Player::Initialize(
 	moveEffect_.SetStartPosition(worldTransform_.translation_);
 	moveEffect_.SetEffectType(Dust);
 	moveEffect_.SetEffect();
+	guardSE_ = audio_->LoadWave("SE/guard.wav");
+	circleAttackSE_ = audio_->LoadWave("SE/circleattack.wav");
+
+	crashEffect_.Initialize();
+	crashEffect_.SetEffectType(Crash);
+	crashEffect_.SetStartPosition(worldTransform_.translation_);
+	crashEffect_.SetTexture(0, textures_[0]);
+	crashEffect_.SetTexture(1, textures_[0]);
+	crashEffect_.SetTexture(2, textures_[0]);
+
+	guardEffect_.Initialize();
+	guardEffect_.SetEffectType(Crash);
+	guardEffect_.SetStartPosition(worldTransform_.translation_);
+	guardEffect_.SetTexture(0, guardTex_);
+	guardEffect_.SetTexture(1, guardTex_);
+	guardEffect_.SetTexture(2, guardTex_);
+
 }
 
-void Player::Update(const ViewProjection& viewProjection, Option* option) {
+void Player::Update(const ViewProjection& viewProjection) {
 
 #ifdef _DEBUG
 
@@ -188,36 +205,51 @@ void Player::Update(const ViewProjection& viewProjection, Option* option) {
 
 		worldTransform_.UpdateMatrix();
 
-	} else {
+	}
+	else if(isEffect_ == false) {
 
 		if (isHit_ == false) {
 
 			if (collisionManager_->IsHitAttack(GetGridX(), GetGridZ(), EnemyAttack)) {
 
-				// ガード状態なら半減し、その後ガードを解除する
-				if (isGuard_) {
+				// ガード状態なら半減し、その後ガードカウントを減らす
+				if (guardCount_ > 0) {
 					life_ -= 5;
-					isGuard_ = false;
+					guardCount_ -= 1;
+
+					if (guardCount_ == 0) {
+						guardEffect_.Reset(60 / gameSpeed_->GetGameSpeed());
+						guardEffect_.SetStartPosition(worldTransform_.translation_);
+						guardEffect_.SetEffect();
+					}
+
 				} else {
 					life_ -= 10;
 				}
 
-				audio_->PlayWave(sounds_[0], false, option->m_seVol);
-				isHit_ = true;
+			sounds_[1] = audio_->PlayWave(sounds_[0], false, option_->m_seVol);
+			isHit_ = true;
 
 			} else if (collisionManager_->IsHitAttack(GetGridX(), GetGridZ(), EnemySpecialAttack)) {
 
 				// ガード状態なら半減し、その後ガードを解除する
-				if (isGuard_) {
+				if (guardCount_ > 0) {
 					life_ -= 10;
-					isGuard_ = false;
+					guardCount_ -= 1;
+
+					if (guardCount_ == 0) {
+						guardEffect_.Reset(60 / gameSpeed_->GetGameSpeed());
+						guardEffect_.SetStartPosition(worldTransform_.translation_);
+						guardEffect_.SetEffect();
+					}
+
 				} else {
 					life_ -= 20;
 				}
 
-				audio_->PlayWave(sounds_[0], false, option->m_seVol);
-				isHit_ = true;
-			}
+			sounds_[1] = audio_->PlayWave(sounds_[0], false, option_->m_seVol);
+			isHit_ = true;
+		}
 
 		}
 		// アタックが終了したらヒットフラグを降ろす
@@ -230,7 +262,10 @@ void Player::Update(const ViewProjection& viewProjection, Option* option) {
 		if (life_ <= 0) {
 			life_ = 0;
 			collisionManager_->RemoveCollision(GetGridX(), GetGridZ());
-			isDead_ = true;
+			crashEffect_.Reset(60 / gameSpeed_->GetGameSpeed());
+			crashEffect_.SetStartPosition(worldTransform_.translation_);
+			crashEffect_.SetEffect();
+			isEffect_ = true;
 		}
 
 		// ポインターを行動カードと接触してる状態でXボタンを押すと効果を表示
@@ -238,17 +273,17 @@ void Player::Update(const ViewProjection& viewProjection, Option* option) {
 			Vector2 pos = selectCommandNumSprite_[i]->GetPosition();
 			Vector2 size = selectCommandNumSprite_[i]->GetSize();
 
-			if ((pos.x) <= (option->GetCursorPos().x + option->GetCursorRad().x) &&
-			    (pos.x + size.x) >= (option->GetCursorPos().x - option->GetCursorRad().x) &&
-			    (pos.y) <= (option->GetCursorPos().y + option->GetCursorRad().y) &&
-			    (pos.y + size.y) >= (option->GetCursorPos().y - option->GetCursorRad().y) &&
-			    option->GetActionLongPush(UI_SELECT)) {
-				if (findUI_[i]->GetSize().x)
-					isFindUI_[i] = true;
-			} else {
-				isFindUI_[i] = false;
-			}
+		if ((pos.x) <= (option_->GetCursorPos().x + option_->GetCursorRad().x) &&
+		    (pos.x + size.x) >= (option_->GetCursorPos().x - option_->GetCursorRad().x) &&
+		    (pos.y) <= (option_->GetCursorPos().y + option_->GetCursorRad().y) &&
+		    (pos.y + size.y) >= (option_->GetCursorPos().y - option_->GetCursorRad().y) &&
+		    option_->GetActionLongPush(UI_SELECT)) {
+			if (findUI_[i]->GetSize().x)
+				isFindUI_[i] = true;
+		} else {
+			isFindUI_[i] = false;
 		}
+	}
 
 		// XINPUT_STATE joyState;
 
@@ -259,42 +294,42 @@ void Player::Update(const ViewProjection& viewProjection, Option* option) {
 		// 行動選択
 		if (isSelect_) {
 
-			if ((input_->TriggerKey(DIK_UP) || option->GetActionTrigger(U_SELECT)) &&
-			    inputCoolTimer_ == 0) {
+		if ((input_->TriggerKey(DIK_UP) || option_->GetActionTrigger(U_SELECT)) &&
+		    inputCoolTimer_ == 0) {
 
 				if (selectNum_ > 0) {
 					selectNum_--;
 
-					// 移動時にSEを鳴らす
-					if (audio_->IsPlaying(selectSE_)) {
-						audio_->StopWave(selectSE_);
-					}
-					audio_->PlayWave(selectSE_, false, 0.4f * option->m_seVol);
+				// 移動時にSEを鳴らす
+				if (audio_->IsPlaying(selectSE_)) {
+					audio_->StopWave(selectSE_);
 				}
+				audio_->PlayWave(selectSE_, false, 0.4f * option_->m_seVol);
+			}
 
 				inputCoolTimer_ = kInputCoolTime;
 
 			}
 
-			else if (
-			    (input_->TriggerKey(DIK_DOWN) || option->GetActionTrigger(D_SELECT)) &&
-			    inputCoolTimer_ == 0) {
+		else if (
+		    (input_->TriggerKey(DIK_DOWN) || option_->GetActionTrigger(D_SELECT)) &&
+		    inputCoolTimer_ == 0) {
 
 				if (selectNum_ < selectCommands_.size() - 1) {
 					selectNum_++;
 
-					// 移動時にSEを鳴らす
-					if (audio_->IsPlaying(selectSE_)) {
-						audio_->StopWave(selectSE_);
-					}
-					audio_->PlayWave(selectSE_, false, 0.4f * option->m_seVol);
+				// 移動時にSEを鳴らす
+				if (audio_->IsPlaying(selectSE_)) {
+					audio_->StopWave(selectSE_);
 				}
+				audio_->PlayWave(selectSE_, false, 0.4f * option_->m_seVol);
+			}
 
 				inputCoolTimer_ = kInputCoolTime;
 			}
 
-			// スペシャルカウントが溜まっていたら特殊攻撃可能にする
-			if (specialCount_ >= kMaxSpecialCount && option->GetActionTrigger(SPECIAL)) {
+		// スペシャルカウントが溜まっていたら特殊攻撃可能にする
+		if (specialCount_ >= kMaxSpecialCount && option_->GetActionTrigger(SPECIAL)) {
 
 				// 攻撃、ガードコマンドリセット
 				for (int i = 0; i < kMaxCommand; i++) {
@@ -308,47 +343,47 @@ void Player::Update(const ViewProjection& viewProjection, Option* option) {
 
 				specialCount_ = 0;
 
-			} else if (
-			    (input_->TriggerKey(DIK_RETURN) || option->GetActionTrigger(ACT)) &&
-			    inputCoolTimer_ == 0 && moveCommands_.size() < kMaxCommand) {
+		} else if (
+		    (input_->TriggerKey(DIK_RETURN) || option_->GetActionTrigger(ACT)) &&
+		    inputCoolTimer_ == 0 && moveCommands_.size() < kMaxCommand) {
 
 				SetMoveCommand(selectNum_);
 				PopSelectCommand(selectNum_);
 
 				inputCoolTimer_ = kInputCoolTime;
 
-				// 行動選択時にSEを鳴らす
-				if (audio_->IsPlaying(clickSE_)) {
-					audio_->StopWave(clickSE_);
-				}
-				audio_->PlayWave(clickSE_, false, 1.0f * option->m_seVol);
-
-			} else if (
-			    (input_->TriggerKey(DIK_RETURN) || option->GetActionTrigger(ACT)) &&
-			    inputCoolTimer_ == 0) {
-				isSelect_ = false;
-				isPlayerTurn_ = true;
-				inputCoolTimer_ = kInputCoolTime;
-
-				// 行動選択時にSEを鳴らす
-				if (audio_->IsPlaying(clickSE_)) {
-					audio_->StopWave(clickSE_);
-				}
-				audio_->PlayWave(clickSE_, false, 1.0f * option->m_seVol);
+			// 行動選択時にSEを鳴らす
+			if (audio_->IsPlaying(clickSE_)) {
+				audio_->StopWave(clickSE_);
 			}
+			audio_->PlayWave(clickSE_, false, 1.0f * option_->m_seVol);
+		
+		} else if (
+		    (input_->TriggerKey(DIK_RETURN) || option_->GetActionTrigger(ACT)) &&
+		    inputCoolTimer_ == 0) {
+			isSelect_ = false;
+			isPlayerTurn_ = true;
+			inputCoolTimer_ = kInputCoolTime;
 
-			if ((input_->TriggerKey(DIK_BACKSPACE) || option->GetActionTrigger(CANCEL)) &&
-			    inputCoolTimer_ == 0 && moveCommands_.size() != 0) {
-				PushSelectCommand(moveCommands_.back());
-				PopBackMoveCommand();
-				inputCoolTimer_ = kInputCoolTime;
-
-				// 行動キャンセル時にSEを鳴らす
-				if (audio_->IsPlaying(cancelSE_)) {
-					audio_->StopWave(cancelSE_);
-				}
-				audio_->PlayWave(cancelSE_, false, 1.0f * option->m_seVol);
+			// 行動選択時にSEを鳴らす
+			if (audio_->IsPlaying(clickSE_)) {
+				audio_->StopWave(clickSE_);
 			}
+			audio_->PlayWave(clickSE_, false, 1.0f * option_->m_seVol);
+		}
+
+		if ((input_->TriggerKey(DIK_BACKSPACE) || option_->GetActionTrigger(CANCEL)) &&
+		    inputCoolTimer_ == 0 && moveCommands_.size() != 0) {
+			PushSelectCommand(moveCommands_.back());
+			PopBackMoveCommand();
+			inputCoolTimer_ = kInputCoolTime;
+
+			// 行動キャンセル時にSEを鳴らす
+			if (audio_->IsPlaying(cancelSE_)) {
+				audio_->StopWave(cancelSE_);
+			}
+			audio_->PlayWave(cancelSE_, false, 1.0f * option_->m_seVol);
+		}
 
 			if (selectNum_ >= selectCommands_.size()) {
 				selectNum_ = int(selectCommands_.size() - 1);
@@ -382,6 +417,20 @@ void Player::Update(const ViewProjection& viewProjection, Option* option) {
 		if (isEffect_) {
 			moveEffect_.Update();
 		}
+	}
+	}
+	else {
+
+		crashEffect_.Update();
+
+		if (crashEffect_.IsDead()) {
+			isDead_ = true;
+		}
+
+	}
+
+	if (guardEffect_.IsDead() == false) {
+		guardEffect_.Update();
 	}
 
 	UpdateMoveCommandsNum();
@@ -460,6 +509,9 @@ void Player::Move(Command& command) {
 				break;
 			}
 
+			// 移動が確認できたら音を再生
+			sounds_[3] = audio_->PlayWave(sounds_[2], false, option_->m_seVol * 3.5f);
+
 			collisionManager_->SetCollision(tmpX, tmpZ);
 			collisionManager_->RemoveCollision(GetGridX(), GetGridZ());
 			SetGrid(tmpX, tmpZ);
@@ -496,6 +548,9 @@ void Player::Move(Command& command) {
 				break;
 			}
 
+			// 移動が確認できたら音を再生
+			sounds_[3] = audio_->PlayWave(sounds_[2], false, option_->m_seVol * 3.5f);
+
 			collisionManager_->SetCollision(tmpX, tmpZ);
 			collisionManager_->RemoveCollision(GetGridX(), GetGridZ());
 			SetGrid(tmpX, tmpZ);
@@ -530,9 +585,13 @@ void Player::Move(Command& command) {
 
 			// 障害物があったらストップコマンドに移行
 			if (collisionManager_->IsHit(tmpX, tmpZ, 1)) {
+
 				command = Stop;
 				break;
 			}
+
+			// 移動が確認できたら音を再生
+			sounds_[3] = audio_->PlayWave(sounds_[2], false, option_->m_seVol * 3.5f);
 
 			collisionManager_->SetCollision(tmpX, tmpZ);
 			collisionManager_->RemoveCollision(GetGridX(), GetGridZ());
@@ -570,6 +629,9 @@ void Player::Move(Command& command) {
 				break;
 			}
 
+			// 移動が確認できたら音を再生
+			sounds_[3] = audio_->PlayWave(sounds_[2], false, option_->m_seVol * 3.5f);
+
 			collisionManager_->SetCollision(tmpX, tmpZ);
 			collisionManager_->RemoveCollision(GetGridX(), GetGridZ());
 			SetGrid(tmpX, tmpZ);
@@ -591,8 +653,6 @@ void Player::Move(Command& command) {
 
 		velocity_ = {0.0f, 0.0f, 0.0f};
 
-		currentTex_ = textures_[3];
-
 		break;
 
 	case AttackCross:
@@ -605,7 +665,7 @@ void Player::Move(Command& command) {
 
 			collisionManager_->SetAttackCross(GetGridX(), GetGridZ(), PlayerAttack);
 
-			audio_->PlayWave(crossAttackSE_);
+			audio_->PlayWave(crossAttackSE_, false, option_->m_seVol);
 		}
 
 		if (MoveTimer_ % 5 == 0) {
@@ -621,8 +681,6 @@ void Player::Move(Command& command) {
 			worldTransformEffect_[i].translation_ += velocity_;
 		}
 
-		currentTex_ = textures_[0];
-
 		break;
 	case AttackCircle:
 
@@ -633,6 +691,8 @@ void Player::Move(Command& command) {
 			}
 
 			collisionManager_->SetAttackCircle(GetGridX(), GetGridZ(), PlayerAttack);
+
+			audio_->PlayWave(circleAttackSE_, false, option_->m_seVol * 1.2f);
 		}
 
 		if (MoveTimer_ % 5 == 0) {
@@ -663,18 +723,17 @@ void Player::Move(Command& command) {
 			worldTransformEffect_[i].translation_ += velocity_;
 		}
 
-		currentTex_ = textures_[1];
-
 		break;
 	case Guard:
 
 		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed()) {
+			audio_->PlayWave(guardSE_, false, option_->m_seVol);
 
 			if (specialCount_ < kMaxSpecialCount) {
 				specialCount_++;
 			}
 
-			isGuard_ = true;
+			guardCount_ = 2;
 
 			for (int i = 0; i < 8; i++) {
 				worldTransformEffect_[i].translation_ = {
@@ -686,7 +745,9 @@ void Player::Move(Command& command) {
 			for (int i = 0; i < 8; i++) {
 				worldTransformEffect_[i].translation_.y = -3.0f;
 			}
+
 		}
+		
 
 		for (int i = 0; i < 5; i++) {
 			const float length = 4.0f;
@@ -703,7 +764,7 @@ void Player::Move(Command& command) {
 			moveAngle_ += 1.0f;
 		}
 
-		currentTex_ = textures_[2];
+		
 
 		break;
 	case S_PlayerAttack:
@@ -722,14 +783,6 @@ void Player::Move(Command& command) {
 	if (--MoveTimer_ <= 0) {
 		moveAngle_ = 0.0f;
 		velocity_ = {0.0f, 0.0f, 0.0f};
-
-		/*if (isGuard_) {
-		    currentTex_ = textures_[9];
-		} else {
-		    currentTex_ = textures_[0];
-		}*/
-		currentTex_ = textures_[0];
-
 		currentMoveCommand_ = Stop;
 		collisionManager_->ResetAttack();
 		interval_ = kMaxInterval;
@@ -750,10 +803,19 @@ void Player::Move(Command& command) {
 
 void Player::Draw(const ViewProjection& viewProjection) {
 
-	models_[0]->Draw(worldTransform_, viewProjection, currentTex_);
+	if (isEffect_) {
+		crashEffect_.Draw(viewProjection);
+	}
+	else {
+		models_[0]->Draw(worldTransform_, viewProjection, currentTex_);
+	}
 
-	if (isGuard_) {
+	if (guardCount_ > 0) {
 		guardModel_->Draw(worldTransformGuard_, viewProjection, guardTex_);
+	}
+
+	if (guardEffect_.IsDead() == false) {
+		guardEffect_.Draw(viewProjection);
 	}
 
 	if (isStart_) {
@@ -893,6 +955,7 @@ void Player::Reset() {
 	startCount_ = 60;
 	life_ = kMaxLife;
 
+	isEffect_ = false;
 	moveAngle_ = 0.0f;
 
 	MoveTimer_ = 0;
@@ -900,7 +963,7 @@ void Player::Reset() {
 	selectNum_ = 0;
 	isMove_ = false;
 	isAttack_ = false;
-	isGuard_ = false;
+	guardCount_ = 0;
 	isPlayerTurn_ = false;
 	currentMoveCommand_ = Stop;
 

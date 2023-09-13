@@ -29,6 +29,13 @@ void MoveCommand::PopSelectCommand(int32_t num) {
 	std::advance(itr, num);
 	selectCommands_.erase(itr);
 
+}
+
+Command MoveCommand::GetSelectCommand(int32_t num) {
+
+	auto itr = selectCommands_.begin();
+	std::advance(itr, num);
+	return *itr;
 
 }
 

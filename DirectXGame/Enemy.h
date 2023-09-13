@@ -132,6 +132,7 @@ private:
 
 	//エフェクト
 	Effect effect_;
+	Effect guardEffect_;
 
 	bool isEffect_ = false;
 
@@ -143,6 +144,8 @@ private:
 	// ワールドトランスフォーム
 	WorldTransform worldTransform_;
 	WorldTransform worldTransformGuard_;
+
+	
 
 	// 速度
 	Vector3 velocity_;
@@ -182,7 +185,7 @@ private:
 	bool isAttack_ = false;
 
 	// ガードしたかどうか
-	bool isGuard_ = false;
+	int guardCount_ = 0;
 
 	// 行動コマンド画像更新
 	void UpdateMoveCommandsNum();
@@ -213,6 +216,8 @@ private:
 	std::unique_ptr<Sprite> selectCommandNumSprite_[kMaxEnemySelectNum];
 
 	std::unique_ptr<Sprite> currentNumSprite_;
+
+	std::unique_ptr<Sprite> hpFrameSprite_;
 
 	//スプライトの位置をセット
 	void SetCommandSprite(const ViewProjection& viewProjection);

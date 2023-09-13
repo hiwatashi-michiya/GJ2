@@ -1,6 +1,8 @@
-﻿#include "Gamepad.h"
+#include "Gamepad.h"
 //#include "Novice.h"
+#ifdef _DEBUG
 #include"ImGuiManager.h"
+#endif // _DEBUG
 #include <limits.h>
 
 XINPUT_STATE Gamepad::state = { 0 };
@@ -88,6 +90,7 @@ void Gamepad::isVibration(const int& flag) {
 }
 
 void Gamepad::Draw() {
+#ifdef _DEBUG
 	ImGui::Begin("GamePad");
 	ImGui::Text("LeftX = %d", getStick(Stick::LEFT_X));
 	ImGui::Text("LeftY = %d", getStick(Stick::LEFT_Y));
@@ -110,4 +113,5 @@ void Gamepad::Draw() {
 	ImGui::Text("LEFT_TRIGER = %d", getTriger(Triger::LEFT));
 	ImGui::Text("RIGHT_TRIGER = %d", getTriger(Triger::RIGHT));
 	ImGui::End();
+#endif // _DEBUG
 }

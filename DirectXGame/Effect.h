@@ -42,15 +42,24 @@ public:
 
 	}
 
+	void SetTexture(int num, uint32_t texture) {
+		num = IntClamp(num, 0, 3);
+		effectTex_[num] = texture; 
+	}
+
 	void SetCurrentMoveCommands(Command command) { currentMoveCommand_ = command; }
 
 private:
 
 	std::unique_ptr<Model> effectModel_;
+	std::unique_ptr<Model> pillarModel_;
 
 	WorldTransform worldTransforms_[kMaxParticles];
 	Vector3 velocities_[kMaxParticles];
 	Vector3 startPosition_[kMaxParticles];
+
+	WorldTransform worldTransformPillar_;
+
 
 	//生存時間
 	int32_t lifeTimer_;
@@ -59,6 +68,7 @@ private:
 
 	EffectType effectType_ = Up;
 
+	uint32_t effectTex_[4];
 	uint32_t effectTex_[2];
 	uint32_t dustTex_;
 
