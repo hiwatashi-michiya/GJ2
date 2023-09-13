@@ -265,6 +265,7 @@ void GameScene::Initialize() {
 
 	// BGM
 	gameBGM_ = audio_->LoadWave("BGM/Battle1.wav");
+	bossBGM_ = audio_->LoadWave("BGM/Battle2.wav");
 }
 
 void GameScene::Update() {
@@ -352,11 +353,20 @@ void GameScene::Update() {
 		    transition_->GetFadeIn() && transition_->GetNextScene() == GAME && stageCount_ == 0) {
 			transition_->SetIsChangeScene(false);
 			transition_->Reset();
-			gameHandale_ = audio_->PlayWave(gameBGM_, true, option->m_bgmVol * 0.8f);
+		
 		} else if (transition_->GetFadeIn() && transition_->GetNextScene() == GAME) {
 			transition_->SetIsChangeScene(false);
 			transition_->Reset();
-			// gameHandale_ = audio_->PlayWave(gameBGM_, true, option->m_bgmVol * 0.8f);
+			if (!audio_->IsPlaying(gameHandale_)) {
+				if (stageCount_ < 2) {
+
+					gameHandale_ = audio_->PlayWave(gameBGM_, true, option->m_bgmVol * 0.8f);
+
+				} else if (stageCount_ == 2) {
+
+					gameHandale_ = audio_->PlayWave(bossBGM_, true, option->m_bgmVol * 0.8f);
+				}
+			}
 		}
 		// ゲームシーンへのフェードインが完了したら
 		else {
@@ -364,6 +374,19 @@ void GameScene::Update() {
 			transition_->ChangeScene();
 		}
 	} else {
+
+		
+		if (!audio_->IsPlaying(gameHandale_)){
+			if (stageCount_ < 2) {
+
+				gameHandale_ = audio_->PlayWave(gameBGM_, true, option->m_bgmVol * 0.8f);
+
+			} else if (stageCount_ == 2) {
+			
+				gameHandale_ = audio_->PlayWave(bossBGM_, true, option->m_bgmVol * 0.8f);
+
+			}
+		}
 
 		// オプション画面時の処理
 		if (option->GetMenuOverlay()) {
@@ -415,6 +438,11 @@ void GameScene::Update() {
 					if (isGameClear_ && stageCount_ < 2) {
 						transition_->SetNextScene(RESET);
 						stageCount_++;
+
+						if (stageCount_ == 2) {
+							audio_->StopWave(gameHandale_);
+						}
+
 					} else {
 						transition_->SetNextScene(TITLE);
 						stageCount_ = 0;

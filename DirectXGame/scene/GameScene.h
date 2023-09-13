@@ -179,6 +179,7 @@ private: // メンバ変数
 
 	// BGM
 	uint32_t gameBGM_ = 0u;
+	uint32_t bossBGM_ = 0u;
 	uint32_t gameHandale_ = 0u;
 
 	// SE
