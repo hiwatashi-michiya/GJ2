@@ -51,7 +51,6 @@ void Effect::Update() {
 			if (lifeTimer_ <= 20) {
 
 				worldTransformPillar_.scale_ -= {0.25f, 0.25f, 0.25f};
-
 			}
 
 			worldTransformPillar_.UpdateMatrix();
@@ -137,22 +136,17 @@ void Effect::Draw(const ViewProjection& viewProjection) {
 	if (isDead_ == false) {
 
 		for (int i = 0; i < kMaxParticles; i++) {
-
-			effectModel_->Draw(worldTransforms_[i], viewProjection, effectTex_[i % 2]);
-		}
-
-		if (effectType_ == Up) {
-			pillarModel_->Draw(worldTransformPillar_, viewProjection, effectTex_[3]);
-		}
-
-	}
-}
 			if (effectType_ == Dust) {
 				effectModel_->Draw(worldTransforms_[i], viewProjection, dustTex_);
 			} else {
 				effectModel_->Draw(worldTransforms_[i], viewProjection, effectTex_[i % 2]);
 			}
 		}
+
+		if (effectType_ == Up) {
+			pillarModel_->Draw(worldTransformPillar_, viewProjection, effectTex_[3]);
+		}
+		
 	}
 }
 

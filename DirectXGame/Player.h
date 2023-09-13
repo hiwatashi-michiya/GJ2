@@ -186,9 +186,6 @@ private:
 
 	int interval_ = 0;
 
-	//エフェクト中かどうか
-	bool isEffect_ = false;
-
 	//スプライト
 	std::unique_ptr<Sprite> commandNumSprite_[kMaxCommand];
 

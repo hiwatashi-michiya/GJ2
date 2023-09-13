@@ -418,7 +418,6 @@ void Player::Update(const ViewProjection& viewProjection) {
 			moveEffect_.Update();
 		}
 	}
-	}
 	else {
 
 		crashEffect_.Update();

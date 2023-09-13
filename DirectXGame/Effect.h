@@ -69,7 +69,6 @@ private:
 	EffectType effectType_ = Up;
 
 	uint32_t effectTex_[4];
-	uint32_t effectTex_[2];
 	uint32_t dustTex_;
 
 	// 現在の行動コマンド
