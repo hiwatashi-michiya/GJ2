@@ -245,6 +245,7 @@ private:
 	uint32_t guardSE_ = 0u;
 	uint32_t circleAttackSE_ = 0u;
 	uint32_t guardHandle_ = 0u;
+	uint32_t eSpecialSE = 0u;
 
 	// 現在セットしている画像
 	uint32_t currentTex_ = 0u;

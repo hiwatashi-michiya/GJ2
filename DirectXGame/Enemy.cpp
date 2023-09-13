@@ -21,6 +21,7 @@ void Enemy::Initialize(
 	crossAttackSE_ = audio_->LoadWave("SE/crossattack.wav");
 	guardSE_ = audio_->LoadWave("SE/guard.wav");
 	circleAttackSE_ = audio_->LoadWave("SE/circleattack.wav");
+	eSpecialSE = audio_->LoadWave("SE/eSpecial.wav");
 
 	guardModel_.reset(Model::CreateFromOBJ("guard", true));
 
@@ -486,17 +487,23 @@ void Enemy::Move(Command& command) {
 		//一回目
 		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed() && moveCommands_.size() == 2) {
 
+			audio_->PlayWave(crossAttackSE_, false, option_->m_seVol * 1.5f);
+
 			collisionManager_->SetAttackCross(GetGridX(), GetGridZ(), EnemyAttack);
 		}
 
 		//二回目
 		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed() && moveCommands_.size() == 1) {
 
+			audio_->PlayWave(circleAttackSE_, false, option_->m_seVol * 1.5f);
+
 			collisionManager_->SetAttackCircle(GetGridX(), GetGridZ(), EnemyAttack);
 		}
 
 		//三回目
 		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed() && moveCommands_.size() == 0) {
+
+			audio_->PlayWave(eSpecialSE, false, option_->m_seVol * 1.5f);
 
 			collisionManager_->SetAttackCross(GetGridX(), GetGridZ(), EnemySpecialAttack);
 			collisionManager_->SetAttackCircle(GetGridX(), GetGridZ(), EnemySpecialAttack);
