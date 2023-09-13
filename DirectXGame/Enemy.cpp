@@ -95,6 +95,12 @@ void Enemy::Initialize(
 	guardEffect_.SetTexture(1, guardTex_);
 	guardEffect_.SetTexture(2, guardTex_);
 
+	isMoveEffect_ = false;
+	moveEffect_.Initialize();
+	moveEffect_.Reset(60 / gameSpeed_->GetGameSpeed());
+	moveEffect_.SetStartPosition(worldTransform_.translation_);
+	moveEffect_.SetEffectType(Dust);
+	moveEffect_.SetEffect();
 }
 
 void Enemy::Update(const ViewProjection& viewProjection, Option* option) {
@@ -210,6 +216,10 @@ void Enemy::Update(const ViewProjection& viewProjection, Option* option) {
 
 		/*XINPUT_STATE joyState;*/
 
+		if (isMoveEffect_) {
+			moveEffect_.Update();
+		}
+
 		if (inputCoolTimer_ > 0) {
 			inputCoolTimer_--;
 		}
@@ -279,6 +289,7 @@ void Enemy::MoveTurn(const ViewProjection& viewProjection) {
 
 	// 行動フラグが立っていたら行動開始
 	if (isMove_) {
+		moveEffect_.SetCurrentMoveCommands(currentMoveCommand_);
 		Move(currentMoveCommand_);
 	} else {
 	}
@@ -315,6 +326,12 @@ void Enemy::Move(Command& command) {
 			collisionManager_->SetCollision(tmpX, tmpZ);
 			collisionManager_->RemoveCollision(GetGridX(), GetGridZ());
 			SetGrid(tmpX, tmpZ);
+
+			// エフェクト配置
+			if (isMoveEffect_ != 1) {
+				isMoveEffect_ = true;
+				moveEffect_.SetEffect();
+			}
 		}
 
 		velocity_ = {-1.0f / 6.0f * gameSpeed_->GetGameSpeed(), 0.0f, 0.0f};
@@ -344,6 +361,12 @@ void Enemy::Move(Command& command) {
 			collisionManager_->SetCollision(tmpX, tmpZ);
 			collisionManager_->RemoveCollision(GetGridX(), GetGridZ());
 			SetGrid(tmpX, tmpZ);
+
+			// エフェクト配置
+			if (isMoveEffect_ != 1) {
+				isMoveEffect_ = true;
+				moveEffect_.SetEffect();
+			}
 		}
 
 		velocity_ = {1.0f / 6.0f * gameSpeed_->GetGameSpeed(), 0.0f, 0.0f};
@@ -373,6 +396,12 @@ void Enemy::Move(Command& command) {
 			collisionManager_->SetCollision(tmpX, tmpZ);
 			collisionManager_->RemoveCollision(GetGridX(), GetGridZ());
 			SetGrid(tmpX, tmpZ);
+
+			// エフェクト配置
+			if (isMoveEffect_ != 1) {
+				isMoveEffect_ = true;
+				moveEffect_.SetEffect();
+			}
 		}
 
 		velocity_ = {0.0f, 0.0f, 1.0f / 6.0f * gameSpeed_->GetGameSpeed()};
@@ -402,6 +431,12 @@ void Enemy::Move(Command& command) {
 			collisionManager_->SetCollision(tmpX, tmpZ);
 			collisionManager_->RemoveCollision(GetGridX(), GetGridZ());
 			SetGrid(tmpX, tmpZ);
+
+			// エフェクト配置
+			if (isMoveEffect_ != 1) {
+				isMoveEffect_ = true;
+				moveEffect_.SetEffect();
+			}
 		}
 
 		velocity_ = {0.0f, 0.0f, -1.0f / 6.0f * gameSpeed_->GetGameSpeed()};
@@ -478,6 +513,16 @@ void Enemy::Move(Command& command) {
 		velocity_.y = 0.0f;
 		collisionManager_->ResetAttack();
 		interval_ = kMaxInterval;
+
+		// エフェクト配置
+		if (isMoveEffect_) {
+			isMoveEffect_ = false;
+			moveEffect_.Reset(60 / gameSpeed_->GetGameSpeed());
+			moveEffect_.SetStartPosition(worldTransform_.translation_);
+			moveEffect_.SetEffectType(Dust);
+			moveEffect_.SetEffect();
+		}
+
 		isMove_ = false;
 	}
 }
@@ -500,6 +545,9 @@ void Enemy::Draw(const ViewProjection& viewProjection) {
 		guardEffect_.Draw(viewProjection);
 	}
 
+	if (isMoveEffect_) {
+		moveEffect_.Draw(viewProjection);
+	}
 }
 
 void Enemy::DrawUI() {

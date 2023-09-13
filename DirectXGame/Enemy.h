@@ -247,5 +247,8 @@ private:
 
 	// オプション
 	Option* option_ = Option::GetInstance(); 
-
+	
+	// エフェクト表示
+	bool isMoveEffect_;
+	Effect moveEffect_;
 };
