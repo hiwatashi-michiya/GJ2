@@ -158,9 +158,6 @@
     <ClInclude Include="2d\Sprite.h">
       <Filter>ヘッダー ファイル\2d</Filter>
     </ClInclude>
-    <ClInclude Include="audio\Audio.h">
-      <Filter>ヘッダー ファイル\audo</Filter>
-    </ClInclude>
     <ClInclude Include="base\DirectXCommon.h">
       <Filter>ヘッダー ファイル\base</Filter>
     </ClInclude>
@@ -253,6 +250,9 @@
     </ClInclude>
     <ClInclude Include="Effect.h">
       <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="audio\Audio.h">
+      <Filter>ヘッダー ファイル\base</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
