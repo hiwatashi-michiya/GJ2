@@ -144,6 +144,9 @@ private:
 	WorldTransform worldTransform_;
 	WorldTransform worldTransformGuard_;
 
+	//エフェクト
+	Effect guardEffect_;
+
 	// 速度
 	Vector3 velocity_;
 
@@ -182,7 +185,7 @@ private:
 	bool isAttack_ = false;
 
 	// ガードしたかどうか
-	bool isGuard_ = false;
+	int guardCount_ = 0;
 
 	// 行動コマンド画像更新
 	void UpdateMoveCommandsNum();

@@ -11,7 +11,7 @@ void Effect::Initialize() {
 
 	effectTex_[0] = TextureManager::Load("particlecube/effect.png");
 	effectTex_[1] = TextureManager::Load("particlecube/effect_black.png");
-	effectTex_[1] = TextureManager::Load("particlecube/dust.png");
+	effectTex_[2] = TextureManager::Load("particlecube/dust.png");
 }
 
 void Effect::Update() {

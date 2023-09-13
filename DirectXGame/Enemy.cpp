@@ -72,6 +72,13 @@ void Enemy::Initialize(
 	effect_.Initialize();
 	effect_.SetEffectType(Crash);
 
+	guardEffect_.Initialize();
+	guardEffect_.SetEffectType(Crash);
+	guardEffect_.SetStartPosition(worldTransform_.translation_);
+	guardEffect_.SetTexture(0, guardTex_);
+	guardEffect_.SetTexture(1, guardTex_);
+	guardEffect_.SetTexture(2, guardTex_);
+
 }
 
 void Enemy::Update(const ViewProjection& viewProjection, Option* option) {
@@ -122,9 +129,16 @@ void Enemy::Update(const ViewProjection& viewProjection, Option* option) {
 			if (collisionManager_->IsHitAttack(GetGridX(), GetGridZ(), PlayerAttack)) {
 
 				// ガード状態なら半減し、その後ガードを解除する
-				if (isGuard_) {
+				if (guardCount_ > 0) {
 					life_ -= 5;
-					isGuard_ = false;
+					guardCount_ -= 1;
+
+					if (guardCount_ == 0) {
+						guardEffect_.Reset(60 / gameSpeed_->GetGameSpeed());
+						guardEffect_.SetStartPosition(worldTransform_.translation_);
+						guardEffect_.SetEffect();
+					}
+
 				} else {
 					life_ -= 10;
 				}
@@ -136,9 +150,16 @@ void Enemy::Update(const ViewProjection& viewProjection, Option* option) {
 			               GetGridX(), GetGridZ(), PlayerSpecialAttack)) {
 
 				// ガード状態なら半減し、その後ガードを解除する
-				if (isGuard_) {
+				if (guardCount_ > 0) {
 					life_ -= 10;
-					isGuard_ = false;
+					guardCount_ -= 1;
+
+					if (guardCount_ == 0) {
+						guardEffect_.Reset(60 / gameSpeed_->GetGameSpeed());
+						guardEffect_.SetStartPosition(worldTransform_.translation_);
+						guardEffect_.SetEffect();
+					}
+
 				} else {
 					life_ -= 20;
 				}
@@ -198,6 +219,10 @@ void Enemy::Update(const ViewProjection& viewProjection, Option* option) {
 			isDead_ = true;
 		}
 
+	}
+
+	if (guardEffect_.IsDead() == false) {
+		guardEffect_.Update();
 	}
 
 	worldTransform_.UpdateMatrix();
@@ -392,7 +417,7 @@ void Enemy::Move(Command& command) {
 
 		velocity_ = {0.0f, 0.0f, 0.0f};
 
-		isGuard_ = true;
+		guardCount_ = 2;
 
 		currentTex_ = textures_[2];
 
@@ -443,11 +468,16 @@ void Enemy::Draw(const ViewProjection& viewProjection) {
 	else {
 		models_[0]->Draw(worldTransform_, viewProjection, currentTex_);
 
-		if (isGuard_) {
+		if (guardCount_ > 0) {
 			guardModel_->Draw(worldTransformGuard_, viewProjection, guardTex_);
 		}
 
 	}
+
+	if (guardEffect_.IsDead() == false) {
+		guardEffect_.Draw(viewProjection);
+	}
+
 }
 
 void Enemy::DrawUI() {

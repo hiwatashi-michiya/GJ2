@@ -135,6 +135,14 @@ void Player::Initialize(
 	selectSE_ = audio_->LoadWave("SE/select.wav");
 	cancelSE_ = audio_->LoadWave("SE/cancel.wav");
 	fallSE_ = audio_->LoadWave("SE/fall.wav");
+
+	guardEffect_.Initialize();
+	guardEffect_.SetEffectType(Crash);
+	guardEffect_.SetStartPosition(worldTransform_.translation_);
+	guardEffect_.SetTexture(0, guardTex_);
+	guardEffect_.SetTexture(1, guardTex_);
+	guardEffect_.SetTexture(2, guardTex_);
+
 }
 
 void Player::Update(const ViewProjection& viewProjection, Option* option) {
@@ -187,10 +195,17 @@ void Player::Update(const ViewProjection& viewProjection, Option* option) {
 
 			if (collisionManager_->IsHitAttack(GetGridX(), GetGridZ(), EnemyAttack)) {
 
-				// ガード状態なら半減し、その後ガードを解除する
-				if (isGuard_) {
+				// ガード状態なら半減し、その後ガードカウントを減らす
+				if (guardCount_ > 0) {
 					life_ -= 5;
-					isGuard_ = false;
+					guardCount_ -= 1;
+
+					if (guardCount_ == 0) {
+						guardEffect_.Reset(60 / gameSpeed_->GetGameSpeed());
+						guardEffect_.SetStartPosition(worldTransform_.translation_);
+						guardEffect_.SetEffect();
+					}
+
 				} else {
 					life_ -= 10;
 				}
@@ -201,9 +216,16 @@ void Player::Update(const ViewProjection& viewProjection, Option* option) {
 			} else if (collisionManager_->IsHitAttack(GetGridX(), GetGridZ(), EnemySpecialAttack)) {
 
 				// ガード状態なら半減し、その後ガードを解除する
-				if (isGuard_) {
+				if (guardCount_ > 0) {
 					life_ -= 10;
-					isGuard_ = false;
+					guardCount_ -= 1;
+
+					if (guardCount_ == 0) {
+						guardEffect_.Reset(60 / gameSpeed_->GetGameSpeed());
+						guardEffect_.SetStartPosition(worldTransform_.translation_);
+						guardEffect_.SetEffect();
+					}
+
 				} else {
 					life_ -= 20;
 				}
@@ -374,6 +396,10 @@ void Player::Update(const ViewProjection& viewProjection, Option* option) {
 			isFall_ = false;
 		}
 
+	}
+
+	if (guardEffect_.IsDead() == false) {
+		guardEffect_.Update();
 	}
 
 	UpdateMoveCommandsNum();
@@ -642,7 +668,7 @@ void Player::Move(Command& command) {
 				specialCount_++;
 			}
 
-			isGuard_ = true;
+			guardCount_ = 2;
 
 			for (int i = 0; i < 8; i++) {
 				worldTransformEffect_[i].translation_ = {
@@ -691,7 +717,7 @@ void Player::Move(Command& command) {
 		moveAngle_ = 0.0f;
 		velocity_ = {0.0f, 0.0f, 0.0f};
 
-		if (isGuard_) {
+		if (guardCount_ > 0) {
 			currentTex_ = textures_[9];
 		} else {
 			currentTex_ = textures_[0];
@@ -709,8 +735,12 @@ void Player::Draw(const ViewProjection& viewProjection) {
 
 	models_[0]->Draw(worldTransform_, viewProjection, currentTex_);
 
-	if (isGuard_) {
+	if (guardCount_ > 0) {
 		guardModel_->Draw(worldTransformGuard_, viewProjection, guardTex_);
+	}
+
+	if (guardEffect_.IsDead() == false) {
+		guardEffect_.Draw(viewProjection);
 	}
 
 	if (isStart_) {
@@ -853,7 +883,7 @@ void Player::Reset() {
 	selectNum_ = 0;
 	isMove_ = false;
 	isAttack_ = false;
-	isGuard_ = false;
+	guardCount_ = 0;
 	isPlayerTurn_ = false;
 	currentMoveCommand_ = Stop;
 

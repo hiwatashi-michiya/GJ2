@@ -114,6 +114,7 @@ private:
 
 	//エフェクトのワールドトランスフォーム
 	WorldTransform worldTransformEffect_[8];
+	Effect guardEffect_;
 
 	//速度
 	Vector3 velocity_;
@@ -163,7 +164,7 @@ private:
 	bool isAttack_ = false;
 
 	//ガードしたかどうか
-	bool isGuard_ = false;
+	int guardCount_ = 0;
 
 	//特殊攻撃発動までのカウント
 	const int kMaxSpecialCount = 10;

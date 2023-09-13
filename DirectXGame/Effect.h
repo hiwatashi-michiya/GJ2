@@ -39,6 +39,11 @@ public:
 
 	}
 
+	void SetTexture(int num, uint32_t texture) {
+		num = IntClamp(num, 0, 2);
+		effectTex_[num] = texture; 
+	}
+
 private:
 
 	std::unique_ptr<Model> effectModel_;
