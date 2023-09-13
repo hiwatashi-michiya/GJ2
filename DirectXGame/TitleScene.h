@@ -93,6 +93,7 @@ private: // メンバ変数
 	uint32_t titleTex_ = 0u;
 	uint32_t titleBackTex_ = 0u;
 	uint32_t titleFrontTex_ = 0u;
+	uint32_t AstartTex_ = 0u;
 
 	// BGM 
 	uint32_t titleBGM_ = 0u;
@@ -104,6 +105,7 @@ private: // メンバ変数
 	std::unique_ptr<Sprite> titleSprite_;
 	std::unique_ptr<Sprite> titleBackSprite_;
 	std::unique_ptr<Sprite> titleFrontSprite_;
+	std::unique_ptr<Sprite> Astart_Sprite_;
 
 	// オプション
 	Option* option = Option::GetInstance();

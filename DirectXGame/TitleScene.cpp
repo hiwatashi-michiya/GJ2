@@ -66,6 +66,7 @@ void TitleScene::Initialize() {
 	titleTex_ = TextureManager::Load("UI/title.png");
 	titleBackTex_ = TextureManager::Load("UI/titleBack.png");
 	titleFrontTex_ = TextureManager::Load("UI/titleFront.png");
+	AstartTex_ = TextureManager::Load("UI/Astart.png");
 
 	titleBGM_ = audio_->LoadWave("BGM/titleBGM.wav");
 	debugSE_ = audio_->LoadWave("SE/guard.wav");
@@ -99,6 +100,15 @@ void TitleScene::Initialize() {
 	    },
 	    {2560.0f, 1440.0f});
 	titleFrontSprite_->SetPosition({0.0f, 0.0f});
+	
+	Astart_Sprite_.reset(Sprite::Create(AstartTex_, {300.0f, 320.0f}));
+	Astart_Sprite_->SetSize({680.0f, 360.0f});
+	Astart_Sprite_->SetTextureRect(
+	    {
+	        0.0f,
+	        0.0f,
+	    },
+	    {2560.0f, 1440.0f});
 
 	// オプション 初期化
 	option->Initialize();
@@ -220,6 +230,8 @@ void TitleScene::Draw() {
 	// タイトルの表示
 	//titleSprite_->Draw();
 	titleFrontSprite_->Draw();
+
+	Astart_Sprite_->Draw();
 
 	// 画面遷移の描画
 	transition_->Draw();
