@@ -132,6 +132,7 @@ private:
 
 	//エフェクト
 	Effect effect_;
+	Effect guardEffect_;
 
 	bool isEffect_ = false;
 
@@ -144,8 +145,7 @@ private:
 	WorldTransform worldTransform_;
 	WorldTransform worldTransformGuard_;
 
-	//エフェクト
-	Effect guardEffect_;
+	
 
 	// 速度
 	Vector3 velocity_;

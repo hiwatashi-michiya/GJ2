@@ -79,6 +79,9 @@ void Enemy::Initialize(
 
 	effect_.Initialize();
 	effect_.SetEffectType(Crash);
+	effect_.SetTexture(0, textures_[0]);
+	effect_.SetTexture(1, textures_[0]);
+	effect_.SetTexture(2, textures_[0]);
 
 	guardEffect_.Initialize();
 	guardEffect_.SetEffectType(Crash);
@@ -192,6 +195,7 @@ void Enemy::Update(const ViewProjection& viewProjection, Option* option) {
 
 		// 体力が0以下で死亡。エフェクト開始
 		if (life_ <= 0) {
+			life_ = 0;
 			collisionManager_->RemoveCollision(GetGridX(), GetGridZ());
 			effect_.Reset(60 / gameSpeed_->GetGameSpeed());
 			effect_.SetStartPosition(worldTransform_.translation_);

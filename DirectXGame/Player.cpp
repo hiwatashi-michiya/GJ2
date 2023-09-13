@@ -136,6 +136,13 @@ void Player::Initialize(
 	cancelSE_ = audio_->LoadWave("SE/cancel.wav");
 	fallSE_ = audio_->LoadWave("SE/fall.wav");
 
+	crashEffect_.Initialize();
+	crashEffect_.SetEffectType(Crash);
+	crashEffect_.SetStartPosition(worldTransform_.translation_);
+	crashEffect_.SetTexture(0, textures_[0]);
+	crashEffect_.SetTexture(1, textures_[0]);
+	crashEffect_.SetTexture(2, textures_[0]);
+
 	guardEffect_.Initialize();
 	guardEffect_.SetEffectType(Crash);
 	guardEffect_.SetStartPosition(worldTransform_.translation_);
@@ -189,7 +196,8 @@ void Player::Update(const ViewProjection& viewProjection, Option* option) {
 
 		worldTransform_.UpdateMatrix();
 
-	} else {
+	}
+	else if(isEffect_ == false) {
 
 		if (isHit_ == false) {
 
@@ -245,7 +253,10 @@ void Player::Update(const ViewProjection& viewProjection, Option* option) {
 		if (life_ <= 0) {
 			life_ = 0;
 			collisionManager_->RemoveCollision(GetGridX(), GetGridZ());
-			isDead_ = true;
+			crashEffect_.Reset(60 / gameSpeed_->GetGameSpeed());
+			crashEffect_.SetStartPosition(worldTransform_.translation_);
+			crashEffect_.SetEffect();
+			isEffect_ = true;
 		}
 
 		// ポインターを行動カードと接触してる状態でXボタンを押すと効果を表示
@@ -395,6 +406,15 @@ void Player::Update(const ViewProjection& viewProjection, Option* option) {
 		}
 		else if (worldTransformArrow_.translation_.y <= 10.0f) {
 			isFall_ = false;
+		}
+
+	}
+	else {
+
+		crashEffect_.Update();
+
+		if (crashEffect_.IsDead()) {
+			isDead_ = true;
 		}
 
 	}
@@ -719,7 +739,12 @@ void Player::Move(Command& command) {
 
 void Player::Draw(const ViewProjection& viewProjection) {
 
-	models_[0]->Draw(worldTransform_, viewProjection, currentTex_);
+	if (isEffect_) {
+		crashEffect_.Draw(viewProjection);
+	}
+	else {
+		models_[0]->Draw(worldTransform_, viewProjection, currentTex_);
+	}
 
 	if (guardCount_ > 0) {
 		guardModel_->Draw(worldTransformGuard_, viewProjection, guardTex_);
@@ -862,6 +887,7 @@ void Player::Reset() {
 	startCount_ = 60;
 	life_ = kMaxLife;
 
+	isEffect_ = false;
 	moveAngle_ = 0.0f;
 
 	MoveTimer_ = 0;

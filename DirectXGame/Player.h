@@ -116,7 +116,10 @@ private:
 
 	//エフェクトのワールドトランスフォーム
 	WorldTransform worldTransformEffect_[8];
+
+	//エフェクト
 	Effect guardEffect_;
+	Effect crashEffect_;
 
 	//速度
 	Vector3 velocity_;
@@ -180,6 +183,9 @@ private:
 	const int kMaxInterval = 10;
 
 	int interval_ = 0;
+
+	//エフェクト中かどうか
+	bool isEffect_ = false;
 
 	//スプライト
 	std::unique_ptr<Sprite> commandNumSprite_[kMaxCommand];
