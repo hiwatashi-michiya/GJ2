@@ -235,6 +235,7 @@ private:
 	uint32_t guardSE_ = 0u;
 	uint32_t circleAttackSE_ = 0u;
 	uint32_t specialSE = 0u;
+	uint32_t specialMissSE_ = 0u;
 
 	// 非音声再生かどうか判断するやつ
 	uint32_t guardHandle = 0u;

@@ -109,7 +109,7 @@ void GameScene::Initialize() {
 	        0.0f,
 	        0.0f,
 	    },
-	    {720.0f, 720.0f});
+	    {720.0f, 1024.0f});
 	ctrGameSprite_->SetPosition({1000.0f, 450.0f});
 
 	AnextSprite_.reset(Sprite::Create(AnextTex_, {300.0f, 380.0f}));
@@ -307,14 +307,14 @@ void GameScene::Update() {
 		    },
 		    {720.0f, 1280.0f});
 		ctrGameSprite_ = ctrPadGameSprite_.get();
-		ctrGameSprite_->SetSize({240.0f, 240.0f});
+		ctrGameSprite_->SetSize({180.0f, 256.0f});
 		ctrGameSprite_->SetTextureRect(
 		    {
 		        0.0f,
 		        0.0f,
 		    },
-		    {720.0f, 720.0f});
-		ctrGameSprite_->SetPosition({1000.0f, 450.0f});
+		    {720.0f, 1024.0f});
+		ctrGameSprite_->SetPosition({1090.0f, 450.0f});
 
 	} 
 	else {
@@ -327,14 +327,14 @@ void GameScene::Update() {
 		    },
 		    {720.0f, 1280.0f});
 		ctrGameSprite_ = ctrKeyGameSprite_.get();
-		ctrGameSprite_->SetSize({240.0f, 240.0f});
+		ctrGameSprite_->SetSize({180.0f, 256.0f});
 		ctrGameSprite_->SetTextureRect(
 		    {
 		        0.0f,
 		        0.0f,
 		    },
-		    {720.0f, 720.0f});
-		ctrGameSprite_->SetPosition({1000.0f, 450.0f});
+		    {720.0f, 1024.0f});
+		ctrGameSprite_->SetPosition({1090.0f, 450.0f});
 	}
 
 	if (transition_->GetIsChangeScene()) {

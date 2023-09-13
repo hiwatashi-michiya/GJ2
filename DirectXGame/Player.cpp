@@ -164,6 +164,7 @@ void Player::Initialize(
 	cancelSE_ = audio_->LoadWave("SE/cancel.wav");
 	fallSE_ = audio_->LoadWave("SE/fall.wav");
 	specialSE = audio_->LoadWave("SE/special.wav");
+	specialMissSE_ = audio_->LoadWave("SE/specialmiss.wav");
 
 	isEffect_ = false;
 	isMoveEffect_ = false;
@@ -372,7 +373,11 @@ void Player::Update(const ViewProjection& viewProjection) {
 				audio_->PlayWave(specialSE, false, option_->m_seVol * 2.5f);
 				specialCount_ = 0;
 
-		} else if (
+		}
+		else if (option_->GetActionTrigger(SPECIAL)) {
+				audio_->PlayWave(specialMissSE_, false, option_->m_seVol * 2.5f);
+		}
+		else if (
 		    (input_->TriggerKey(DIK_RETURN) || option_->GetActionTrigger(ACT)) &&
 		    inputCoolTimer_ == 0 && moveCommands_.size() < kMaxCommand) {
 

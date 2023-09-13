@@ -5,7 +5,7 @@
 
 Option::Option() {
 	// 初期キー設定
-	m_InputButton[ActCode::SPECIAL] = (int)Gamepad::Button::RIGHT_SHOULDER;
+	m_InputButton[ActCode::SPECIAL] = (int)Gamepad::Button::Y;
 	m_InputButton[ActCode::ACT] = (int)Gamepad::Button::A;
 	m_InputButton[ActCode::CANCEL] = (int)Gamepad::Button::B;
 	m_InputButton[ActCode::MENU] = (int)Gamepad::Button::START;
