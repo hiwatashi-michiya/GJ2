@@ -135,7 +135,7 @@ private:
 	bool isFall_ = false;
 
 	//体力
-	const int kMaxLife = 100;
+	const int kMaxLife = 50;
 
 	int life_ = kMaxLife;
 	int lifeNum_[3] = {0, 0, 0};
