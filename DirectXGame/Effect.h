@@ -49,6 +49,8 @@ public:
 
 	void SetCurrentMoveCommands(Command command) { currentMoveCommand_ = command; }
 
+	void shuffle(float array);
+
 private:
 
 	std::unique_ptr<Model> effectModel_;
@@ -75,4 +77,6 @@ private:
 	Command currentMoveCommand_ = Stop;
 
 	std::unique_ptr<Player> player_ = nullptr;
+
+	Vector3 array_[kMaxParticles];
 };

@@ -22,6 +22,11 @@ void Effect::Initialize() {
 	dustTex_ = TextureManager::Load("particlecube/dust.png");
 
 	player_ = std::make_unique<Player>();
+
+	for (int i = 0; i < kMaxParticles; i++) {
+		array_[i].x = float(rand() % 30 - 20) / 100.0f;
+		array_[i].z = float(rand() % 20 - 20) / 100.0f;
+	}
 }
 
 void Effect::Update() {
@@ -87,19 +92,19 @@ void Effect::Update() {
 
 				switch (currentMoveCommand_) {
 				case MoveUp:
-					velocities_[i].z += 0.01f;
+					velocities_[i].z += 0.02f;
 
 					break;
 				case MoveDown:
-					velocities_[i].z -= 0.01f;
+					velocities_[i].z -= 0.02f;
 
 					break;
 				case MoveLeft:
-					velocities_[i].x -= 0.01f;
+					velocities_[i].x -= 0.02f;
 
 					break;
 				case MoveRight:
-					velocities_[i].x += 0.01f;
+					velocities_[i].x += 0.02f;
 
 					break;
 
@@ -211,17 +216,61 @@ void Effect::SetEffect() {
 		for (int i = 0; i < kMaxParticles; i++) {
 			SetRandom();
 
-			velocities_[i].x = float(rand() % 10 - 5) / 100.0f;
-			velocities_[i].y = 1.0f;
-			velocities_[i].z = float(rand() % 10 - 5) / 100.0f;
+			shuffle(array_[i].x);
+			array_[i].y = 1.0f;
+			shuffle(array_[i].z);
 
-			worldTransforms_[i].rotation_ += Vector3(0.3f, 0.0f, 0.0f);
+			switch (currentMoveCommand_) {
+			case MoveUp:
+				velocities_[i].x = array_[i].x;
+				velocities_[i].y = array_[i].y;
+				velocities_[i].z = array_[i].z;
+				break;
+			case MoveDown:
+				velocities_[i].x = array_[i].x;
+				velocities_[i].y = array_[i].y;
+				velocities_[i].z = array_[i].z;
+				velocities_[i].z *= 1.0f;
+				break;
+			case MoveLeft:
+				velocities_[i].x = array_[i].z;
+				velocities_[i].y = array_[i].y;
+				velocities_[i].z = array_[i].x;
+				velocities_[i].x *= 1.0f;
+				break;
+			case MoveRight:
+				velocities_[i].x = array_[i].z;
+				velocities_[i].y = array_[i].y;
+				velocities_[i].z = array_[i].x;
+				break;
 
-			worldTransforms_[i].translation_ = startPosition_[i];
+			default:
+			case Stop:
+				break;
+
+			case AttackCross:
+				break;
+
+			case AttackCircle:
+				break;
+
+			case Guard:
+				break;
+
+			case S_PlayerAttack:
+				break;
+
+			case S_EnemyAttack:
+				break;
+			}
 
 			velocities_[i] *= 0.5f;
 
-			worldTransforms_[i].scale_ = Vector3(0.5f, 0.5f, 0.5f);
+			worldTransforms_[i].translation_ = startPosition_[i];
+
+			worldTransforms_[i].rotation_ += Vector3(0.3f, 0.3f, 0.3f);
+
+			worldTransforms_[i].scale_ = Vector3(0.75f, 0.75f, 0.75f);
 
 			worldTransforms_[i].UpdateMatrix();
 		}
@@ -233,4 +282,10 @@ void Effect::SetEffect() {
 void Effect::Reset(int32_t lifeTime) {
 	lifeTimer_ = lifeTime;
 	isDead_ = false;
+}
+
+void Effect::shuffle(float array) {
+	int tmp;
+	tmp = int(array);
+	array = float(tmp);
 }
