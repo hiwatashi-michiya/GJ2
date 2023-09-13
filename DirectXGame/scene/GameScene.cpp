@@ -432,9 +432,11 @@ void GameScene::Update() {
 			if (isStageClear_ == false && isGameOver_ == false) {
 
 				if (CheckAllEnemyIsDead() && player_->GetIsPlayerTurn() == false) {
-					isGameClear_ = true;
+					isStageClear_ = true;
 
 					if (stageCount_ == 2) {
+						isGameClear_ = true;
+
 						audio_->StopWave(gameHandale_);
 						clearHandale = audio_->PlayWave(clearBGM, false, option->m_bgmVol);
 					}
@@ -458,7 +460,7 @@ void GameScene::Update() {
 
 						transition_->SetIsChangeScene(true);
 						// 遷移先のシーンをゲームにする
-						if (isGameClear_ && stageCount_ < 2) {
+						if (isStageClear_ && stageCount_ < 2) {
 							transition_->SetNextScene(RESET);
 							stageCount_++;
 
