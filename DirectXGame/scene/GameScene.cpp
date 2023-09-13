@@ -281,6 +281,7 @@ void GameScene::Update() {
 		} else if (transition_->GetFadeIn() && transition_->GetNextScene() == GAME) {
 			transition_->SetIsChangeScene(false);
 			transition_->Reset();
+			gameHandale_ = audio_->PlayWave(gameBGM_, true, option->m_bgmVol * 0.8f);
 		}
 		// ゲームシーンへのフェードインが完了したら
 		else {
@@ -295,8 +296,9 @@ void GameScene::Update() {
 			if (option->GetActionTrigger(MENU) || input_->TriggerKey(DIK_Q)) {
 				option->isMenuOverlay_ = false;
 			}
+				
 
-			audio_->SetVolume(gameHandale_, option->m_bgmVol * 0.8f);
+			audio_->SetVolume(gameHandale_, option->m_bgmVol * 0.8f * 0.5f);
 
 		} else {
 
