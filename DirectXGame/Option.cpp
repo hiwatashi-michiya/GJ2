@@ -167,6 +167,11 @@ void Option::Update() {
 				if (m_seVol > 0.0f) {
 					m_seVol -= 0.1f;
 				}
+
+				if (0.0f > m_seVol) {
+					m_seVol = 0.0f;
+				}
+
 			}
 		}
 

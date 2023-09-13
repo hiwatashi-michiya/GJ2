@@ -228,7 +228,7 @@ void Player::Update(const ViewProjection& viewProjection) {
 			velocity_ = {0.0f, 3.0f * float(startCount_ / 60.0f), 0.0f};
 
 			if (startCount_ >= 10) {
-				audio_->PlayWave(fallSE_);
+				audio_->PlayWave(fallSE_,false,option_->m_seVol);
 			}
 		}
 

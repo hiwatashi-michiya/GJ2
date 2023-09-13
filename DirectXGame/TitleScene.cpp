@@ -157,7 +157,7 @@ void TitleScene::Update() {
 			transition_->SetIsChangeScene(true);
 			// 遷移先のシーンをゲームにする
 			transition_->SetNextScene(GAME);
-			audio_->PlayWave(debugSE_);
+			audio_->PlayWave(debugSE_, false, option->m_seVol);
 			if (audio_->IsPlaying(titleHandle_)) {
 				audio_->StopWave(titleHandle_);
 			}
