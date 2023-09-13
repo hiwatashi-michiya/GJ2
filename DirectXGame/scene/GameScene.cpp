@@ -701,6 +701,8 @@ void GameScene::Reset() {
 
 	player_->Reset();
 
+	skydome_->SetTex(stageCount_);
+
 	enemies_.remove_if([](Enemy* enemy) {
 		delete enemy;
 		return true;
