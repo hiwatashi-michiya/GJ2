@@ -232,6 +232,10 @@ private:
 
 	// SE
 	std::vector<uint32_t> sounds_;
+	uint32_t crossAttackSE_ = 0u;
+	uint32_t guardSE_ = 0u;
+	uint32_t circleAttackSE_ = 0u;
+	uint32_t guardHandle_ = 0u;
 
 	// 現在セットしている画像
 	uint32_t currentTex_ = 0u;
@@ -240,5 +244,8 @@ private:
 	bool isStart_ = false;
 
 	int startCount_ = 60;
+
+	// オプション
+	Option* option_ = Option::GetInstance(); 
 
 };
