@@ -670,7 +670,7 @@ void GameScene::Reset() {
 	    enemyModel_.get(), crossEffectModel_.get(), guardEffectModel_.get()};
 	std::vector<uint32_t> enemyTextures{enemyTex_,  redTex_,       greenTex_, blueTex_,
 	                                    numberTex_, alphaDarkTex_, frameTex_};
-	std::vector<uint32_t> enemySounds{damageSE_, damageHandle_};
+	std::vector<uint32_t> enemySounds{damageSE_, damageHandle_, moveSE_, moveHandle_};
 
 	Enemy* newEnemy;
 	Enemy* newEnemy2;

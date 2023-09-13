@@ -665,7 +665,7 @@ void Player::Move(Command& command) {
 
 			collisionManager_->SetAttackCross(GetGridX(), GetGridZ(), PlayerAttack);
 
-			audio_->PlayWave(crossAttackSE_, false, option_->m_seVol);
+			audio_->PlayWave(crossAttackSE_, false, option_->m_seVol * 1.2f);
 		}
 
 		if (MoveTimer_ % 5 == 0) {
