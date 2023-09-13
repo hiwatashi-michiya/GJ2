@@ -342,6 +342,7 @@ void Player::Update(const ViewProjection& viewProjection, Option* option) {
 			    (input_->TriggerKey(DIK_RETURN) || option->GetActionTrigger(ACT)) &&
 			    inputCoolTimer_ == 0) {
 				isSelect_ = false;
+				selectNum_ = 0;
 				isPlayerTurn_ = true;
 				inputCoolTimer_ = kInputCoolTime;
 
@@ -585,8 +586,6 @@ void Player::Move(Command& command) {
 
 		velocity_ = {0.0f, 0.0f, 0.0f};
 
-		currentTex_ = textures_[3];
-
 		break;
 
 	case AttackCross:
@@ -614,8 +613,6 @@ void Player::Move(Command& command) {
 			    sinf(i * 3.14f / 2.0f) / 3.0f * gameSpeed_->GetGameSpeed()};
 			worldTransformEffect_[i].translation_ += velocity_;
 		}
-
-		currentTex_ = textures_[0];
 
 		break;
 	case AttackCircle:
@@ -657,8 +654,6 @@ void Player::Move(Command& command) {
 			worldTransformEffect_[i].translation_ += velocity_;
 		}
 
-		currentTex_ = textures_[1];
-
 		break;
 	case Guard:
 
@@ -697,8 +692,6 @@ void Player::Move(Command& command) {
 			moveAngle_ += 1.0f;
 		}
 
-		currentTex_ = textures_[2];
-
 		break;
 	case S_PlayerAttack:
 
@@ -716,13 +709,6 @@ void Player::Move(Command& command) {
 	if (--MoveTimer_ <= 0) {
 		moveAngle_ = 0.0f;
 		velocity_ = {0.0f, 0.0f, 0.0f};
-
-		if (guardCount_ > 0) {
-			currentTex_ = textures_[9];
-		} else {
-			currentTex_ = textures_[0];
-		}
-
 		currentMoveCommand_ = Stop;
 		collisionManager_->ResetAttack();
 		interval_ = kMaxInterval;

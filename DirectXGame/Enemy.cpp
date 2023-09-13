@@ -393,8 +393,6 @@ void Enemy::Move(Command& command) {
 
 		velocity_ = {0.0f, 0.0f, 0.0f};
 
-		currentTex_ = textures_[3];
-
 		break;
 
 	case AttackCross:
@@ -404,8 +402,6 @@ void Enemy::Move(Command& command) {
 			collisionManager_->SetAttackCross(GetGridX(), GetGridZ(), EnemyAttack);
 
 		}
-
-		currentTex_ = textures_[0];
 
 		break;
 	case AttackCircle:
@@ -418,16 +414,12 @@ void Enemy::Move(Command& command) {
 
 		velocity_ = {0.0f, 0.0f, 0.0f};
 
-		currentTex_ = textures_[1];
-
 		break;
 	case Guard:
 
 		velocity_ = {0.0f, 0.0f, 0.0f};
 
 		guardCount_ = 2;
-
-		currentTex_ = textures_[2];
 
 		break;
 	case S_EnemyAttack:
@@ -461,7 +453,6 @@ void Enemy::Move(Command& command) {
 
 	if (--MoveTimer_ <= 0) {
 		velocity_.y = 0.0f;
-		currentTex_ = textures_[0];
 		collisionManager_->ResetAttack();
 		interval_ = kMaxInterval;
 		isMove_ = false;
