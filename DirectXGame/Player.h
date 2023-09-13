@@ -222,6 +222,13 @@ private:
 	uint32_t selectSE_ = 0u;
 	uint32_t cancelSE_ = 0u;
 	uint32_t fallSE_ = 0u;
+	uint32_t guardSE_ = 0u;
+	uint32_t circleAttackSE_ = 0u;
+
+	// 非音声再生かどうか判断するやつ
+	uint32_t guardHandle = 0u;
+	uint32_t crossHandle = 0u;
+	uint32_t circleHandle = 0u;
 
 	//現在セットしている画像
 	uint32_t currentTex_ = 0u;

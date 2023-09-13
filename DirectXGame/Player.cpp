@@ -135,6 +135,8 @@ void Player::Initialize(
 	selectSE_ = audio_->LoadWave("SE/select.wav");
 	cancelSE_ = audio_->LoadWave("SE/cancel.wav");
 	fallSE_ = audio_->LoadWave("SE/fall.wav");
+	guardSE_ = audio_->LoadWave("SE/guard.wav");
+	circleAttackSE_ = audio_->LoadWave("SE/circleattack.wav");
 
 	crashEffect_.Initialize();
 	crashEffect_.SetEffectType(Crash);
@@ -630,7 +632,7 @@ void Player::Move(Command& command) {
 
 			collisionManager_->SetAttackCross(GetGridX(), GetGridZ(), PlayerAttack);
 
-			audio_->PlayWave(crossAttackSE_);
+			audio_->PlayWave(crossAttackSE_, false, option_->m_seVol);
 		}
 
 		if (MoveTimer_ % 5 == 0) {
@@ -656,6 +658,8 @@ void Player::Move(Command& command) {
 			}
 
 			collisionManager_->SetAttackCircle(GetGridX(), GetGridZ(), PlayerAttack);
+
+			audio_->PlayWave(circleAttackSE_, false, option_->m_seVol * 1.2f);
 		}
 
 		if (MoveTimer_ % 5 == 0) {
@@ -690,6 +694,7 @@ void Player::Move(Command& command) {
 	case Guard:
 
 		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed()) {
+			audio_->PlayWave(guardSE_, false, option_->m_seVol);
 
 			if (specialCount_ < kMaxSpecialCount) {
 				specialCount_++;
@@ -707,7 +712,9 @@ void Player::Move(Command& command) {
 			for (int i = 0; i < 8; i++) {
 				worldTransformEffect_[i].translation_.y = -3.0f;
 			}
+
 		}
+		
 
 		for (int i = 0; i < 5; i++) {
 			const float length = 4.0f;
@@ -723,6 +730,8 @@ void Player::Move(Command& command) {
 
 			moveAngle_ += 1.0f;
 		}
+
+		
 
 		break;
 	case S_PlayerAttack:
