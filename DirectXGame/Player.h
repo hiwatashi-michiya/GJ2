@@ -91,6 +91,8 @@ public:
 
 	bool GetIsStart() { return isStart_; }
 
+	int GetSelectNum() { return selectNum_; }
+
 private:
 
 	//入力

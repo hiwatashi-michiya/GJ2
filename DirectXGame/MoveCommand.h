@@ -42,6 +42,8 @@ public:
 
 	Command GetNextCommand() { return moveCommands_.front(); }
 
+	Command GetSelectCommand(int32_t num);
+
 	std::list<Command> GetmoveCommands() { return moveCommands_; }
 
 	std::list<Command> moveCommands_;

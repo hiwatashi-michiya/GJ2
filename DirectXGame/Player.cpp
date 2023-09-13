@@ -275,7 +275,7 @@ void Player::Update(const ViewProjection& viewProjection, Option* option) {
 		if (isSelect_) {
 
 			if ((input_->TriggerKey(DIK_UP) || option->GetActionTrigger(U_SELECT)) &&
-			    inputCoolTimer_ == 0) {
+			    inputCoolTimer_ == 0 && moveCommands_.size() < kMaxCommand) {
 
 				if (selectNum_ > 0) {
 					selectNum_--;
@@ -293,7 +293,7 @@ void Player::Update(const ViewProjection& viewProjection, Option* option) {
 
 			else if (
 			    (input_->TriggerKey(DIK_DOWN) || option->GetActionTrigger(D_SELECT)) &&
-			    inputCoolTimer_ == 0) {
+			    inputCoolTimer_ == 0 && moveCommands_.size() < kMaxCommand) {
 
 				if (selectNum_ < selectCommands_.size() - 1) {
 					selectNum_++;

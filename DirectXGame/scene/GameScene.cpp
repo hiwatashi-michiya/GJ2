@@ -857,6 +857,213 @@ void GameScene::PredictionActDraw() {
 			}
 		}
 
+		//現在選択しているコマンドの行動プレビュー表示
+		if (player_->moveCommands_.size() < kMaxCommand) {
+
+			Command selectCommand = player_->GetSelectCommand(player_->GetSelectNum());
+
+			switch (selectCommand) {
+			case MoveLeft:
+
+				if (tmpGridX - 1 >= 0 && tmpCollisionMass[tmpGridZ][tmpGridX - 1] == 0) {
+					tmpCollisionMass[tmpGridZ][tmpGridX] = 0;
+					tmpGridX -= 1;
+					arrowLeftModel_->Draw(
+					    worldTransformArrowMass_[tmpGridZ][tmpGridX], viewProjection_,
+					    moveMassTex_);
+					tmpCollisionMass[tmpGridZ][tmpGridX] = 1;
+				}
+
+				break;
+			case MoveRight:
+
+				if (tmpGridX + 1 < 6 && tmpCollisionMass[tmpGridZ][tmpGridX + 1] == 0) {
+					tmpCollisionMass[tmpGridZ][tmpGridX] = 0;
+					tmpGridX += 1;
+					arrowRightModel_->Draw(
+					    worldTransformArrowMass_[tmpGridZ][tmpGridX], viewProjection_,
+					    moveMassTex_);
+					tmpCollisionMass[tmpGridZ][tmpGridX] = 1;
+				}
+
+				break;
+			case MoveUp:
+
+				if (tmpGridZ - 1 >= 0 && tmpCollisionMass[tmpGridZ - 1][tmpGridX] == 0) {
+					tmpCollisionMass[tmpGridZ][tmpGridX] = 0;
+					tmpGridZ -= 1;
+					arrowUpModel_->Draw(
+					    worldTransformArrowMass_[tmpGridZ][tmpGridX], viewProjection_,
+					    moveMassTex_);
+					tmpCollisionMass[tmpGridZ][tmpGridX] = 1;
+				}
+
+				break;
+			case MoveDown:
+
+				if (tmpGridZ + 1 < 6 && tmpCollisionMass[tmpGridZ + 1][tmpGridX] == 0) {
+					tmpCollisionMass[tmpGridZ][tmpGridX] = 0;
+					tmpGridZ += 1;
+					arrowDownModel_->Draw(
+					    worldTransformArrowMass_[tmpGridZ][tmpGridX], viewProjection_,
+					    moveMassTex_);
+					tmpCollisionMass[tmpGridZ][tmpGridX] = 1;
+				}
+
+				break;
+			case Stop:
+				break;
+			case AttackCross:
+
+				for (int i = 1; i < 3; i++) {
+
+					if (tmpGridZ - i >= 0) {
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ - i][tmpGridX], viewProjection_,
+						    playerAttackMassTex_);
+					}
+
+					if (tmpGridZ + i < 6) {
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ + i][tmpGridX], viewProjection_,
+						    playerAttackMassTex_);
+					}
+
+					if (tmpGridX - i >= 0) {
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ][tmpGridX - i], viewProjection_,
+						    playerAttackMassTex_);
+					}
+
+					if (tmpGridX + i < 6) {
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ][tmpGridX + i], viewProjection_,
+						    playerAttackMassTex_);
+					}
+				}
+
+				break;
+			case AttackCircle:
+
+				if (tmpGridZ - 1 >= 0) {
+
+					groundModel_->Draw(
+					    worldTransformMass_[tmpGridZ - 1][tmpGridX], viewProjection_,
+					    playerAttackMassTex_);
+
+					if (tmpGridX - 1 >= 0) {
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ - 1][tmpGridX - 1], viewProjection_,
+						    playerAttackMassTex_);
+					}
+
+					if (tmpGridX + 1 < 6) {
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ - 1][tmpGridX + 1], viewProjection_,
+						    playerAttackMassTex_);
+					}
+				}
+
+				if (tmpGridZ + 1 < 6) {
+
+					groundModel_->Draw(
+					    worldTransformMass_[tmpGridZ + 1][tmpGridX], viewProjection_,
+					    playerAttackMassTex_);
+
+					if (tmpGridX - 1 >= 0) {
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ + 1][tmpGridX - 1], viewProjection_,
+						    playerAttackMassTex_);
+					}
+
+					if (tmpGridX + 1 < 6) {
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ + 1][tmpGridX + 1], viewProjection_,
+						    playerAttackMassTex_);
+					}
+				}
+
+				if (tmpGridX - 1 >= 0) {
+					groundModel_->Draw(
+					    worldTransformMass_[tmpGridZ][tmpGridX - 1], viewProjection_,
+					    playerAttackMassTex_);
+				}
+
+				if (tmpGridX + 1 < 6) {
+					groundModel_->Draw(
+					    worldTransformMass_[tmpGridZ][tmpGridX + 1], viewProjection_,
+					    playerAttackMassTex_);
+				}
+
+				break;
+			case Guard:
+				break;
+			case S_PlayerAttack:
+
+				for (int i = 1; i < 3; i++) {
+
+					if (tmpGridZ - i >= 0) {
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ - i][tmpGridX], viewProjection_,
+						    playerAttackMassTex_);
+					}
+
+					if (tmpGridZ + i < 6) {
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ + i][tmpGridX], viewProjection_,
+						    playerAttackMassTex_);
+					}
+
+					if (tmpGridX - i >= 0) {
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ][tmpGridX - i], viewProjection_,
+						    playerAttackMassTex_);
+					}
+
+					if (tmpGridX + i < 6) {
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ][tmpGridX + i], viewProjection_,
+						    playerAttackMassTex_);
+					}
+				}
+
+				if (tmpGridZ - 1 >= 0) {
+
+					if (tmpGridX - 1 >= 0) {
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ - 1][tmpGridX - 1], viewProjection_,
+						    playerAttackMassTex_);
+					}
+
+					if (tmpGridX + 1 < 6) {
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ - 1][tmpGridX + 1], viewProjection_,
+						    playerAttackMassTex_);
+					}
+				}
+
+				if (tmpGridZ + 1 < 6) {
+
+					if (tmpGridX - 1 >= 0) {
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ + 1][tmpGridX - 1], viewProjection_,
+						    playerAttackMassTex_);
+					}
+
+					if (tmpGridX + 1 < 6) {
+						groundModel_->Draw(
+						    worldTransformMass_[tmpGridZ + 1][tmpGridX + 1], viewProjection_,
+						    playerAttackMassTex_);
+					}
+				}
+
+				break;
+			default:
+				break;
+			}
+
+		}
+
 		for (Enemy* enemy : enemies_) {
 
 			int tmpEnemyGridX = enemy->GetGridX();
