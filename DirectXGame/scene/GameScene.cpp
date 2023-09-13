@@ -191,9 +191,9 @@ void GameScene::Initialize() {
 
 	std::vector<Model*> playerModels{
 	    playerModel_.get(), crossEffectModel_.get(), guardEffectModel_.get()};
-	std::vector<uint32_t> playerTextures{playerTex_, redTex_,      greenTex_,    blueTex_,
-	                                     numberTex_, alphaRedTex_, numPlateTex_, frameTex_,
-	                                     nextTex_,   alphaBlueTex_};
+	std::vector<uint32_t> playerTextures{playerTex_, redTex_,       greenTex_,    blueTex_,
+	                                     numberTex_, alphaRedTex_,  numPlateTex_, frameTex_,
+	                                     nextTex_,   alphaBlueTex_, alphaDarkTex_};
 	std::vector<uint32_t> playerSounds{damageSE_, damageHandle_, moveSE_, moveHandle_};
 
 	player_ = std::make_unique<Player>();
