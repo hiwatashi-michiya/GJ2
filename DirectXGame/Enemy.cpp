@@ -20,6 +20,7 @@ void Enemy::Initialize(
 	guardModel_.reset(Model::CreateFromOBJ("guard", true));
 
 	guardTex_ = TextureManager::Load("guard/guard.png");
+	bossTex_ = TextureManager::Load("king/kingboss.png");
 
 	currentTex_ = textures_[0];
 
@@ -186,8 +187,8 @@ void Enemy::Update(const ViewProjection& viewProjection, Option* option) {
 			isHit_ = false;
 		}
 
-		// 体力半分以下で行動変化
-		if (life_ <= (maxLife_ / 2) && isFormChange_ == false) {
+		// 体力半分以下でボスのみ行動変化
+		if (isBoss_ && life_ <= (maxLife_ / 2) && isFormChange_ == false) {
 			// 半分以下で確定行動
 			movePattern_ = E_Special;
 			isFormChange_ = true;

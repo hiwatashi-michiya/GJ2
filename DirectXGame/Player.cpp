@@ -142,7 +142,6 @@ void Player::Initialize(
 	moveEffect_.Reset(60 / gameSpeed_->GetGameSpeed());
 	moveEffect_.SetStartPosition(worldTransform_.translation_);
 	moveEffect_.SetEffectType(Dust);
-	moveEffect_.SetEffect();
 	guardSE_ = audio_->LoadWave("SE/guard.wav");
 	circleAttackSE_ = audio_->LoadWave("SE/circleattack.wav");
 
@@ -296,7 +295,7 @@ void Player::Update(const ViewProjection& viewProjection) {
 		if (isSelect_) {
 
 		if ((input_->TriggerKey(DIK_UP) || option_->GetActionTrigger(U_SELECT)) &&
-		    inputCoolTimer_ == 0) {
+			    inputCoolTimer_ == 0 && moveCommands_.size() < kMaxCommand) {
 
 				if (selectNum_ > 0) {
 					selectNum_--;
@@ -314,7 +313,7 @@ void Player::Update(const ViewProjection& viewProjection) {
 
 		else if (
 		    (input_->TriggerKey(DIK_DOWN) || option_->GetActionTrigger(D_SELECT)) &&
-		    inputCoolTimer_ == 0) {
+			inputCoolTimer_ == 0 && moveCommands_.size() < kMaxCommand) {
 
 				if (selectNum_ < selectCommands_.size() - 1) {
 					selectNum_++;
@@ -365,6 +364,7 @@ void Player::Update(const ViewProjection& viewProjection) {
 			isSelect_ = false;
 			isPlayerTurn_ = true;
 			inputCoolTimer_ = kInputCoolTime;
+			selectNum_ = 0;
 
 			// 行動選択時にSEを鳴らす
 			if (audio_->IsPlaying(clickSE_)) {
@@ -889,6 +889,21 @@ void Player::DrawUI() {
 	nextUISprite_->Draw();
 
 	// currentNumSprite_->Draw();
+}
+
+void Player::SetGridPosition(int x, int z) {
+
+	collisionManager_->RemoveCollision(GetGridX(), GetGridZ());
+
+	x = IntClamp(x, 0, 5);
+	z = IntClamp(z, 0, 5);
+
+	worldTransform_.translation_ = Vector3(-25.0f + x * 10.0f, 2.0f, 25.0f - z * 10.0f);
+	worldTransform_.UpdateMatrix();
+	SetGrid(x, z);
+	collisionManager_->SetCollision(GetGridX(), GetGridZ());
+	moveEffect_.SetStartPosition(worldTransform_.translation_);
+
 }
 
 void Player::UpdateMoveCommandsNum() {
