@@ -17,6 +17,11 @@ void Enemy::Initialize(
 	SetTextures(textures);
 	SetSounds(sounds);
 
+	//SE
+	crossAttackSE_ = audio_->LoadWave("SE/crossattack.wav");
+	guardSE_ = audio_->LoadWave("SE/guard.wav");
+	circleAttackSE_ = audio_->LoadWave("SE/circleattack.wav");
+
 	guardModel_.reset(Model::CreateFromOBJ("guard", true));
 
 	guardTex_ = TextureManager::Load("guard/guard.png");
@@ -304,6 +309,9 @@ void Enemy::Move(Command& command) {
 				break;
 			}
 
+			// 移動が確認できたら音を再生
+			sounds_[3] = audio_->PlayWave(sounds_[2], false, option_->m_seVol * 2.5f);
+
 			collisionManager_->SetCollision(tmpX, tmpZ);
 			collisionManager_->RemoveCollision(GetGridX(), GetGridZ());
 			SetGrid(tmpX, tmpZ);
@@ -329,6 +337,9 @@ void Enemy::Move(Command& command) {
 				command = Stop;
 				break;
 			}
+
+				// 移動が確認できたら音を再生
+			sounds_[3] = audio_->PlayWave(sounds_[2], false, option_->m_seVol * 2.5f);
 
 			collisionManager_->SetCollision(tmpX, tmpZ);
 			collisionManager_->RemoveCollision(GetGridX(), GetGridZ());
@@ -356,6 +367,9 @@ void Enemy::Move(Command& command) {
 				break;
 			}
 
+			// 移動が確認できたら音を再生
+			sounds_[3] = audio_->PlayWave(sounds_[2], false, option_->m_seVol * 2.5f);
+
 			collisionManager_->SetCollision(tmpX, tmpZ);
 			collisionManager_->RemoveCollision(GetGridX(), GetGridZ());
 			SetGrid(tmpX, tmpZ);
@@ -382,6 +396,9 @@ void Enemy::Move(Command& command) {
 				break;
 			}
 
+			// 移動が確認できたら音を再生
+			sounds_[3] = audio_->PlayWave(sounds_[2], false, option_->m_seVol * 2.5f);
+
 			collisionManager_->SetCollision(tmpX, tmpZ);
 			collisionManager_->RemoveCollision(GetGridX(), GetGridZ());
 			SetGrid(tmpX, tmpZ);
@@ -404,7 +421,7 @@ void Enemy::Move(Command& command) {
 		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed()) {
 
 			collisionManager_->SetAttackCross(GetGridX(), GetGridZ(), EnemyAttack);
-
+			audio_->PlayWave(crossAttackSE_, false, option_->m_seVol * 1.2f);
 		}
 
 		break;
@@ -413,7 +430,7 @@ void Enemy::Move(Command& command) {
 		if (MoveTimer_ == kMoveTime / gameSpeed_->GetGameSpeed()) {
 
 			collisionManager_->SetAttackCircle(GetGridX(), GetGridZ(), EnemyAttack);
-
+			audio_->PlayWave(circleAttackSE_, false, option_->m_seVol * 1.2f);
 		}
 
 		velocity_ = {0.0f, 0.0f, 0.0f};
@@ -422,7 +439,9 @@ void Enemy::Move(Command& command) {
 	case Guard:
 
 		velocity_ = {0.0f, 0.0f, 0.0f};
-
+		if (!audio_->IsPlaying(guardHandle_)) {
+			guardHandle_ = audio_->PlayWave(guardSE_, false, option_->m_seVol * 1.1f);
+		}
 		guardCount_ = 2;
 
 		break;
