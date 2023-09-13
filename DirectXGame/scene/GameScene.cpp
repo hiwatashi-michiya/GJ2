@@ -276,8 +276,8 @@ void GameScene::Initialize() {
 	// BGM
 	gameBGM_ = audio_->LoadWave("BGM/Battle1.wav");
 	bossBGM_ = audio_->LoadWave("BGM/Battle2.wav");
+	clearBGM = audio_->LoadWave("BGM/clear.wav");
 
-	isGameClear_ = false;
 }
 
 void GameScene::Update() {
@@ -386,14 +386,18 @@ void GameScene::Update() {
 		}
 	} else {
 
-		if (!audio_->IsPlaying(gameHandale_)) {
-			if (stageCount_ < 2) {
+		if (!isGameClear_ && !isGameOver_)
+		{
 
-				gameHandale_ = audio_->PlayWave(gameBGM_, true, option->m_bgmVol * 0.8f);
+			if (!audio_->IsPlaying(gameHandale_)) {
+				if (stageCount_ < 2) {
 
-			} else if (stageCount_ == 2) {
+					gameHandale_ = audio_->PlayWave(gameBGM_, true, option->m_bgmVol * 0.8f);
 
-				gameHandale_ = audio_->PlayWave(bossBGM_, true, option->m_bgmVol * 0.8f);
+				} else if (stageCount_ == 2) {
+
+					gameHandale_ = audio_->PlayWave(bossBGM_, true, option->m_bgmVol * 0.8f);
+				}
 			}
 		}
 
@@ -428,10 +432,13 @@ void GameScene::Update() {
 			if (isStageClear_ == false && isGameOver_ == false) {
 
 				if (CheckAllEnemyIsDead() && player_->GetIsPlayerTurn() == false) {
-					isStageClear_ = true;
+					isGameClear_ = true;
+
 					if (stageCount_ == 2) {
-						isGameClear_ = true;
+						audio_->StopWave(gameHandale_);
+						clearHandale = audio_->PlayWave(clearBGM, false, option->m_bgmVol);
 					}
+
 				} else if (player_->GetIsDead() && CheckAllEnemyTurn() == false) {
 					isGameOver_ = true;
 				}
@@ -443,23 +450,27 @@ void GameScene::Update() {
 				// シーンチェンジ
 				if ((input_->TriggerKey(DIK_RETURN) || option->GetActionTrigger(ACT))) {
 
-					audio_->PlayWave(guardSE_, false, option->m_seVol * 1.2f);
-
-					transition_->SetIsChangeScene(true);
-					// 遷移先のシーンをゲームにする
-					if (isStageClear_ && stageCount_ < 2) {
-						transition_->SetNextScene(RESET);
-						stageCount_++;
-
-						if (stageCount_ == 2) {
-							audio_->StopWave(gameHandale_);
-						}
-
+					if (stageCount_ == 2 && audio_->IsPlaying(clearHandale)) {
+						
 					} else {
-						transition_->SetNextScene(TITLE);
-						stageCount_ = 0;
-						if (audio_->IsPlaying(gameHandale_)) {
+
+						audio_->PlayWave(guardSE_, false, option->m_seVol * 1.2f);
+
+						transition_->SetIsChangeScene(true);
+						// 遷移先のシーンをゲームにする
+						if (isGameClear_ && stageCount_ < 2) {
+							transition_->SetNextScene(RESET);
+							stageCount_++;
+
+							if (stageCount_ == 2) {
+								audio_->StopWave(gameHandale_);
+							}
+
+						} else {
+							transition_->SetNextScene(TITLE);
+							stageCount_ = 0;
 							audio_->StopWave(gameHandale_);
+							audio_->StopWave(clearHandale);
 						}
 					}
 				}
@@ -679,7 +690,13 @@ void GameScene::Draw() {
 				petalSprite_[i]->Draw();
 			}
 		}
-		AnextSprite_->Draw();
+
+		if (stageCount_ == 2 && audio_->IsPlaying(clearHandale)) {
+
+		} else {
+			AnextSprite_->Draw();
+		}
+
 	}
 	if (isGameOver_) {
 		gameoverSprite_->Draw();

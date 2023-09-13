@@ -183,6 +183,8 @@ private: // メンバ変数
 	uint32_t gameBGM_ = 0u;
 	uint32_t bossBGM_ = 0u;
 	uint32_t gameHandale_ = 0u;
+	uint32_t clearBGM = 0u;
+	uint32_t clearHandale = 0u;
 
 	// SE
 	uint32_t damageSE_ = 0u;
