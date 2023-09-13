@@ -297,7 +297,7 @@ void GameScene::Update() {
 		} else if (transition_->GetFadeIn() && transition_->GetNextScene() == GAME) {
 			transition_->SetIsChangeScene(false);
 			transition_->Reset();
-			gameHandale_ = audio_->PlayWave(gameBGM_, true, option->m_bgmVol * 0.8f);
+			//gameHandale_ = audio_->PlayWave(gameBGM_, true, option->m_bgmVol * 0.8f);
 		}
 		// ゲームシーンへのフェードインが完了したら
 		else {

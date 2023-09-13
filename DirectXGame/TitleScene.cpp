@@ -67,8 +67,8 @@ void TitleScene::Initialize() {
 	titleBackTex_ = TextureManager::Load("UI/titleBack.png");
 	titleFrontTex_ = TextureManager::Load("UI/titleFront.png");
 
-
-	debugSE_ = audio_->LoadWave("SE/debugmode.wav");
+	titleBGM_ = audio_->LoadWave("BGM/titleBGM.wav");
+	debugSE_ = audio_->LoadWave("SE/guard.wav");
 
 	titleSprite_.reset(Sprite::Create(titleTex_, {0.0f, 0.0f}));
 	titleSprite_->SetSize({1280.0f, 720.0f});
@@ -136,6 +136,11 @@ void TitleScene::Update() {
 	// シーンチェンジしていない時の処理
 	else {
 
+		if (!audio_->IsPlaying(titleBGM_)) {
+			audio_->StopWave(titleHandle_);
+			titleHandle_ = audio_->PlayWave(titleBGM_, true, option->m_bgmVol);
+		}
+
 		option->Update();
 
 		// シーンチェンジ
@@ -143,7 +148,8 @@ void TitleScene::Update() {
 			transition_->SetIsChangeScene(true);
 			// 遷移先のシーンをゲームにする
 			transition_->SetNextScene(GAME);
-			// audio_->PlayWave(debugSE_);
+			audio_->PlayWave(debugSE_);
+			audio_->StopWave(titleHandle_);
 		}
 	}
 
