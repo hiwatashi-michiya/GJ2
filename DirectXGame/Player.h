@@ -110,12 +110,19 @@ private:
 	//プレイヤーのワールドトランスフォーム
 	WorldTransform worldTransform_;
 	WorldTransform worldTransformGuard_;
+	WorldTransform worldTransformArrow_;
 
 	//エフェクトのワールドトランスフォーム
 	WorldTransform worldTransformEffect_[8];
 
 	//速度
 	Vector3 velocity_;
+
+	//プレイヤー矢印の速度
+	Vector3 arrowVelocity_{0.0f, 0.01f, 0.0f};
+
+	//上昇、下降フラグ
+	bool isFall_ = false;
 
 	//体力
 	const int kMaxLife = 100;
@@ -191,10 +198,12 @@ private:
 	//モデル
 	std::vector<Model*> models_;
 	std::unique_ptr<Model> guardModel_;
+	std::unique_ptr<Model> arrowModel_;
 
 	//画像
 	std::vector<uint32_t> textures_;
 	uint32_t guardTex_ = 0u;
+	uint32_t arrowTex_ = 0u;
 
 	//SE
 	std::vector<uint32_t> sounds_;

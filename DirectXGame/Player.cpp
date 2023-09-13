@@ -18,8 +18,10 @@ void Player::Initialize(
 	SetSounds(sounds);
 
 	guardModel_.reset(Model::CreateFromOBJ("guard", true));
+	arrowModel_.reset(Model::CreateFromOBJ("arrowplayer", true));
 
 	guardTex_ = TextureManager::Load("guard/guard.png");
+	arrowTex_ = TextureManager::Load("arrowplayer/arrowplayer.png");
 
 	currentTex_ = textures_[0];
 
@@ -107,6 +109,12 @@ void Player::Initialize(
 	worldTransformGuard_.translation_.y = 3.0f;
 	worldTransformGuard_.scale_ *= 5.0f;
 	worldTransformGuard_.UpdateMatrix();
+
+	worldTransformArrow_.Initialize();
+	worldTransformArrow_.parent_ = &worldTransform_;
+	worldTransformArrow_.translation_.y = 10.0f;
+	worldTransformArrow_.scale_ *= 3.0f;
+	worldTransformArrow_.UpdateMatrix();
 
 	for (int i = 0; i < 8; i++) {
 		worldTransformEffect_[i].Initialize();
@@ -341,6 +349,31 @@ void Player::Update(const ViewProjection& viewProjection, Option* option) {
 
 		} else {
 		}
+
+		worldTransformArrow_.rotation_.y += 3.14f / 60.0f;
+
+		if (worldTransformArrow_.rotation_.y >= 6.28f) {
+			worldTransformArrow_.rotation_.y = 0.0f;
+		}
+
+		if (isFall_) {
+			arrowVelocity_ -= {0.0f, 0.01f, 0.0f};
+		}
+		else {
+			arrowVelocity_ += {0.0f, 0.01f, 0.0f};
+		}
+
+		arrowVelocity_.y = Clamp(arrowVelocity_.y, -0.1f, 0.1f);
+
+		worldTransformArrow_.translation_ += arrowVelocity_;
+
+		if (worldTransformArrow_.translation_.y >= 12.0f) {
+			isFall_ = true;
+		}
+		else if (worldTransformArrow_.translation_.y <= 10.0f) {
+			isFall_ = false;
+		}
+
 	}
 
 	UpdateMoveCommandsNum();
@@ -349,6 +382,7 @@ void Player::Update(const ViewProjection& viewProjection, Option* option) {
 
 	worldTransform_.UpdateMatrix();
 	worldTransformGuard_.UpdateMatrix();
+	worldTransformArrow_.UpdateMatrix();
 
 }
 
@@ -389,6 +423,7 @@ void Player::MoveTurn() {
 
 	worldTransform_.UpdateMatrix();
 	worldTransformGuard_.UpdateMatrix();
+	worldTransformArrow_.UpdateMatrix();
 	for (int i = 0; i < 8; i++) {
 		worldTransformEffect_[i].UpdateMatrix();
 	}
@@ -676,6 +711,10 @@ void Player::Draw(const ViewProjection& viewProjection) {
 
 	if (isGuard_) {
 		guardModel_->Draw(worldTransformGuard_, viewProjection, guardTex_);
+	}
+
+	if (isStart_) {
+		arrowModel_->Draw(worldTransformArrow_, viewProjection, arrowTex_);
 	}
 
 	/*if (currentMoveCommand_ == AttackCross || currentMoveCommand_ == AttackCircle) {
