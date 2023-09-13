@@ -563,6 +563,8 @@ void GameScene::Draw() {
 			enemy->DrawUI();
 		}
 	}
+	
+	optionSprite_->Draw();
 
 	if (isGameClear_) {
 		clearSprite_->Draw();
@@ -576,7 +578,7 @@ void GameScene::Draw() {
 		gameoverSprite_->Draw();
 	}
 
-	optionSprite_->Draw();
+	
 
 	option->Draw();
 
