@@ -201,9 +201,12 @@ private:
 	std::unique_ptr<Sprite> findUI_[kMaxSelectNum];
 	
 	std::unique_ptr<Sprite> hpFrameSprite_;
-	std::unique_ptr<Sprite> hpSprite_[3];
 
 	std::unique_ptr<Sprite> nextUISprite_;
+	
+	std::unique_ptr<Sprite> specialUI_;
+	std::unique_ptr<Sprite> specialCountUI_;
+	std::unique_ptr<Sprite> specialGoUI_;
 
 	// スプライトの位置をセット
 	void SetCommandSprite(const ViewProjection& viewProjection);
@@ -217,6 +220,7 @@ private:
 	std::vector<uint32_t> textures_;
 	uint32_t guardTex_ = 0u;
 	uint32_t arrowTex_ = 0u;
+	uint32_t goTex = 0u;
 
 	//SE
 	std::vector<uint32_t> sounds_;
@@ -228,6 +232,7 @@ private:
 	uint32_t fallSE_ = 0u;
 	uint32_t guardSE_ = 0u;
 	uint32_t circleAttackSE_ = 0u;
+	uint32_t specialSE = 0u;
 
 	// 非音声再生かどうか判断するやつ
 	uint32_t guardHandle = 0u;

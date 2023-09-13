@@ -22,6 +22,7 @@ void Player::Initialize(
 
 	guardTex_ = TextureManager::Load("guard/guard.png");
 	arrowTex_ = TextureManager::Load("arrowplayer/arrowplayer.png");
+	goTex = TextureManager::Load("UI/GO.png");
 
 	currentTex_ = textures_[0];
 
@@ -84,17 +85,33 @@ void Player::Initialize(
 		     selectCommandNumSprite_[i]->GetPosition().y});
 	}
 
-	for (int i = 0; i < 3; i++) {
-		hpSprite_[i].reset(Sprite::Create(textures_[6], {0.0f, 0.0f}));
-		hpSprite_[i]->SetSize({64.0f, 64.0f});
-		hpSprite_[i]->SetTextureRect(
-		    {
-		        0.0f,
-		        0.0f,
-		    },
-		    {1024.0f, 1024.0f});
-		hpSprite_[i]->SetPosition({(float)(i + 1) * 64, 10.0f});
-	}
+	specialUI_.reset(Sprite::Create(textures_[4], {10.0f, 79.0f}));
+	specialUI_->SetSize({64.0f, 64.0f});
+	specialUI_->SetTextureRect(
+	    {
+	        8192.0f,
+	        0.0f,
+	    },
+	    {1024.0f, 1024.0f});
+
+	specialCountUI_.reset(Sprite::Create(textures_[10], {10.0f, 79.0f}));
+	specialCountUI_->SetColor({0.0f, 0.0f, 0.0f, 1.0f});
+	specialCountUI_->SetSize({64.0f, 64.0f});
+	specialCountUI_->SetTextureRect(
+	    {
+	        0.0f,
+	        0.0f,
+	    },
+	    {1024.0f, 1024.0f});
+
+	specialGoUI_.reset(Sprite::Create(goTex, {54.0f, 80.0f}));
+	specialGoUI_->SetSize({64.0f, 64.0f});
+	specialGoUI_->SetTextureRect(
+	    {
+	        0.0f,
+	        0.0f,
+	    },
+	    {1024.0f, 1024.0f});
 
 	currentNumSprite_.reset(Sprite::Create(textures_[0], {0.0f, 0.0f}));
 	currentNumSprite_->SetSize({16.0f, 16.0f});
@@ -135,6 +152,7 @@ void Player::Initialize(
 	selectSE_ = audio_->LoadWave("SE/select.wav");
 	cancelSE_ = audio_->LoadWave("SE/cancel.wav");
 	fallSE_ = audio_->LoadWave("SE/fall.wav");
+	specialSE = audio_->LoadWave("SE/special.wav");
 
 	isEffect_ = false;
 	isMoveEffect_ = false;
@@ -340,7 +358,7 @@ void Player::Update(const ViewProjection& viewProjection) {
 
 					selectCommands_.push_back(S_PlayerAttack);
 				}
-
+				audio_->PlayWave(specialSE, false, option_->m_seVol * 2.5f);
 				specialCount_ = 0;
 
 		} else if (
@@ -495,6 +513,9 @@ void Player::Move(Command& command) {
 
 			if (specialCount_ < kMaxSpecialCount) {
 				specialCount_++;
+				if (specialCount_ == kMaxSpecialCount) {
+				audio_->PlayWave(specialSE, false, option_->m_seVol * 2.5f);
+				}
 			}
 
 			int tmpX = GetGridX() - 1;
@@ -534,6 +555,9 @@ void Player::Move(Command& command) {
 
 			if (specialCount_ < kMaxSpecialCount) {
 				specialCount_++;
+				if (specialCount_ == kMaxSpecialCount) {
+				audio_->PlayWave(specialSE, false, option_->m_seVol * 2.5f);
+				}
 			}
 
 			int tmpX = GetGridX() + 1;
@@ -573,6 +597,9 @@ void Player::Move(Command& command) {
 
 			if (specialCount_ < kMaxSpecialCount) {
 				specialCount_++;
+				if (specialCount_ == kMaxSpecialCount) {
+				audio_->PlayWave(specialSE, false, option_->m_seVol * 2.5f);
+				}
 			}
 
 			/*audio_->PlayWave(upMoveSE_);*/
@@ -615,6 +642,9 @@ void Player::Move(Command& command) {
 
 			if (specialCount_ < kMaxSpecialCount) {
 				specialCount_++;
+				if (specialCount_ == kMaxSpecialCount) {
+				audio_->PlayWave(specialSE, false, option_->m_seVol * 2.5f);
+				}
 			}
 
 			int tmpX = GetGridX();
@@ -862,7 +892,7 @@ void Player::DrawUI() {
 
 	for (int i = 0; i < selectCommands_.size(); i++) {
 		if (isFindUI_[i] == true) {
-			findUI_[i]->Draw();
+			//findUI_[i]->Draw();
 		}
 	}
 
@@ -885,6 +915,12 @@ void Player::DrawUI() {
 	    hpSprite_[i]->Draw();
 	}*/
 
+	specialUI_->Draw();
+	specialCountUI_->SetSize({64.0f, (10 - specialCount_) * 6.4f});
+	specialCountUI_->Draw();
+	if (specialCount_ == kMaxSpecialCount) {
+		specialGoUI_->Draw();
+	}
 	hpFrameSprite_->Draw();
 	nextUISprite_->Draw();
 
