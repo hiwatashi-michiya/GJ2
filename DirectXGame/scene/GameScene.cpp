@@ -100,7 +100,7 @@ void GameScene::Initialize() {
 	        0.0f,
 	    },
 	    {720.0f, 1280.0f});
-	ctrSprite_->SetPosition({1040.0f, 0.00f});
+	ctrSprite_->SetPosition({860.0f, 45.0f});
 
 	ctrGameSprite_ = ctrKeyGameSprite_.get();
 	ctrGameSprite_->SetSize({240.0f, 240.0f});
@@ -320,6 +320,7 @@ void GameScene::Update() {
 		        0.0f,
 		    },
 		    {720.0f, 1280.0f});
+		ctrSprite_->SetPosition({860.0f, 45.0f});
 		ctrGameSprite_ = ctrPadGameSprite_.get();
 		ctrGameSprite_->SetSize({180.0f, 256.0f});
 		ctrGameSprite_->SetTextureRect(
@@ -339,6 +340,7 @@ void GameScene::Update() {
 		        0.0f,
 		    },
 		    {720.0f, 1280.0f});
+		ctrSprite_->SetPosition({860.0f, 45.0f});
 		ctrGameSprite_ = ctrKeyGameSprite_.get();
 		ctrGameSprite_->SetSize({180.0f, 256.0f});
 		ctrGameSprite_->SetTextureRect(
