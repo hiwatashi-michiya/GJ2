@@ -193,6 +193,7 @@ private:
 
 	//スプライト
 	std::unique_ptr<Sprite> commandNumSprite_[kMaxCommand];
+	std::unique_ptr<Sprite> emptyNumSprite_[kMaxCommand];
 
 	std::unique_ptr<Sprite> selectCommandNumSprite_[kMaxSelectNum];
 
@@ -217,6 +218,7 @@ private:
 	std::vector<uint32_t> textures_;
 	uint32_t guardTex_ = 0u;
 	uint32_t arrowTex_ = 0u;
+	uint32_t backTex_ = 0u;
 
 	//SE
 	std::vector<uint32_t> sounds_;

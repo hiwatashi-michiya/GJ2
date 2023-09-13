@@ -22,6 +22,7 @@ void Player::Initialize(
 
 	guardTex_ = TextureManager::Load("guard/guard.png");
 	arrowTex_ = TextureManager::Load("arrowplayer/arrowplayer.png");
+	backTex_ = TextureManager::Load("UI/baseBack.png");
 
 	currentTex_ = textures_[0];
 
@@ -55,6 +56,16 @@ void Player::Initialize(
 		    },
 		    {1024.0f, 1024.0f});
 		commandNumSprite_[i]->SetPosition({(kMaxCommand - 1 + i) * 64.0f + 10.0f, 10.0f});
+		emptyNumSprite_[i].reset(Sprite::Create(backTex_, {0.0f, 0.0f}));
+		emptyNumSprite_[i]->SetSize({64.0f, 64.0f});
+		emptyNumSprite_[i]->SetTextureRect(
+		    {
+		        0.0f,
+		        0.0f,
+		    },
+		    {1024.0f, 1024.0f});
+		emptyNumSprite_[i]->SetPosition({(kMaxCommand - 1 + i) * 64.0f + 10.0f, 10.0f});
+
 	}
 
 	for (int i = 0; i < kMaxSelectNum; i++) {
@@ -842,6 +853,10 @@ void Player::Draw(const ViewProjection& viewProjection) {
 }
 
 void Player::DrawUI() {
+
+	for (int i = 0; i < kMaxCommand; i++) {
+		emptyNumSprite_[i]->Draw();
+	}
 
 	for (int i = 0; i < GetmoveCommands().size(); i++) {
 		commandNumSprite_[i]->Draw();

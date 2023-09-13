@@ -75,6 +75,8 @@ void GameScene::Initialize() {
 	petalTex_ = TextureManager::Load("UI/petal.png");
 	ctrKeyTex_ = TextureManager::Load("UI/ctrKey.png");
 	ctrPadTex_ = TextureManager::Load("UI/ctrPad.png");
+	ctrPadGameTex_ = TextureManager::Load("UI/ctrPad_game.png");
+	ctrKeyGameTex_ = TextureManager::Load("UI/ctrKey_game.png");
 	playerAttackTex_ = TextureManager::Load("attack/playerattack.png");
 	enemyAttackTex_ = TextureManager::Load("attack/enemyattack.png");
 	playerSpecialAttackTex_ = TextureManager::Load("attack/playerspecialattack.png");
@@ -83,8 +85,13 @@ void GameScene::Initialize() {
 	AtitleTex_ = TextureManager::Load("UI/Atitle.png");
 	AnextTex_ = TextureManager::Load("UI/Anext.png");
 
+	ctrPadSprite_.reset(Sprite::Create(ctrPadTex_, {860.0f, 45.0f}));
+	ctrKeySprite_.reset(Sprite::Create(ctrKeyTex_, {860.0f, 45.0f}));
+	ctrPadGameSprite_.reset(Sprite::Create(ctrPadGameTex_, {1000.0f, 450.0f}));
+	ctrKeyGameSprite_.reset(Sprite::Create(ctrKeyGameTex_, {1000.0f, 450.0f}));
+
 	// スプライト
-	ctrSprite_ = Sprite::Create(ctrKeyTex_, {0.0f, 0.0f});
+	ctrSprite_ = ctrKeySprite_.get();
 	ctrSprite_->SetSize({240.0f, 720.0f});
 	ctrSprite_->SetTextureRect(
 	    {
@@ -93,6 +100,17 @@ void GameScene::Initialize() {
 	    },
 	    {720.0f, 1280.0f});
 	ctrSprite_->SetPosition({1040.0f, 0.00f});
+	
+
+	ctrGameSprite_ = ctrKeyGameSprite_.get();
+	ctrGameSprite_->SetSize({240.0f, 240.0f});
+	ctrGameSprite_->SetTextureRect(
+	    {
+	        0.0f,
+	        0.0f,
+	    },
+	    {720.0f, 720.0f});
+	ctrGameSprite_->SetPosition({1000.0f, 450.0f});
 
 	AnextSprite_.reset(Sprite::Create(AnextTex_, {300.0f, 380.0f}));
 	AnextSprite_->SetSize({680.0f, 360.0f});
@@ -280,7 +298,7 @@ void GameScene::Update() {
 #endif // _DEBUG
 
 	if (input_->GetJoystickState(0, joyState)) {
-		ctrSprite_ = Sprite::Create(ctrPadTex_, {860.0f, 45.0f});
+		ctrSprite_ = ctrPadSprite_.get();
 		ctrSprite_->SetSize({300.0f, 628.0f});
 		ctrSprite_->SetTextureRect(
 		    {
@@ -288,8 +306,19 @@ void GameScene::Update() {
 		        0.0f,
 		    },
 		    {720.0f, 1280.0f});
-	} else {
-		ctrSprite_ = Sprite::Create(ctrKeyTex_, {860.0f, 45.0f});
+		ctrGameSprite_ = ctrPadGameSprite_.get();
+		ctrGameSprite_->SetSize({240.0f, 240.0f});
+		ctrGameSprite_->SetTextureRect(
+		    {
+		        0.0f,
+		        0.0f,
+		    },
+		    {720.0f, 720.0f});
+		ctrGameSprite_->SetPosition({1000.0f, 450.0f});
+
+	} 
+	else {
+		ctrSprite_ = ctrKeySprite_.get();
 		ctrSprite_->SetSize({300.0f, 628.0f});
 		ctrSprite_->SetTextureRect(
 		    {
@@ -297,6 +326,15 @@ void GameScene::Update() {
 		        0.0f,
 		    },
 		    {720.0f, 1280.0f});
+		ctrGameSprite_ = ctrKeyGameSprite_.get();
+		ctrGameSprite_->SetSize({240.0f, 240.0f});
+		ctrGameSprite_->SetTextureRect(
+		    {
+		        0.0f,
+		        0.0f,
+		    },
+		    {720.0f, 720.0f});
+		ctrGameSprite_->SetPosition({1000.0f, 450.0f});
 	}
 
 	if (transition_->GetIsChangeScene()) {
@@ -580,6 +618,8 @@ void GameScene::Draw() {
 			enemy->DrawUI();
 		}
 	}
+
+	ctrGameSprite_->Draw();
 
 	optionSprite_->Draw();
 
@@ -1192,209 +1232,214 @@ void GameScene::PredictionActDraw() {
 
 			for (Command command : enemy->moveCommands_) {
 
-				switch (command) {
-				case MoveLeft:
+				if (enemy->GetIsEffect() == false && enemy->GetIsDead() == false) {
 
-					if (tmpEnemyGridX - 1 >= 0 &&
-					    tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX - 1] == 0) {
-						tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX] = 0;
-						tmpEnemyGridX -= 1;
-						arrowLeftModel_->Draw(
-						    worldTransformArrowMass_[tmpEnemyGridZ][tmpEnemyGridX], viewProjection_,
-						    enemyMoveMassTex_);
-						tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX] = 1;
-					}
+					switch (command) {
+					case MoveLeft:
 
-					break;
-				case MoveRight:
-
-					if (tmpEnemyGridX + 1 < 6 &&
-					    tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX + 1] == 0) {
-						tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX] = 0;
-						tmpEnemyGridX += 1;
-						arrowRightModel_->Draw(
-						    worldTransformArrowMass_[tmpEnemyGridZ][tmpEnemyGridX], viewProjection_,
-						    enemyMoveMassTex_);
-						tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX] = 1;
-					}
-
-					break;
-				case MoveUp:
-
-					if (tmpEnemyGridZ - 1 >= 0 &&
-					    tmpCollisionMass[tmpEnemyGridZ - 1][tmpEnemyGridX] == 0) {
-						tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX] = 0;
-						tmpEnemyGridZ -= 1;
-						arrowUpModel_->Draw(
-						    worldTransformArrowMass_[tmpEnemyGridZ][tmpEnemyGridX], viewProjection_,
-						    enemyMoveMassTex_);
-						tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX] = 1;
-					}
-
-					break;
-				case MoveDown:
-
-					if (tmpEnemyGridZ + 1 < 6 &&
-					    tmpCollisionMass[tmpEnemyGridZ + 1][tmpEnemyGridX] == 0) {
-						tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX] = 0;
-						tmpEnemyGridZ += 1;
-						arrowDownModel_->Draw(
-						    worldTransformArrowMass_[tmpEnemyGridZ][tmpEnemyGridX], viewProjection_,
-						    enemyMoveMassTex_);
-						tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX] = 1;
-					}
-
-					break;
-				case Stop:
-					break;
-				case AttackCross:
-
-					for (int i = 1; i < 3; i++) {
-
-						if (tmpEnemyGridZ - i >= 0) {
-							groundModel_->Draw(
-							    worldTransformMass_[tmpEnemyGridZ - i][tmpEnemyGridX],
-							    viewProjection_, enemyAttackMassTex_);
+						if (tmpEnemyGridX - 1 >= 0 &&
+						    tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX - 1] == 0) {
+							tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX] = 0;
+							tmpEnemyGridX -= 1;
+							arrowLeftModel_->Draw(
+							    worldTransformArrowMass_[tmpEnemyGridZ][tmpEnemyGridX],
+							    viewProjection_, enemyMoveMassTex_);
+							tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX] = 1;
 						}
 
-						if (tmpEnemyGridZ + i < 6) {
-							groundModel_->Draw(
-							    worldTransformMass_[tmpEnemyGridZ + i][tmpEnemyGridX],
-							    viewProjection_, enemyAttackMassTex_);
+						break;
+					case MoveRight:
+
+						if (tmpEnemyGridX + 1 < 6 &&
+						    tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX + 1] == 0) {
+							tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX] = 0;
+							tmpEnemyGridX += 1;
+							arrowRightModel_->Draw(
+							    worldTransformArrowMass_[tmpEnemyGridZ][tmpEnemyGridX],
+							    viewProjection_, enemyMoveMassTex_);
+							tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX] = 1;
 						}
 
-						if (tmpEnemyGridX - i >= 0) {
-							groundModel_->Draw(
-							    worldTransformMass_[tmpEnemyGridZ][tmpEnemyGridX - i],
-							    viewProjection_, enemyAttackMassTex_);
+						break;
+					case MoveUp:
+
+						if (tmpEnemyGridZ - 1 >= 0 &&
+						    tmpCollisionMass[tmpEnemyGridZ - 1][tmpEnemyGridX] == 0) {
+							tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX] = 0;
+							tmpEnemyGridZ -= 1;
+							arrowUpModel_->Draw(
+							    worldTransformArrowMass_[tmpEnemyGridZ][tmpEnemyGridX],
+							    viewProjection_, enemyMoveMassTex_);
+							tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX] = 1;
 						}
 
-						if (tmpEnemyGridX + i < 6) {
-							groundModel_->Draw(
-							    worldTransformMass_[tmpEnemyGridZ][tmpEnemyGridX + i],
-							    viewProjection_, enemyAttackMassTex_);
+						break;
+					case MoveDown:
+
+						if (tmpEnemyGridZ + 1 < 6 &&
+						    tmpCollisionMass[tmpEnemyGridZ + 1][tmpEnemyGridX] == 0) {
+							tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX] = 0;
+							tmpEnemyGridZ += 1;
+							arrowDownModel_->Draw(
+							    worldTransformArrowMass_[tmpEnemyGridZ][tmpEnemyGridX],
+							    viewProjection_, enemyMoveMassTex_);
+							tmpCollisionMass[tmpEnemyGridZ][tmpEnemyGridX] = 1;
 						}
-					}
 
-					break;
-				case AttackCircle:
+						break;
+					case Stop:
+						break;
+					case AttackCross:
 
-					if (tmpEnemyGridZ - 1 >= 0) {
+						for (int i = 1; i < 3; i++) {
 
-						groundModel_->Draw(
-						    worldTransformMass_[tmpEnemyGridZ - 1][tmpEnemyGridX], viewProjection_,
-						    enemyAttackMassTex_);
+							if (tmpEnemyGridZ - i >= 0) {
+								groundModel_->Draw(
+								    worldTransformMass_[tmpEnemyGridZ - i][tmpEnemyGridX],
+								    viewProjection_, enemyAttackMassTex_);
+							}
+
+							if (tmpEnemyGridZ + i < 6) {
+								groundModel_->Draw(
+								    worldTransformMass_[tmpEnemyGridZ + i][tmpEnemyGridX],
+								    viewProjection_, enemyAttackMassTex_);
+							}
+
+							if (tmpEnemyGridX - i >= 0) {
+								groundModel_->Draw(
+								    worldTransformMass_[tmpEnemyGridZ][tmpEnemyGridX - i],
+								    viewProjection_, enemyAttackMassTex_);
+							}
+
+							if (tmpEnemyGridX + i < 6) {
+								groundModel_->Draw(
+								    worldTransformMass_[tmpEnemyGridZ][tmpEnemyGridX + i],
+								    viewProjection_, enemyAttackMassTex_);
+							}
+						}
+
+						break;
+					case AttackCircle:
+
+						if (tmpEnemyGridZ - 1 >= 0) {
+
+							groundModel_->Draw(
+							    worldTransformMass_[tmpEnemyGridZ - 1][tmpEnemyGridX],
+							    viewProjection_, enemyAttackMassTex_);
+
+							if (tmpEnemyGridX - 1 >= 0) {
+								groundModel_->Draw(
+								    worldTransformMass_[tmpEnemyGridZ - 1][tmpEnemyGridX - 1],
+								    viewProjection_, enemyAttackMassTex_);
+							}
+
+							if (tmpEnemyGridX + 1 < 6) {
+								groundModel_->Draw(
+								    worldTransformMass_[tmpEnemyGridZ - 1][tmpEnemyGridX + 1],
+								    viewProjection_, enemyAttackMassTex_);
+							}
+						}
+
+						if (tmpEnemyGridZ + 1 < 6) {
+
+							groundModel_->Draw(
+							    worldTransformMass_[tmpEnemyGridZ + 1][tmpEnemyGridX],
+							    viewProjection_, enemyAttackMassTex_);
+
+							if (tmpEnemyGridX - 1 >= 0) {
+								groundModel_->Draw(
+								    worldTransformMass_[tmpEnemyGridZ + 1][tmpEnemyGridX - 1],
+								    viewProjection_, enemyAttackMassTex_);
+							}
+
+							if (tmpEnemyGridX + 1 < 6) {
+								groundModel_->Draw(
+								    worldTransformMass_[tmpEnemyGridZ + 1][tmpEnemyGridX + 1],
+								    viewProjection_, enemyAttackMassTex_);
+							}
+						}
 
 						if (tmpEnemyGridX - 1 >= 0) {
 							groundModel_->Draw(
-							    worldTransformMass_[tmpEnemyGridZ - 1][tmpEnemyGridX - 1],
+							    worldTransformMass_[tmpEnemyGridZ][tmpEnemyGridX - 1],
 							    viewProjection_, enemyAttackMassTex_);
 						}
 
 						if (tmpEnemyGridX + 1 < 6) {
 							groundModel_->Draw(
-							    worldTransformMass_[tmpEnemyGridZ - 1][tmpEnemyGridX + 1],
+							    worldTransformMass_[tmpEnemyGridZ][tmpEnemyGridX + 1],
 							    viewProjection_, enemyAttackMassTex_);
 						}
+
+						break;
+					case Guard:
+						break;
+					case S_EnemyAttack:
+
+						for (int i = 1; i < 3; i++) {
+
+							if (tmpEnemyGridZ - i >= 0) {
+								groundModel_->Draw(
+								    worldTransformMass_[tmpEnemyGridZ - i][tmpEnemyGridX],
+								    viewProjection_, enemyAttackMassTex_);
+							}
+
+							if (tmpEnemyGridZ + i < 6) {
+								groundModel_->Draw(
+								    worldTransformMass_[tmpEnemyGridZ + i][tmpEnemyGridX],
+								    viewProjection_, enemyAttackMassTex_);
+							}
+
+							if (tmpEnemyGridX - i >= 0) {
+								groundModel_->Draw(
+								    worldTransformMass_[tmpEnemyGridZ][tmpEnemyGridX - i],
+								    viewProjection_, enemyAttackMassTex_);
+							}
+
+							if (tmpEnemyGridX + i < 6) {
+								groundModel_->Draw(
+								    worldTransformMass_[tmpEnemyGridZ][tmpEnemyGridX + i],
+								    viewProjection_, enemyAttackMassTex_);
+							}
+						}
+
+						if (tmpEnemyGridZ - 1 >= 0) {
+
+							if (tmpEnemyGridX - 1 >= 0) {
+								groundModel_->Draw(
+								    worldTransformMass_[tmpEnemyGridZ - 1][tmpEnemyGridX - 1],
+								    viewProjection_, enemyAttackMassTex_);
+							}
+
+							if (tmpEnemyGridX + 1 < 6) {
+								groundModel_->Draw(
+								    worldTransformMass_[tmpEnemyGridZ - 1][tmpEnemyGridX + 1],
+								    viewProjection_, enemyAttackMassTex_);
+							}
+						}
+
+						if (tmpEnemyGridZ + 1 < 6) {
+
+							if (tmpEnemyGridX - 1 >= 0) {
+								groundModel_->Draw(
+								    worldTransformMass_[tmpEnemyGridZ + 1][tmpEnemyGridX - 1],
+								    viewProjection_, enemyAttackMassTex_);
+							}
+
+							if (tmpEnemyGridX + 1 < 6) {
+								groundModel_->Draw(
+								    worldTransformMass_[tmpEnemyGridZ + 1][tmpEnemyGridX + 1],
+								    viewProjection_, enemyAttackMassTex_);
+							}
+						}
+
+						break;
+					default:
+						break;
 					}
 
-					if (tmpEnemyGridZ + 1 < 6) {
-
-						groundModel_->Draw(
-						    worldTransformMass_[tmpEnemyGridZ + 1][tmpEnemyGridX], viewProjection_,
-						    enemyAttackMassTex_);
-
-						if (tmpEnemyGridX - 1 >= 0) {
-							groundModel_->Draw(
-							    worldTransformMass_[tmpEnemyGridZ + 1][tmpEnemyGridX - 1],
-							    viewProjection_, enemyAttackMassTex_);
-						}
-
-						if (tmpEnemyGridX + 1 < 6) {
-							groundModel_->Draw(
-							    worldTransformMass_[tmpEnemyGridZ + 1][tmpEnemyGridX + 1],
-							    viewProjection_, enemyAttackMassTex_);
-						}
-					}
-
-					if (tmpEnemyGridX - 1 >= 0) {
-						groundModel_->Draw(
-						    worldTransformMass_[tmpEnemyGridZ][tmpEnemyGridX - 1], viewProjection_,
-						    enemyAttackMassTex_);
-					}
-
-					if (tmpEnemyGridX + 1 < 6) {
-						groundModel_->Draw(
-						    worldTransformMass_[tmpEnemyGridZ][tmpEnemyGridX + 1], viewProjection_,
-						    enemyAttackMassTex_);
-					}
-
-					break;
-				case Guard:
-					break;
-				case S_EnemyAttack:
-
-					for (int i = 1; i < 3; i++) {
-
-						if (tmpEnemyGridZ - i >= 0) {
-							groundModel_->Draw(
-							    worldTransformMass_[tmpEnemyGridZ - i][tmpEnemyGridX],
-							    viewProjection_, enemyAttackMassTex_);
-						}
-
-						if (tmpEnemyGridZ + i < 6) {
-							groundModel_->Draw(
-							    worldTransformMass_[tmpEnemyGridZ + i][tmpEnemyGridX],
-							    viewProjection_, enemyAttackMassTex_);
-						}
-
-						if (tmpEnemyGridX - i >= 0) {
-							groundModel_->Draw(
-							    worldTransformMass_[tmpEnemyGridZ][tmpEnemyGridX - i],
-							    viewProjection_, enemyAttackMassTex_);
-						}
-
-						if (tmpEnemyGridX + i < 6) {
-							groundModel_->Draw(
-							    worldTransformMass_[tmpEnemyGridZ][tmpEnemyGridX + i],
-							    viewProjection_, enemyAttackMassTex_);
-						}
-					}
-
-					if (tmpEnemyGridZ - 1 >= 0) {
-
-						if (tmpEnemyGridX - 1 >= 0) {
-							groundModel_->Draw(
-							    worldTransformMass_[tmpEnemyGridZ - 1][tmpEnemyGridX - 1],
-							    viewProjection_, enemyAttackMassTex_);
-						}
-
-						if (tmpEnemyGridX + 1 < 6) {
-							groundModel_->Draw(
-							    worldTransformMass_[tmpEnemyGridZ - 1][tmpEnemyGridX + 1],
-							    viewProjection_, enemyAttackMassTex_);
-						}
-					}
-
-					if (tmpEnemyGridZ + 1 < 6) {
-
-						if (tmpEnemyGridX - 1 >= 0) {
-							groundModel_->Draw(
-							    worldTransformMass_[tmpEnemyGridZ + 1][tmpEnemyGridX - 1],
-							    viewProjection_, enemyAttackMassTex_);
-						}
-
-						if (tmpEnemyGridX + 1 < 6) {
-							groundModel_->Draw(
-							    worldTransformMass_[tmpEnemyGridZ + 1][tmpEnemyGridX + 1],
-							    viewProjection_, enemyAttackMassTex_);
-						}
-					}
-
-					break;
-				default:
-					break;
 				}
+				
 			}
 		}
 	}

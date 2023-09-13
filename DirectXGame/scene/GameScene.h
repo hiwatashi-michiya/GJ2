@@ -153,6 +153,8 @@ private: // メンバ変数
 	uint32_t nextTex_ = 0u;
 	uint32_t ctrPadTex_ = 0u;
 	uint32_t ctrKeyTex_ = 0u;
+	uint32_t ctrPadGameTex_ = 0u;
+	uint32_t ctrKeyGameTex_ = 0u;
 	uint32_t playerAttackTex_ = 0u;
 	uint32_t enemyAttackTex_ = 0u;
 	uint32_t playerSpecialAttackTex_ = 0u;
@@ -166,9 +168,14 @@ private: // メンバ変数
 
 	// スプライト
 	Sprite* ctrSprite_ = nullptr;
+	Sprite* ctrGameSprite_ = nullptr;
 	std::unique_ptr<Sprite> optionSprite_ = nullptr;
 	std::unique_ptr<Sprite> AnextSprite_ = nullptr;
 	std::unique_ptr<Sprite> AtitleSprite_ = nullptr;
+	std::unique_ptr<Sprite> ctrPadSprite_ = nullptr;
+	std::unique_ptr<Sprite> ctrKeySprite_ = nullptr;
+	std::unique_ptr<Sprite> ctrPadGameSprite_ = nullptr;
+	std::unique_ptr<Sprite> ctrKeyGameSprite_ = nullptr;
 
 	// BGM
 	uint32_t gameBGM_ = 0u;
