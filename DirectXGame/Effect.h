@@ -3,6 +3,7 @@
 #include <ViewProjection.h>
 #include <Model.h>
 #include <memory>
+#include "MoveCommand.h"
 
 const int kMaxParticles = 10;
 
@@ -13,6 +14,8 @@ enum EffectType {
 	Dust,
 
 };
+
+class Player;
 
 class Effect {
 public:
@@ -39,6 +42,8 @@ public:
 
 	}
 
+	void SetCurrentMoveCommands(Command command) { currentMoveCommand_ = command; }
+
 private:
 
 	std::unique_ptr<Model> effectModel_;
@@ -54,6 +59,11 @@ private:
 
 	EffectType effectType_ = Up;
 
-	uint32_t effectTex_[3];
+	uint32_t effectTex_[2];
+	uint32_t dustTex_;
 
+	// 現在の行動コマンド
+	Command currentMoveCommand_ = Stop;
+
+	std::unique_ptr<Player> player_ = nullptr;
 };

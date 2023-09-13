@@ -135,6 +135,13 @@ void Player::Initialize(
 	selectSE_ = audio_->LoadWave("SE/select.wav");
 	cancelSE_ = audio_->LoadWave("SE/cancel.wav");
 	fallSE_ = audio_->LoadWave("SE/fall.wav");
+
+	isEffect_ = false;
+	moveEffect_.Initialize();
+	moveEffect_.Reset(60 / gameSpeed_->GetGameSpeed());
+	moveEffect_.SetStartPosition(worldTransform_.translation_);
+	moveEffect_.SetEffectType(Dust);
+	moveEffect_.SetEffect();
 }
 
 void Player::Update(const ViewProjection& viewProjection, Option* option) {
@@ -358,8 +365,7 @@ void Player::Update(const ViewProjection& viewProjection, Option* option) {
 
 		if (isFall_) {
 			arrowVelocity_ -= {0.0f, 0.01f, 0.0f};
-		}
-		else {
+		} else {
 			arrowVelocity_ += {0.0f, 0.01f, 0.0f};
 		}
 
@@ -369,11 +375,13 @@ void Player::Update(const ViewProjection& viewProjection, Option* option) {
 
 		if (worldTransformArrow_.translation_.y >= 12.0f) {
 			isFall_ = true;
-		}
-		else if (worldTransformArrow_.translation_.y <= 10.0f) {
+		} else if (worldTransformArrow_.translation_.y <= 10.0f) {
 			isFall_ = false;
 		}
 
+		if (isEffect_) {
+			moveEffect_.Update();
+		}
 	}
 
 	UpdateMoveCommandsNum();
@@ -383,7 +391,6 @@ void Player::Update(const ViewProjection& viewProjection, Option* option) {
 	worldTransform_.UpdateMatrix();
 	worldTransformGuard_.UpdateMatrix();
 	worldTransformArrow_.UpdateMatrix();
-
 }
 
 void Player::MoveTurn() {
@@ -417,6 +424,7 @@ void Player::MoveTurn() {
 
 	// 行動フラグが立っていたら行動開始
 	if (isMove_) {
+		moveEffect_.SetCurrentMoveCommands(currentMoveCommand_);
 		Move(currentMoveCommand_);
 	} else {
 	}
@@ -455,6 +463,12 @@ void Player::Move(Command& command) {
 			collisionManager_->SetCollision(tmpX, tmpZ);
 			collisionManager_->RemoveCollision(GetGridX(), GetGridZ());
 			SetGrid(tmpX, tmpZ);
+
+			// エフェクト配置
+			if (isEffect_ != 1) {
+				isEffect_ = true;
+				moveEffect_.SetEffect();
+			}
 		}
 
 		velocity_ = {-1.0f / 6.0f * gameSpeed_->GetGameSpeed(), 0.0f, 0.0f};
@@ -485,6 +499,12 @@ void Player::Move(Command& command) {
 			collisionManager_->SetCollision(tmpX, tmpZ);
 			collisionManager_->RemoveCollision(GetGridX(), GetGridZ());
 			SetGrid(tmpX, tmpZ);
+
+			// エフェクト配置
+			if (isEffect_ != 1) {
+				isEffect_ = true;
+				moveEffect_.SetEffect();
+			}
 		}
 
 		velocity_ = {1.0f / 6.0f * gameSpeed_->GetGameSpeed(), 0.0f, 0.0f};
@@ -517,6 +537,12 @@ void Player::Move(Command& command) {
 			collisionManager_->SetCollision(tmpX, tmpZ);
 			collisionManager_->RemoveCollision(GetGridX(), GetGridZ());
 			SetGrid(tmpX, tmpZ);
+
+			// エフェクト配置
+			if (isEffect_ != 1) {
+				isEffect_ = true;
+				moveEffect_.SetEffect();
+			}
 		}
 
 		velocity_ = {0.0f, 0.0f, 1.0f / 6.0f * gameSpeed_->GetGameSpeed()};
@@ -547,6 +573,12 @@ void Player::Move(Command& command) {
 			collisionManager_->SetCollision(tmpX, tmpZ);
 			collisionManager_->RemoveCollision(GetGridX(), GetGridZ());
 			SetGrid(tmpX, tmpZ);
+
+			// エフェクト配置
+			if (isEffect_ != 1) {
+				isEffect_ = true;
+				moveEffect_.SetEffect();
+			}
 		}
 
 		velocity_ = {0.0f, 0.0f, -1.0f / 6.0f * gameSpeed_->GetGameSpeed()};
@@ -691,15 +723,26 @@ void Player::Move(Command& command) {
 		moveAngle_ = 0.0f;
 		velocity_ = {0.0f, 0.0f, 0.0f};
 
-		if (isGuard_) {
-			currentTex_ = textures_[9];
+		/*if (isGuard_) {
+		    currentTex_ = textures_[9];
 		} else {
-			currentTex_ = textures_[0];
-		}
+		    currentTex_ = textures_[0];
+		}*/
+		currentTex_ = textures_[0];
 
 		currentMoveCommand_ = Stop;
 		collisionManager_->ResetAttack();
 		interval_ = kMaxInterval;
+
+		// エフェクト配置
+		if (isEffect_) {
+			isEffect_ = false;
+			moveEffect_.Reset(60 / gameSpeed_->GetGameSpeed());
+			moveEffect_.SetStartPosition(worldTransform_.translation_);
+			moveEffect_.SetEffectType(Dust);
+			moveEffect_.SetEffect();
+		}
+
 		isMove_ = false;
 		isHit_ = false;
 	}
@@ -729,6 +772,10 @@ void Player::Draw(const ViewProjection& viewProjection) {
 		for (int i = 0; i < 5; i++) {
 			models_[2]->Draw(worldTransformEffect_[i], viewProjection, textures_[9]);
 		}
+	}
+
+	if (isEffect_) {
+		moveEffect_.Draw(viewProjection);
 	}
 }
 

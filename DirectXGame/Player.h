@@ -91,6 +91,8 @@ public:
 
 	bool GetIsStart() { return isStart_; }
 
+	Command GetCurrentMoveCommands() { return currentMoveCommand_; }
+
 private:
 
 	//入力
@@ -229,4 +231,7 @@ private:
 
 	int startCount_ = 60;
 
+	// エフェクト表示
+	bool isEffect_;
+	Effect moveEffect_;
 };
