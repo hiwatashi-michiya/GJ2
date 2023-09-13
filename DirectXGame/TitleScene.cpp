@@ -102,6 +102,9 @@ void TitleScene::Initialize() {
 
 	// オプション 初期化
 	option->Initialize();
+
+	titleHandle_ = audio_->PlayWave(titleBGM_, true, option->m_bgmVol);
+
 }
 
 /// <summary>
@@ -125,6 +128,7 @@ void TitleScene::Update() {
 		else if (transition_->GetFadeIn() && transition_->GetNextScene() == TITLE) {
 			transition_->SetIsChangeScene(false);
 			transition_->Reset();
+			titleHandle_ = audio_->PlayWave(titleBGM_, true, option->m_bgmVol);
 		}
 		// ゲームシーンへのフェードインが完了したら
 		else {
@@ -136,11 +140,6 @@ void TitleScene::Update() {
 	// シーンチェンジしていない時の処理
 	else {
 
-		if (!audio_->IsPlaying(titleBGM_)) {
-			audio_->StopWave(titleHandle_);
-			titleHandle_ = audio_->PlayWave(titleBGM_, true, option->m_bgmVol);
-		}
-
 		option->Update();
 
 		// シーンチェンジ
@@ -149,7 +148,9 @@ void TitleScene::Update() {
 			// 遷移先のシーンをゲームにする
 			transition_->SetNextScene(GAME);
 			audio_->PlayWave(debugSE_);
-			audio_->StopWave(titleHandle_);
+			if (audio_->IsPlaying(titleHandle_)) {
+				audio_->StopWave(titleHandle_);
+			}
 		}
 	}
 

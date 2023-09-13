@@ -293,7 +293,7 @@ void GameScene::Update() {
 		    transition_->GetFadeIn() && transition_->GetNextScene() == GAME && stageCount_ == 0) {
 			transition_->SetIsChangeScene(false);
 			transition_->Reset();
-			gameHandale_ = audio_->PlayWave(gameBGM_, true, option->m_bgmVol);
+			gameHandale_ = audio_->PlayWave(gameBGM_, true, option->m_bgmVol * 0.8f);
 		} else if (transition_->GetFadeIn() && transition_->GetNextScene() == GAME) {
 			transition_->SetIsChangeScene(false);
 			transition_->Reset();
