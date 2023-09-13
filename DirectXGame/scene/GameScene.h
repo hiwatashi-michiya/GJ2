@@ -151,6 +151,11 @@ private: // メンバ変数
 	uint32_t enemyMoveMassTex_ = 0u;
 	uint32_t frameTex_ = 0u;
 	uint32_t nextTex_ = 0u;
+	uint32_t ctrPadTex_ = 0u;
+	uint32_t ctrKeyTex_ = 0u;
+
+	// スプライト
+	Sprite* ctrSprite_ = nullptr;
 	uint32_t clearTex_ = 0u;
 	uint32_t gameoverTex_ = 0u;
 	uint32_t petalTex_ = 0u;
@@ -162,7 +167,8 @@ private: // メンバ変数
 	// SE
 	uint32_t damageSE_ = 0u;
 	uint32_t damageHandle_ = 0u;
-
+	uint32_t moveSE_ = 0u;
+	uint32_t moveHandle_ = 0u;
 
 	// オプション
 	Option* option = Option::GetInstance();
