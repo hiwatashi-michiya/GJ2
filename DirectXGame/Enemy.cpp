@@ -609,6 +609,7 @@ void Enemy::SetGridPosition(int x, int z) {
 	worldTransform_.UpdateMatrix();
 	SetGrid(x, z);
 	collisionManager_->SetCollision(GetGridX(), GetGridZ());
+	moveEffect_.SetStartPosition(worldTransform_.translation_);
 
 }
 
