@@ -80,6 +80,8 @@ void GameScene::Initialize() {
 	playerSpecialAttackTex_ = TextureManager::Load("attack/playerspecialattack.png");
 	enemySpecialAttackTex_ = TextureManager::Load("attack/enemyspecialattack.png");
 	optionTex_ = TextureManager::Load("UI/option.png");
+	AtitleTex_ = TextureManager::Load("UI/Atitle.png");
+	AnextTex_ = TextureManager::Load("UI/Anext.png");
 
 	// スプライト
 	ctrSprite_ = Sprite::Create(ctrKeyTex_, {0.0f, 0.0f});
@@ -91,6 +93,24 @@ void GameScene::Initialize() {
 	    },
 	    {720.0f, 1280.0f});
 	ctrSprite_->SetPosition({1040.0f, 0.00f});
+
+	AnextSprite_.reset(Sprite::Create(AnextTex_, {300.0f, 380.0f}));
+	AnextSprite_->SetSize({680.0f, 360.0f});
+	AnextSprite_->SetTextureRect(
+	    {
+	        0.0f,
+	        0.0f,
+	    },
+	    {2560.0f, 1440.0f});
+
+	AtitleSprite_.reset(Sprite::Create(AtitleTex_, {300.0f, 380.0f}));
+	AtitleSprite_->SetSize({680.0f, 360.0f});
+	AtitleSprite_->SetTextureRect(
+	    {
+	        0.0f,
+	        0.0f,
+	    },
+	    {2560.0f, 1440.0f});
 
 	// SE
 	damageSE_ = audio_->LoadWave("SE/damage.wav");
@@ -297,7 +317,7 @@ void GameScene::Update() {
 		} else if (transition_->GetFadeIn() && transition_->GetNextScene() == GAME) {
 			transition_->SetIsChangeScene(false);
 			transition_->Reset();
-			//gameHandale_ = audio_->PlayWave(gameBGM_, true, option->m_bgmVol * 0.8f);
+			// gameHandale_ = audio_->PlayWave(gameBGM_, true, option->m_bgmVol * 0.8f);
 		}
 		// ゲームシーンへのフェードインが完了したら
 		else {
@@ -313,7 +333,6 @@ void GameScene::Update() {
 				option->isMenuOverlay_ = false;
 				audio_->PlayWave(optionCloseSE_, false, option->m_seVol * 0.8f);
 			}
-				
 
 			audio_->SetVolume(gameHandale_, option->m_bgmVol * 0.8f * 0.5f);
 
@@ -414,7 +433,7 @@ void GameScene::Update() {
 						effectMass_[z][x].SetEffectType(Up);
 						effectMass_[z][x].SetEffect();
 
-						switch (collisionManager_->GetAttackMass(x,z)) {
+						switch (collisionManager_->GetAttackMass(x, z)) {
 						default:
 						case 1:
 							effectMass_[z][x].SetTexture(3, playerAttackTex_);
@@ -429,7 +448,6 @@ void GameScene::Update() {
 							effectMass_[z][x].SetTexture(3, enemySpecialAttackTex_);
 							break;
 						}
-
 					}
 				}
 			}
@@ -474,7 +492,6 @@ void GameScene::Update() {
 	if (isStageTransition_) {
 	    transition_->Update();
 	}*/
-
 }
 
 void GameScene::Draw() {
@@ -563,7 +580,7 @@ void GameScene::Draw() {
 			enemy->DrawUI();
 		}
 	}
-	
+
 	optionSprite_->Draw();
 
 	if (isGameClear_) {
@@ -573,12 +590,12 @@ void GameScene::Draw() {
 				petalSprite_[i]->Draw();
 			}
 		}
+		AnextSprite_->Draw();
 	}
 	if (isGameOver_) {
 		gameoverSprite_->Draw();
+		AtitleSprite_->Draw();
 	}
-
-	
 
 	option->Draw();
 

@@ -161,10 +161,14 @@ private: // メンバ変数
 	uint32_t clearTex_ = 0u;
 	uint32_t gameoverTex_ = 0u;
 	uint32_t petalTex_ = 0u;
+	uint32_t AnextTex_ = 0u;
+	uint32_t AtitleTex_ = 0u;
 
 	// スプライト
 	Sprite* ctrSprite_ = nullptr;
 	std::unique_ptr<Sprite> optionSprite_ = nullptr;
+	std::unique_ptr<Sprite> AnextSprite_ = nullptr;
+	std::unique_ptr<Sprite> AtitleSprite_ = nullptr;
 
 	// BGM
 	uint32_t gameBGM_ = 0u;
