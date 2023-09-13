@@ -325,7 +325,8 @@ void Player::Update(const ViewProjection& viewProjection) {
 		// 行動選択
 		if (isSelect_) {
 
-		if ((input_->TriggerKey(DIK_UP) || option_->GetActionTrigger(U_SELECT)) &&
+		if ((input_->TriggerKey(DIK_W) || input_->TriggerKey(DIK_UP) ||
+			     option_->GetActionTrigger(U_SELECT)) &&
 			    inputCoolTimer_ == 0 && moveCommands_.size() < kMaxCommand) {
 
 				if (selectNum_ > 0) {
@@ -343,7 +344,8 @@ void Player::Update(const ViewProjection& viewProjection) {
 			}
 
 		else if (
-		    (input_->TriggerKey(DIK_DOWN) || option_->GetActionTrigger(D_SELECT)) &&
+			(input_->TriggerKey(DIK_S) || input_->TriggerKey(DIK_DOWN) ||
+			 option_->GetActionTrigger(D_SELECT)) &&
 			inputCoolTimer_ == 0 && moveCommands_.size() < kMaxCommand) {
 
 				if (selectNum_ < selectCommands_.size() - 1) {
@@ -360,7 +362,7 @@ void Player::Update(const ViewProjection& viewProjection) {
 			}
 
 		// スペシャルカウントが溜まっていたら特殊攻撃可能にする
-		if (specialCount_ >= kMaxSpecialCount && option_->GetActionTrigger(SPECIAL)) {
+		if (specialCount_ >= kMaxSpecialCount && (option_->GetActionTrigger(SPECIAL)||input_->TriggerKey(DIK_E))) {
 
 				// 攻撃、ガードコマンドリセット
 				for (int i = 0; i < kMaxCommand; i++) {
