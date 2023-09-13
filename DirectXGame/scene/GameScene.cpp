@@ -137,6 +137,7 @@ void GameScene::Initialize() {
 	moveHandle_ = moveSE_;
 	optionOpenSE_ = audio_->LoadWave("SE/optionopen.wav");
 	optionCloseSE_ = audio_->LoadWave("SE/optionclose.wav");
+	guardSE_ = audio_->LoadWave("SE/guard.wav");
 
 	clearSprite_.reset(Sprite::Create(clearTex_, {0.0f, 0.0f}));
 	clearSprite_->SetSize({1280.0f, 720.0f});
@@ -407,6 +408,8 @@ void GameScene::Update() {
 				// シーンチェンジ
 				if ((input_->TriggerKey(DIK_RETURN) || option->GetActionTrigger(ACT))) {
 
+					audio_->PlayWave(guardSE_, false, option->m_seVol * 1.2f);
+					
 					transition_->SetIsChangeScene(true);
 					// 遷移先のシーンをゲームにする
 					if (isGameClear_ && stageCount_ < 2) {
