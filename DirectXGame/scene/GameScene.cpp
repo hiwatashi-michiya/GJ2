@@ -75,6 +75,10 @@ void GameScene::Initialize() {
 	petalTex_ = TextureManager::Load("UI/petal.png");
 	ctrKeyTex_ = TextureManager::Load("UI/ctrKey.png");
 	ctrPadTex_ = TextureManager::Load("UI/ctrPad.png");
+	playerAttackTex_ = TextureManager::Load("attack/playerattack.png");
+	enemyAttackTex_ = TextureManager::Load("attack/enemyattack.png");
+	playerSpecialAttackTex_ = TextureManager::Load("attack/playerspecialattack.png");
+	enemySpecialAttackTex_ = TextureManager::Load("attack/enemyspecialattack.png");
 
 	// スプライト
 	ctrSprite_ = Sprite::Create(ctrKeyTex_, {0.0f, 0.0f});
@@ -395,6 +399,23 @@ void GameScene::Update() {
 						effectMass_[z][x].Reset(60 / gameSpeed_->GetGameSpeed());
 						effectMass_[z][x].SetEffectType(Up);
 						effectMass_[z][x].SetEffect();
+
+						switch (collisionManager_->GetAttackMass(x,z)) {
+						default:
+						case 1:
+							effectMass_[z][x].SetTexture(3, playerAttackTex_);
+							break;
+						case 2:
+							effectMass_[z][x].SetTexture(3, enemyAttackTex_);
+							break;
+						case 3:
+							effectMass_[z][x].SetTexture(3, playerSpecialAttackTex_);
+							break;
+						case 4:
+							effectMass_[z][x].SetTexture(3, enemySpecialAttackTex_);
+							break;
+						}
+
 					}
 				}
 			}

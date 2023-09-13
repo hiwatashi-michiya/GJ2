@@ -153,6 +153,10 @@ private: // メンバ変数
 	uint32_t nextTex_ = 0u;
 	uint32_t ctrPadTex_ = 0u;
 	uint32_t ctrKeyTex_ = 0u;
+	uint32_t playerAttackTex_ = 0u;
+	uint32_t enemyAttackTex_ = 0u;
+	uint32_t playerSpecialAttackTex_ = 0u;
+	uint32_t enemySpecialAttackTex_ = 0u;
 
 	// スプライト
 	Sprite* ctrSprite_ = nullptr;
